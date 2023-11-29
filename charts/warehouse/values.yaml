@@ -60,6 +60,50 @@ opal:
   dataSources:
     config: []
 
+bundler:
+  image:
+    repository: ghcr.io/garryod/authz-bundler
+    pullPolicy: IfNotPresent
+    tag: 0.7.4
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    create: false
+    annotations: {}
+    name: ""
+    podAnnotations: {}
+
+  podSecurityContext: {}
+
+  securityContext: {}
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+
+  resources: {}
+
+  autoscaling:
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  affinity: {}
+
+  tolerations: []
+
 kafka:
   enabled: true
 
