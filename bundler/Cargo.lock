@@ -180,6 +180,8 @@ dependencies = [
  "clap",
  "dotenvy",
  "flate2",
+ "serde",
+ "serde_json",
  "tar",
  "tokio",
  "tracing",
