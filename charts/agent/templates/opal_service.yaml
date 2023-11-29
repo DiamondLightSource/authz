@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "opal.fullname" . }}
+  labels:
+    {{- include "opal.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.opal.service.type }}
+  ports:
+    - port: {{ .Values.opal.service.port }}
+      targetPort: opa-http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "opal.selectorLabels" . | nindent 4 }}

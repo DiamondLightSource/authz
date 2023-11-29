@@ -1,0 +1,30 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "opal.fullname" . }}
+  labels:
+    {{- include "opal.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "opal.fullname" . }}
+  minReplicas: {{ .Values.opal.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.opal.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.opal.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.opal.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.opal.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.opal.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}

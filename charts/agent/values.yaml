@@ -1,0 +1,44 @@
+opal:
+  image:
+    repository: docker.io/permitio/opal-client
+    pullPolicy: IfNotPresent
+    tag: 0.7.4
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  server:
+    url: http://tests-warehouse-opal-server.enu43627
+
+  serviceAccount:
+    create: false
+    annotations: {}
+    name: ""
+
+  podAnnotations: {}
+
+  podSecurityContext: {}
+
+  securityContext: {}
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources: {}
+
+  replicaCount: 1
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
