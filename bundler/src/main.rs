@@ -1,3 +1,6 @@
+mod bundle;
+
+use crate::bundle::{Bundle, NoMetadata};
 use axum::{
     body::Bytes,
     http::StatusCode,
@@ -6,9 +9,7 @@ use axum::{
     serve, Router,
 };
 use clap::Parser;
-use flate2::{write::GzEncoder, Compression};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
-use tar::Header;
 use tokio::net::TcpListener;
 use tracing_subscriber::EnvFilter;
 
@@ -54,14 +55,6 @@ impl IntoResponse for BundleError {
 }
 
 async fn bundle_endpoint() -> Result<Bytes, BundleError> {
-    let mut bundle_builder = tar::Builder::new(GzEncoder::new(Vec::new(), Compression::default()));
-
-    let data = r#"{"hello":"world"}"#.as_bytes();
-    let mut data_header = Header::new_gnu();
-    data_header.set_size(data.len() as u64);
-    data_header.set_cksum();
-
-    bundle_builder.append_data(&mut data_header, "diamond/data.json", data)?;
-
-    Ok(bundle_builder.into_inner()?.finish()?.into())
+    let bundle = Bundle::new(NoMetadata);
+    Ok(bundle.to_tar_gz()?.into())
 }
