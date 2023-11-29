@@ -15,7 +15,7 @@ use tracing_subscriber::EnvFilter;
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about= None)]
 struct Cli {
-    #[arg(short, long, default_value_t = 80)]
+    #[arg(short, long, env = "BUNDLER_PORT", default_value_t = 80)]
     port: u16,
 }
 
