@@ -1,0 +1,75 @@
+opal:
+  image:
+    repository: docker.io/permitio/opal-server
+    pullPolicy: IfNotPresent
+    tag: 0.7.4
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  serviceAccount:
+    create: false
+    annotations: {}
+    name: ""
+    podAnnotations: {}
+
+  podSecurityContext: {}
+
+  securityContext: {}
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts: []
+    tls: []
+
+  resources: {}
+
+  autoscaling:
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  affinity: {}
+
+  tolerations: []
+
+  broadcast:
+    uri: kafka://{{ .Release.Name }}-kafka:9092
+    secret:
+      name: "{{ .Release.Name }}-kafka-user-passwords"
+      key: client-passwords
+
+  policy:
+    url: git@github.com:garryod/authz.git
+    sshKeySecret:
+      name: github
+      key: ssh-key
+    path: org-policy
+    branch: main
+    pollingInterval: 60
+
+  dataSources:
+    config: []
+
+kafka:
+  enabled: true
+
+  serviceAccount:
+    create: false
+
+  controller:
+    replicaCount: 1
+
+  broker:
+    persistence:
+      enabled: false
+
