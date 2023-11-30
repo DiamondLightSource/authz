@@ -15,7 +15,8 @@ use permissionables::{proposals::Proposals, sessions::Sessions};
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use tokio::net::TcpListener;
-use tracing_subscriber::EnvFilter;
+use tower_http::trace::TraceLayer;
+use tracing_subscriber::util::SubscriberInitExt;
 use url::Url;
 
 #[derive(Debug, Parser)]
@@ -25,6 +26,8 @@ struct Cli {
     port: u16,
     #[arg(long, env = "BUNDLER_DATABASE_URL")]
     database_url: Url,
+    #[arg(long, env = "BUNDLER_LOG_LEVEL", default_value_t = tracing::Level::INFO)]
+    log_level: tracing::Level,
 }
 
 #[tokio::main]
@@ -32,10 +35,10 @@ async fn main() {
     dotenvy::dotenv().ok();
     let args = Cli::parse();
 
-    let tracing_subscriber = tracing_subscriber::FmtSubscriber::builder()
-        .with_env_filter(EnvFilter::from_default_env())
-        .finish();
-    tracing::subscriber::set_global_default(tracing_subscriber).unwrap();
+    tracing_subscriber::FmtSubscriber::builder()
+        .with_max_level(args.log_level)
+        .finish()
+        .init();
 
     let pool = MySqlPoolOptions::new()
         .connect(args.database_url.as_str())
@@ -43,6 +46,7 @@ async fn main() {
         .unwrap();
     let app = Router::new()
         .route("/bundle.tar.gz", get(bundle_endpoint))
+        .layer(TraceLayer::new_for_http())
         .with_state(pool);
     let socket_addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(socket_addr).await.unwrap();
