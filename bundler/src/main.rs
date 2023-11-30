@@ -1,23 +1,30 @@
 mod bundle;
+mod permissionables;
 
 use crate::bundle::{Bundle, NoMetadata};
 use axum::{
     body::Bytes,
+    extract::State,
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::get,
     serve, Router,
 };
 use clap::Parser;
+use permissionables::proposals::Proposals;
+use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use tokio::net::TcpListener;
 use tracing_subscriber::EnvFilter;
+use url::Url;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about= None)]
 struct Cli {
     #[arg(short, long, env = "BUNDLER_PORT", default_value_t = 80)]
     port: u16,
+    #[arg(long, env = "BUNDLER_DATABASE_URL")]
+    database_url: Url,
 }
 
 #[tokio::main]
@@ -30,7 +37,13 @@ async fn main() {
         .finish();
     tracing::subscriber::set_global_default(tracing_subscriber).unwrap();
 
-    let app = Router::new().route("/bundle.tar.gz", get(bundle_endpoint));
+    let pool = MySqlPoolOptions::new()
+        .connect(args.database_url.as_str())
+        .await
+        .unwrap();
+    let app = Router::new()
+        .route("/bundle.tar.gz", get(bundle_endpoint))
+        .with_state(pool);
     let socket_addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(socket_addr).await.unwrap();
     serve(listener, app).await.unwrap();
@@ -54,7 +67,8 @@ impl IntoResponse for BundleError {
     }
 }
 
-async fn bundle_endpoint() -> Result<Bytes, BundleError> {
-    let bundle = Bundle::new(NoMetadata);
+async fn bundle_endpoint(State(pool): State<MySqlPool>) -> Result<Bytes, BundleError> {
+    let proposals = Proposals::fetch(&pool).await?;
+    let bundle = Bundle::new(NoMetadata, proposals);
     Ok(bundle.to_tar_gz()?.into())
 }
