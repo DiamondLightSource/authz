@@ -40,7 +40,6 @@ jobs:
         uses: docker/build-push-action@v5.1.0
         with:
           context: bundler/
-          target: ${{ matrix.target }}
           push: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
           load: ${{ !(github.event_name == 'push' && startsWith(github.ref, 'refs/tags')) }}
           tags: ${{ steps.meta.outputs.tags }}
