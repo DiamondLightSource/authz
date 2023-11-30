@@ -11,7 +11,7 @@ use axum::{
     serve, Router,
 };
 use clap::Parser;
-use permissionables::proposals::Proposals;
+use permissionables::{proposals::Proposals, sessions::Sessions};
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use tokio::net::TcpListener;
@@ -69,6 +69,7 @@ impl IntoResponse for BundleError {
 
 async fn bundle_endpoint(State(pool): State<MySqlPool>) -> Result<Bytes, BundleError> {
     let proposals = Proposals::fetch(&pool).await?;
-    let bundle = Bundle::new(NoMetadata, proposals);
+    let sessions = Sessions::fetch(&pool).await?;
+    let bundle = Bundle::new(NoMetadata, proposals, sessions);
     Ok(bundle.to_tar_gz()?.into())
 }
