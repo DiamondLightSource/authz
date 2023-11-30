@@ -1,5 +1,7 @@
 FROM docker.io/library/rust:1.74.0-bullseye AS build
 
+ARG DATABASE_URL
+
 WORKDIR /app
 
 RUN cargo init
