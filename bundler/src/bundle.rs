@@ -1,4 +1,4 @@
-use crate::permissionables::proposals::Proposals;
+use crate::permissionables::{proposals::Proposals, sessions::Sessions};
 use flate2::{write::GzEncoder, Compression};
 use serde::Serialize;
 use tar::Header;
@@ -42,13 +42,14 @@ where
 {
     manifest: Manifest<Metadata>,
     proposals: Proposals,
+    sessions: Sessions,
 }
 
 impl<Metadata> Bundle<Metadata>
 where
     Metadata: Serialize,
 {
-    pub fn new(metadata: Metadata, proposals: Proposals) -> Self {
+    pub fn new(metadata: Metadata, proposals: Proposals, sessions: Sessions) -> Self {
         Self {
             manifest: Manifest {
                 revision: "v0.1.0".to_string(),
@@ -57,6 +58,7 @@ where
                 metadata,
             },
             proposals,
+            sessions,
         }
     }
 
@@ -74,6 +76,14 @@ where
             &mut proposals_header,
             "diamond/users/proposals.json",
             proposals.as_slice(),
+        )?;
+
+        let sessions = serde_json::to_vec(&self.sessions)?;
+        let mut sessions_header = Header::from_bytes(&sessions);
+        bundle_builder.append_data(
+            &mut sessions_header,
+            "diamond/users/sessions.json",
+            sessions.as_slice(),
         )?;
 
         Ok(bundle_builder.into_inner()?.finish()?)
