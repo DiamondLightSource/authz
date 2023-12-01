@@ -13,15 +13,22 @@ impl Sessions {
             SELECT
                 personId as person_id,
                 sessionId as session_id
-            FROM Session_has_Person
+            FROM
+                Session_has_Person
             UNION
             SELECT
-                personId as person_id,
-                sessionId as session_id
-            FROM ProposalHasPerson
+                BLSession.proposalId,
+                sessionId
+            FROM (
+                    SELECT
+                        DISTINCT proposalId,
+                        personId
+                    FROM
+                        ProposalHasPerson
+                ) AS UniqueProposalHasPerson
                 CROSS JOIN BLSession
             WHERE
-                ProposalHasPerson.proposalId = BLSession.proposalId
+                UniqueProposalHasPerson.proposalId = BLSession.proposalId
             "
         )
         .fetch_all(pool)
