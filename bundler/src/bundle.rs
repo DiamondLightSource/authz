@@ -1,6 +1,7 @@
 use crate::permissionables::{proposals::Proposals, sessions::Sessions};
 use flate2::{write::GzEncoder, Compression};
 use serde::Serialize;
+use sqlx::MySqlPool;
 use tar::Header;
 
 #[derive(Debug, Serialize)]
@@ -60,6 +61,12 @@ where
             proposals,
             sessions,
         }
+    }
+
+    pub async fn fetch(metadata: Metadata, ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
+        let proposals = Proposals::fetch(ispyb_pool).await?;
+        let sessions = Sessions::fetch(ispyb_pool).await?;
+        Ok(Self::new(metadata, proposals, sessions))
     }
 
     pub fn to_tar_gz(&self) -> Result<Vec<u8>, anyhow::Error> {

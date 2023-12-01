@@ -6,7 +6,7 @@ use std::collections::HashMap;
 pub struct Proposals(HashMap<u32, Vec<u32>>);
 
 impl Proposals {
-    pub async fn fetch(pool: &MySqlPool) -> Result<Self, sqlx::Error> {
+    pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let proposal_rows = query_as!(
             ProposalRow,
             "
@@ -16,7 +16,7 @@ impl Proposals {
             FROM ProposalHasPerson
             "
         )
-        .fetch_all(pool)
+        .fetch_all(ispyb_pool)
         .await?;
 
         Ok(proposal_rows.into_iter().collect())
