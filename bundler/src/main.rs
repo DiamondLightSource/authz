@@ -11,9 +11,12 @@ use axum::{
     serve, Router,
 };
 use clap::Parser;
-use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
-use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
-use tokio::net::TcpListener;
+use sqlx::mysql::MySqlPoolOptions;
+use std::{
+    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
+    sync::Arc,
+};
+use tokio::{net::TcpListener, sync::RwLock};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::util::SubscriberInitExt;
 use url::Url;
@@ -29,6 +32,8 @@ struct Cli {
     log_level: tracing::Level,
 }
 
+type CurrentBundle = Arc<RwLock<Bundle<NoMetadata>>>;
+
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().ok();
@@ -43,10 +48,13 @@ async fn main() {
         .connect(args.database_url.as_str())
         .await
         .unwrap();
+    let current_bundle = Arc::new(RwLock::new(
+        Bundle::fetch(NoMetadata, &ispyb_pool).await.unwrap(),
+    ));
     let app = Router::new()
         .route("/bundle.tar.gz", get(bundle_endpoint))
         .layer(TraceLayer::new_for_http())
-        .with_state(ispyb_pool);
+        .with_state(current_bundle);
     let socket_addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(socket_addr).await.unwrap();
     serve(listener, app).await.unwrap();
@@ -70,7 +78,8 @@ impl IntoResponse for BundleError {
     }
 }
 
-async fn bundle_endpoint(State(ispyb_pool): State<MySqlPool>) -> Result<Bytes, BundleError> {
-    let bundle = Bundle::fetch(NoMetadata, &ispyb_pool).await?;
-    Ok(bundle.to_tar_gz()?.into())
+async fn bundle_endpoint(
+    State(current_bundle): State<CurrentBundle>,
+) -> Result<Bytes, BundleError> {
+    Ok(current_bundle.as_ref().read().await.to_tar_gz()?.into())
 }
