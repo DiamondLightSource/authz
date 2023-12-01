@@ -11,7 +11,6 @@ use axum::{
     serve, Router,
 };
 use clap::Parser;
-use permissionables::{proposals::Proposals, sessions::Sessions};
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 use tokio::net::TcpListener;
@@ -40,14 +39,14 @@ async fn main() {
         .finish()
         .init();
 
-    let pool = MySqlPoolOptions::new()
+    let ispyb_pool = MySqlPoolOptions::new()
         .connect(args.database_url.as_str())
         .await
         .unwrap();
     let app = Router::new()
         .route("/bundle.tar.gz", get(bundle_endpoint))
         .layer(TraceLayer::new_for_http())
-        .with_state(pool);
+        .with_state(ispyb_pool);
     let socket_addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(socket_addr).await.unwrap();
     serve(listener, app).await.unwrap();
@@ -71,9 +70,7 @@ impl IntoResponse for BundleError {
     }
 }
 
-async fn bundle_endpoint(State(pool): State<MySqlPool>) -> Result<Bytes, BundleError> {
-    let proposals = Proposals::fetch(&pool).await?;
-    let sessions = Sessions::fetch(&pool).await?;
-    let bundle = Bundle::new(NoMetadata, proposals, sessions);
+async fn bundle_endpoint(State(ispyb_pool): State<MySqlPool>) -> Result<Bytes, BundleError> {
+    let bundle = Bundle::fetch(NoMetadata, &ispyb_pool).await?;
     Ok(bundle.to_tar_gz()?.into())
 }

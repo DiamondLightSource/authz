@@ -6,7 +6,7 @@ use std::collections::HashMap;
 pub struct Sessions(HashMap<u32, Vec<u32>>);
 
 impl Sessions {
-    pub async fn fetch(pool: &MySqlPool) -> Result<Self, sqlx::Error> {
+    pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let session_rows = query_as!(
             SessionRow,
             "
@@ -31,7 +31,7 @@ impl Sessions {
                 UniqueProposalHasPerson.proposalId = BLSession.proposalId
             "
         )
-        .fetch_all(pool)
+        .fetch_all(ispyb_pool)
         .await?;
 
         Ok(session_rows.into_iter().collect())
