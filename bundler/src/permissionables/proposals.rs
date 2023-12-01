@@ -10,7 +10,7 @@ impl Proposals {
         let proposal_rows = query_as!(
             ProposalRow,
             "
-            SELECT
+            SELECT DISTINCT
                 proposalId as proposal_id,
                 personId as person_id
             FROM ProposalHasPerson
