@@ -13,12 +13,11 @@ impl Sessions {
             SELECT
                 personId as person_id,
                 sessionId as session_id
-            FROM
-                Session_has_Person
+            FROM Session_has_Person
             UNION
             SELECT
-                BLSession.proposalId,
-                sessionId
+                personId as person_id,
+                sessionId as session_id
             FROM (
                     SELECT
                         DISTINCT proposalId,
