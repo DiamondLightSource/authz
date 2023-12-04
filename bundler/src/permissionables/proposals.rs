@@ -2,7 +2,7 @@ use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::HashMap;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct Proposals(HashMap<u32, Vec<u32>>);
 
 impl Proposals {
@@ -40,5 +40,31 @@ impl FromIterator<ProposalRow> for Proposals {
         }
 
         Self(proposals)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Proposals;
+    use sqlx::MySqlPool;
+    use std::collections::HashMap;
+
+    #[sqlx::test(migrations = "tests/migrations")]
+    async fn fetch_empty(ispyb_pool: MySqlPool) {
+        let proposals = Proposals::fetch(&ispyb_pool).await.unwrap();
+        let expected = Proposals(HashMap::new());
+        assert_eq!(expected, proposals);
+    }
+
+    #[sqlx::test(
+        migrations = "tests/migrations",
+        fixtures(path = "../../tests/fixtures", scripts("proposal_membership"))
+    )]
+    async fn fetch_some(ispyb_pool: MySqlPool) {
+        let proposals = Proposals::fetch(&ispyb_pool).await.unwrap();
+        let mut expected = Proposals(HashMap::new());
+        expected.0.insert(10, vec![100, 101, 102]);
+        expected.0.insert(11, vec![100]);
+        assert_eq!(expected, proposals);
     }
 }
