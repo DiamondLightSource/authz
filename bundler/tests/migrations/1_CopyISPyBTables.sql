@@ -1,0 +1,1 @@
+CREATE TABLE ProposalHasPerson LIKE ispyb_build.ProposalHasPerson;
