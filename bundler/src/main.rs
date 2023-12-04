@@ -11,12 +11,18 @@ use axum::{
     serve, Router,
 };
 use clap::Parser;
-use sqlx::mysql::MySqlPoolOptions;
+use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
+    ops::Add,
     sync::Arc,
+    time::Duration,
 };
-use tokio::{net::TcpListener, sync::RwLock};
+use tokio::{
+    net::TcpListener,
+    sync::RwLock,
+    time::{sleep_until, Instant},
+};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::util::SubscriberInitExt;
 use url::Url;
@@ -30,6 +36,8 @@ struct Cli {
     database_url: Url,
     #[arg(long, env = "BUNDLER_LOG_LEVEL", default_value_t = tracing::Level::INFO)]
     log_level: tracing::Level,
+    #[arg(long, env = "BUNDLER_POLLING_INTERVAL", default_value_t=humantime::Duration::from(Duration::from_secs(60)))]
+    polling_interval: humantime::Duration,
 }
 
 type CurrentBundle = Arc<RwLock<Bundle<NoMetadata>>>;
@@ -44,12 +52,19 @@ async fn main() {
         .finish()
         .init();
 
-    let ispyb_pool = MySqlPoolOptions::new()
-        .connect(args.database_url.as_str())
-        .await
-        .unwrap();
+    let ispyb_pool = Arc::new(
+        MySqlPoolOptions::new()
+            .connect(args.database_url.as_str())
+            .await
+            .unwrap(),
+    );
     let current_bundle = Arc::new(RwLock::new(
         Bundle::fetch(NoMetadata, &ispyb_pool).await.unwrap(),
+    ));
+    tokio::task::spawn(update_bundle(
+        current_bundle.clone(),
+        ispyb_pool.clone(),
+        args.polling_interval.into(),
     ));
     let app = Router::new()
         .route("/bundle.tar.gz", get(bundle_endpoint))
@@ -58,6 +73,22 @@ async fn main() {
     let socket_addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, args.port));
     let listener = TcpListener::bind(socket_addr).await.unwrap();
     serve(listener, app).await.unwrap();
+}
+
+async fn update_bundle(
+    current_bundle: impl AsRef<RwLock<Bundle<NoMetadata>>>,
+    ispyb_pool: impl AsRef<MySqlPool> + Clone,
+    polling_interval: Duration,
+) {
+    let mut next_fetch = Instant::now().add(polling_interval);
+    loop {
+        sleep_until(next_fetch).await;
+        next_fetch = next_fetch.add(polling_interval);
+        *current_bundle.as_ref().write().await =
+            Bundle::fetch(NoMetadata, ispyb_pool.clone().as_ref())
+                .await
+                .unwrap();
+    }
 }
 
 struct BundleError(anyhow::Error);
