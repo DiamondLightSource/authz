@@ -2,7 +2,7 @@ use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::HashMap;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, PartialEq, Eq, Serialize)]
 pub struct Sessions(HashMap<u32, Vec<u32>>);
 
 impl Sessions {
@@ -54,5 +54,61 @@ impl FromIterator<SessionRow> for Sessions {
         }
 
         Self(sessions)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Sessions;
+    use sqlx::MySqlPool;
+    use std::collections::HashMap;
+
+    #[sqlx::test(migrations = "tests/migrations")]
+    async fn fetch_empty(ispyb_pool: MySqlPool) {
+        let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
+        let expected = Sessions(HashMap::new());
+        assert_eq!(expected, sessions);
+    }
+
+    #[sqlx::test(
+        migrations = "tests/migrations",
+        fixtures(path = "../../tests/fixtures", scripts("session_membership"))
+    )]
+    async fn fetch_direct(ispyb_pool: MySqlPool) {
+        let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
+        let mut expected = Sessions(HashMap::new());
+        expected.0.insert(10, vec![1000, 1001]);
+        expected.0.insert(11, vec![1000]);
+        assert_eq!(expected, sessions);
+    }
+
+    #[sqlx::test(
+        migrations = "tests/migrations",
+        fixtures(
+            path = "../../tests/fixtures",
+            scripts("proposal_membership", "beamline_sessions")
+        )
+    )]
+    async fn fetch_indirect(ispyb_pool: MySqlPool) {
+        let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
+        let mut expected = Sessions(HashMap::new());
+        expected.0.insert(10, vec![1002, 1003, 1004]);
+        expected.0.insert(11, vec![1002, 1003]);
+        assert_eq!(expected, sessions);
+    }
+
+    #[sqlx::test(
+        migrations = "tests/migrations",
+        fixtures(
+            path = "../../tests/fixtures",
+            scripts("session_membership", "proposal_membership", "beamline_sessions")
+        )
+    )]
+    async fn fetch_both(ispyb_pool: MySqlPool) {
+        let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
+        let mut expected = Sessions(HashMap::new());
+        expected.0.insert(10, vec![1000, 1001, 1002, 1003, 1004]);
+        expected.0.insert(11, vec![1000, 1002, 1003]);
+        assert_eq!(expected, sessions);
     }
 }
