@@ -70,8 +70,7 @@ where
     }
 
     pub fn to_tar_gz(&self) -> Result<Vec<u8>, anyhow::Error> {
-        let mut bundle_builder =
-            tar::Builder::new(GzEncoder::new(Vec::new(), Compression::default()));
+        let mut bundle_builder = tar::Builder::new(GzEncoder::new(Vec::new(), Compression::best()));
 
         let manifest = serde_json::to_vec(&self.manifest)?;
         let mut manifest_header = Header::from_bytes(&manifest);
