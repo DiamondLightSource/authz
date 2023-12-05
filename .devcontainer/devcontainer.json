@@ -1,27 +1,21 @@
 {
-    "name": "Policy Admin",
-    "build": {
-        "context": ".",
-        "dockerfile": "Dockerfile"
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-				"ms-kubernetes-tools.vscode-kubernetes-tools",
-				"rust-lang.rust-analyzer",
-				"tamasfe.even-better-toml"
-			]
-        }
-    },
-    "features": {
-        "ghcr.io/devcontainers/features/common-utils:2.2.0": {
-            "username": "none",
-            "upgradePackages":false
-        }
-    },
-    "runArgs": [
-        "--security-opt=label=type:container_runtime_t"
-    ],
-    "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
-    "workspaceFolder": "${localWorkspaceFolder}"
+  "name": "Policy Admin",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "bundler",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2.2.0": {
+      "username": "none",
+      "upgradePackages": false
+    }
+  },
+  "workspaceFolder": "/workspace"
 }
