@@ -11,6 +11,7 @@ use axum::{
     serve, Router,
 };
 use clap::Parser;
+use serde::Serialize;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
@@ -27,6 +28,30 @@ use tower_http::trace::TraceLayer;
 use tracing_subscriber::util::SubscriberInitExt;
 use url::Url;
 
+struct BundleFile<Metadata>
+where
+    Metadata: Serialize,
+{
+    _bundle: Bundle<Metadata>,
+    file: Bytes,
+}
+
+impl<Metadata> TryFrom<Bundle<Metadata>> for BundleFile<Metadata>
+where
+    Metadata: Serialize,
+{
+    type Error = anyhow::Error;
+
+    fn try_from(bundle: Bundle<Metadata>) -> Result<Self, Self::Error> {
+        Ok(Self {
+            file: bundle.to_tar_gz()?.into(),
+            _bundle: bundle,
+        })
+    }
+}
+
+type CurrentBundle = Arc<RwLock<BundleFile<NoMetadata>>>;
+
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about= None)]
 struct Cli {
@@ -39,8 +64,6 @@ struct Cli {
     #[arg(long, env = "BUNDLER_POLLING_INTERVAL", default_value_t=humantime::Duration::from(Duration::from_secs(60)))]
     polling_interval: humantime::Duration,
 }
-
-type CurrentBundle = Arc<RwLock<Bundle<NoMetadata>>>;
 
 #[tokio::main]
 async fn main() {
@@ -59,7 +82,7 @@ async fn main() {
             .unwrap(),
     );
     let current_bundle = Arc::new(RwLock::new(
-        Bundle::fetch(NoMetadata, &ispyb_pool).await.unwrap(),
+        BundleFile::try_from(Bundle::fetch(NoMetadata, &ispyb_pool).await.unwrap()).unwrap(),
     ));
     tokio::task::spawn(update_bundle(
         current_bundle.clone(),
@@ -76,7 +99,7 @@ async fn main() {
 }
 
 async fn update_bundle(
-    current_bundle: impl AsRef<RwLock<Bundle<NoMetadata>>>,
+    current_bundle: impl AsRef<RwLock<BundleFile<NoMetadata>>>,
     ispyb_pool: impl AsRef<MySqlPool> + Clone,
     polling_interval: Duration,
 ) {
@@ -84,10 +107,11 @@ async fn update_bundle(
     loop {
         sleep_until(next_fetch).await;
         next_fetch = next_fetch.add(polling_interval);
-        *current_bundle.as_ref().write().await =
-            Bundle::fetch(NoMetadata, ispyb_pool.clone().as_ref())
-                .await
-                .unwrap();
+        let bundle = Bundle::fetch(NoMetadata, ispyb_pool.clone().as_ref())
+            .await
+            .unwrap();
+        let bundle_file = BundleFile::try_from(bundle).unwrap();
+        *current_bundle.as_ref().write().await = bundle_file;
     }
 }
 
@@ -112,5 +136,5 @@ impl IntoResponse for BundleError {
 async fn bundle_endpoint(
     State(current_bundle): State<CurrentBundle>,
 ) -> Result<Bytes, BundleError> {
-    Ok(current_bundle.as_ref().read().await.to_tar_gz()?.into())
+    Ok(current_bundle.as_ref().read().await.file.clone())
 }
