@@ -1,0 +1,46 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: authz-bundler
+  title: Authorization Bundler
+  description: An Open Policy Agent bundle server, providing access to permissionable data from ISPyB
+spec:
+  owner: user:enu43627
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: authz-bundler
+  title: Authorization Bundler
+  description: An Open Policy Agent bundle server, providing access to permissionable data from ISPyB
+  annotations:
+    github.com/project-slug: garryod/authz
+spec:
+  type: service
+  lifecycle: experimental
+  system: authz-bundler
+  owner: user:enu43627
+  dependsOn:
+    - resource:ispyb-database
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: authz-bundler-rest
+  title: Authorization Bundler REST API
+  description: A RESTful API exposing permissionable data from ISPyB in OPA bundle format
+spec:
+  type: openapi
+  lifecycle: experimental
+  system: authz-bundler
+  owner: user:enu43627
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: AuthZ Bundler API
+      version: 0.0.1
+
