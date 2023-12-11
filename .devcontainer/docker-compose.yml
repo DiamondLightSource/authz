@@ -6,12 +6,23 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ..:/workspace:cached,Z
+      - ..:/workspace:cached,z
     command: sleep infinity
     environment:
       DATABASE_URL: mysql://root:rootpassword@ispyb/ispyb_build
       BUNDLER_DATABASE_URL: mysql://root:rootpassword@ispyb/ispyb_build
       BUNDLER_LOG_LEVEL: DEBUG
+
+  opa:
+    image: docker.io/openpolicyagent/opa:0.59.0
+    restart: unless-stopped
+    command: >
+      run
+      --server
+      --watch
+      /org-policy
+    volumes:
+      - ../org-policy/:/org-policy:cached,z
 
   ispyb:
     image: ghcr.io/diamondlightsource/ispyb-database:v3.0.0
