@@ -80,7 +80,7 @@ where
         let mut proposals_header = Header::from_bytes(&proposals);
         bundle_builder.append_data(
             &mut proposals_header,
-            "diamond/users/proposals.json",
+            "diamond/users/proposals/data.json",
             proposals.as_slice(),
         )?;
 
@@ -88,7 +88,7 @@ where
         let mut sessions_header = Header::from_bytes(&sessions);
         bundle_builder.append_data(
             &mut sessions_header,
-            "diamond/users/sessions.json",
+            "diamond/users/sessions/data.json",
             sessions.as_slice(),
         )?;
 
