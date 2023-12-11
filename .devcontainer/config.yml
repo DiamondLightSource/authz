@@ -1,0 +1,11 @@
+services:
+  bundler:
+    url: http://bundler
+
+bundles:
+  permissionables:
+    service: bundler
+    resource: bundle.tar.gz
+    polling:
+      min_delay_seconds: 10
+      max_delay_seconds: 60

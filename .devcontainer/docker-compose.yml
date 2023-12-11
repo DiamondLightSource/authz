@@ -19,9 +19,11 @@ services:
     command: >
       run
       --server
+      --config-file /config.yml
       --watch
       /org-policy
     volumes:
+      - ./config.yml:/config.yml:cached,z
       - ../org-policy/:/org-policy:cached,z
 
   ispyb:
