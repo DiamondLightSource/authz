@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.75"
-axum = { version = "0.7.1" }
+axum = { version = "0.7.2" }
 clap = { version = "4.4.10", features = ["derive", "env"] }
 dotenvy = { version = "0.15.7" }
 flate2 = { version = "1.0.28" }
