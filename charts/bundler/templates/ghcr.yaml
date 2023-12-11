@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJodHRwczovL2doY3IuaW8iOnsidXNlcm5hbWUiOiJnYXJyeW9kIiwicGFzc3dvcmQiOiJnaHBfcXNrZW5KRUp6N2I4dmc3VzhIQ1ZQTm9IbmNvWjd4M01TbjhUIiwiZW1haWwiOiJnYXJyeS5ldWFuLm9kb25uZWxsQG50bHdvcmxkLmNvbSIsImF1dGgiOiJaMkZ5Y25sdlpEcG5hSEJmY1hOclpXNUtSVXA2TjJJNGRtYzNWemhJUTFaUVRtOUlibU52V2pkNE0wMVRiamhVIn19fQ==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: ghcr
+type: kubernetes.io/dockerconfigjson

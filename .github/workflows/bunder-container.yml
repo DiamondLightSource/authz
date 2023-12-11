@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4.1.1
 
       - name: Generate Image Name
-        run: echo IMAGE_REPOSITORY=ghcr.io/$(echo "${{ github.repository_owner }}/bundler" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]') >> $GITHUB_ENV
+        run: echo IMAGE_REPOSITORY=ghcr.io/$(echo "${{ github.repository }}-bundler" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]') >> $GITHUB_ENV
 
       - name: Log in to GitHub Docker Registry
         if: github.event_name != 'pull_request'
