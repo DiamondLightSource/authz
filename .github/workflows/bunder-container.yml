@@ -9,6 +9,9 @@ jobs:
     # Deduplicate jobs from pull requests and branch pushes within the same repo.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     services:
       ispyb:
         image: ghcr.io/diamondlightsource/ispyb-database:v3.0.0
