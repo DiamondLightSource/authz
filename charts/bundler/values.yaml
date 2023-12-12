@@ -1,0 +1,58 @@
+image:
+  repository: ghcr.io/diamondlightsource/authz-bundler
+  pullPolicy: IfNotPresent
+  tag: 0.0.1
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+bundler:
+  database:
+    scheme: mysql
+    host: ispybdbproxy.diamond.ac.uk:4306
+    path: ispyb
+    user: ispyb_ro
+    passwordSecret:
+      name: ispyb
+      key: password
+  pollingInterval: 60s
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+  podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: ""
+  annotations: {}
+  hosts:
+    - host: authz.diamond.ac.uk
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources: {}
+
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+nodeSelector: {}
+
+affinity: {}
+
+tolerations: []
+

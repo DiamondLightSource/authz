@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: ispyb
+  namespace: authz-warehouse
+spec:
+  encryptedData:
+    password: AgAn4fg+aMydw4A+oSkBe1nmRX0VyL1x3Q0k/PuPx/rIV6vBiCYDDYtHqqmO5y1D4eKU787qG+Co8khfgDpqcIF48WotlYcA+g3iEnPcE20XY3ODrxpu0vTg5N4Qv6unRixAFfr6UO0BI07kOGk6Ul5SgpI4L/lkoH9J45weAk0itwvCAfqP7MmuSBkACocDCTSmKQZgC1bqxV3TyN6lq/utaill/Sm3JaBINMChZnB/bECnXL5Wg358iZBjtw+hgOAYPukDHA1QhmTxP54xVXArqYssZ11YlDnUFeslHe+XX1WY+ZqJeIKOCxxA16VesnacQRS+9b67Ono2Cp2esN+FzfmCEFmRcBwV2CMezajvogtyUxuWVLxeRLXEMJWmi5x+yaXU8ZpBAWj/I1ufhI1zA+XOdZUn/AZHMjfgbuzuisYrJQE3DFgveXBSu7hnftwpMDZV9SILIljnt3kS14uDwl0XITAxMfs9fTd/T/yHDDpX/YaIej0tYhn1ShSZXxFbkZ0WYfpDTarmFRQfd5+p2TzNGzyJ5D/+dyGys/GTRQxo6xk9jl6ofC+M82bru8yhzAM2XSQbdsqaUXgyOzfWETitLK7EhM09iCafl5tT8hmo3p9KUK/rKDu+VWuOaz4o7fFBH1TLZ+udcbKFlPSzOhZ4pLH1EaGIWmkgtNhHcoT11munpiuFubpUwo5UFspFnI3P3oRiHWzHQcQ=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: ispyb
+      namespace: authz-warehouse
+
