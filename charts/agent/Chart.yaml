@@ -1,6 +1,0 @@
-apiVersion: v2
-name: agent
-description: An OPA & OPAL Client deployment to run alongside applications requiring authorization
-type: application
-version: 0.1.0
-

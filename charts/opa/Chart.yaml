@@ -1,0 +1,6 @@
+apiVersion: v2
+name: opa
+description: An OPA deployment to run alongside applications requiring authorization
+type: application
+version: 0.1.0
+
