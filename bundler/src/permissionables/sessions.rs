@@ -2,8 +2,8 @@ use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
-pub struct Sessions(HashMap<u32, Vec<u32>>);
+#[derive(Debug, Default, PartialEq, Eq, Serialize)]
+pub struct Sessions(HashMap<u32, Vec<(u32, u32)>>);
 
 impl Sessions {
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
@@ -12,12 +12,16 @@ impl Sessions {
             "
             SELECT
                 personId as person_id,
-                sessionId as session_id
+                proposalId as proposal_id,
+                visit_number
             FROM Session_has_Person
+            JOIN BLSession
+            WHERE Session_has_Person.sessionId = BLSession.sessionId
             UNION
             SELECT
                 personId as person_id,
-                sessionId as session_id
+                BLSession.proposalId as proposal_id,
+                visit_number
             FROM (
                     SELECT
                         DISTINCT proposalId,
@@ -39,21 +43,20 @@ impl Sessions {
 
 struct SessionRow {
     person_id: u32,
-    session_id: u32,
+    proposal_id: u32,
+    visit_number: Option<u32>,
 }
 
 impl FromIterator<SessionRow> for Sessions {
     fn from_iter<T: IntoIterator<Item = SessionRow>>(iter: T) -> Self {
-        let mut sessions = HashMap::<u32, Vec<u32>>::default();
-
+        let mut sessions = Self::default();
         for session_row in iter {
-            sessions
-                .entry(session_row.person_id)
-                .or_default()
-                .push(session_row.session_id);
+            sessions.0.entry(session_row.person_id).or_default().push((
+                session_row.proposal_id,
+                session_row.visit_number.unwrap_or_default(),
+            ));
         }
-
-        Self(sessions)
+        sessions
     }
 }
 
@@ -72,13 +75,16 @@ mod tests {
 
     #[sqlx::test(
         migrations = "tests/migrations",
-        fixtures(path = "../../tests/fixtures", scripts("session_membership"))
+        fixtures(
+            path = "../../tests/fixtures",
+            scripts("session_membership", "beamline_sessions")
+        )
     )]
     async fn fetch_direct(ispyb_pool: MySqlPool) {
         let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
         let mut expected = Sessions(HashMap::new());
-        expected.0.insert(10, vec![1000, 1001]);
-        expected.0.insert(11, vec![1000]);
+        expected.0.insert(10, vec![(100, 1), (100, 2)]);
+        expected.0.insert(11, vec![(101, 1)]);
         assert_eq!(expected, sessions);
     }
 
@@ -92,8 +98,10 @@ mod tests {
     async fn fetch_indirect(ispyb_pool: MySqlPool) {
         let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
         let mut expected = Sessions(HashMap::new());
-        expected.0.insert(10, vec![1002, 1003, 1004]);
-        expected.0.insert(11, vec![1002, 1003]);
+        expected
+            .0
+            .insert(10, vec![(100, 1), (100, 2), (100, 3), (101, 1), (101, 2)]);
+        expected.0.insert(11, vec![(100, 1), (100, 2), (100, 3)]);
         assert_eq!(expected, sessions);
     }
 
@@ -107,8 +115,12 @@ mod tests {
     async fn fetch_both(ispyb_pool: MySqlPool) {
         let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
         let mut expected = Sessions(HashMap::new());
-        expected.0.insert(10, vec![1000, 1001, 1002, 1003, 1004]);
-        expected.0.insert(11, vec![1000, 1002, 1003]);
+        expected
+            .0
+            .insert(10, vec![(100, 1), (100, 2), (100, 3), (101, 1), (101, 2)]);
+        expected
+            .0
+            .insert(11, vec![(101, 1), (100, 1), (100, 2), (100, 3)]);
         assert_eq!(expected, sessions);
     }
 }
