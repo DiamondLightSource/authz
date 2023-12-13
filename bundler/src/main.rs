@@ -2,14 +2,7 @@ mod bundle;
 mod permissionables;
 
 use crate::bundle::{Bundle, NoMetadata};
-use axum::{
-    body::Bytes,
-    extract::State,
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    routing::get,
-    serve, Router,
-};
+use axum::{ body::Bytes, extract::State, routing::get, serve, Router};
 use clap::Parser;
 use serde::Serialize;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
@@ -120,26 +113,6 @@ async fn update_bundle(
     }
 }
 
-struct BundleError(anyhow::Error);
-
-impl<E: Into<anyhow::Error>> From<E> for BundleError {
-    fn from(err: E) -> Self {
-        Self(err.into())
-    }
-}
-
-impl IntoResponse for BundleError {
-    fn into_response(self) -> Response {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Something went wrong: {}", self.0),
-        )
-            .into_response()
-    }
-}
-
-async fn bundle_endpoint(
-    State(current_bundle): State<CurrentBundle>,
-) -> Result<Bytes, BundleError> {
-    Ok(current_bundle.as_ref().read().await.file.clone())
+async fn bundle_endpoint(State(current_bundle): State<CurrentBundle>) -> Bytes {
+    current_bundle.as_ref().read().await.file.clone()
 }
