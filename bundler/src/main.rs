@@ -1,8 +1,9 @@
+mod built_info;
 mod bundle;
 mod permissionables;
 
 use crate::bundle::{Bundle, NoMetadata};
-use axum::{ body::Bytes, extract::State, routing::get, serve, Router};
+use axum::{body::Bytes, extract::State, routing::get, serve, Router};
 use clap::Parser;
 use serde::Serialize;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};

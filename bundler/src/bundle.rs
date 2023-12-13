@@ -53,7 +53,7 @@ where
     pub fn new(metadata: Metadata, proposals: Proposals, sessions: Sessions) -> Self {
         Self {
             manifest: Manifest {
-                revision: "v0.1.0".to_string(),
+                revision: crate::built_info::PKG_VERSION.to_string(),
                 roots: vec!["diamond".to_string()],
                 wasm: vec![],
                 metadata,
