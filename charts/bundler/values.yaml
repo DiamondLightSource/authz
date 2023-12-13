@@ -1,7 +1,7 @@
 image:
   repository: ghcr.io/diamondlightsource/authz-bundler
   pullPolicy: IfNotPresent
-  tag: 0.0.1
+  tag: 0.0.2
 
 imagePullSecrets: []
 nameOverride: ""
@@ -55,4 +55,3 @@ nodeSelector: {}
 affinity: {}
 
 tolerations: []
-
