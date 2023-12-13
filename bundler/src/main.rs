@@ -14,6 +14,7 @@ use clap::Parser;
 use serde::Serialize;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{
+    marker::PhantomData,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     ops::Add,
     sync::Arc,
@@ -32,8 +33,8 @@ struct BundleFile<Metadata>
 where
     Metadata: Serialize,
 {
-    _bundle: Bundle<Metadata>,
     file: Bytes,
+    _metadata: PhantomData<Metadata>,
 }
 
 impl<Metadata> TryFrom<Bundle<Metadata>> for BundleFile<Metadata>
@@ -45,7 +46,7 @@ where
     fn try_from(bundle: Bundle<Metadata>) -> Result<Self, Self::Error> {
         Ok(Self {
             file: bundle.to_tar_gz()?.into(),
-            _bundle: bundle,
+            _metadata: PhantomData,
         })
     }
 }
