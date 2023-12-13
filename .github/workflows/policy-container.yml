@@ -1,0 +1,42 @@
+name: Policy Container
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build_bundle:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+
+      - name: Generate Image Name
+        run: echo IMAGE_REPOSITORY=ghcr.io/$(echo "${{ github.repository }}-policy" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]') >> $GITHUB_ENV
+
+      - name: Log in to GitHub Docker Registry
+        uses: docker/login-action@v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup OPA
+        uses: open-policy-agent/setup-opa@v2.1.0
+        with:
+          version: latest
+      
+      - name: Build OPA Policy  # If this is a tag, use it as a revision string
+        run: opa build ./org-policy -r ${{ github.ref_name }}
+
+      - name: Test OPA Bundle
+        run: opa test -b bundle.tar.gz
+
+      - name: Publish OPA Bundle
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
+        run: oras push ${{ env.IMAGE_REPOSITORY }}:${{ github.ref_name }} bundle.tar.gz:application/vnd.oci.image.layer.v1.tar+gzip
