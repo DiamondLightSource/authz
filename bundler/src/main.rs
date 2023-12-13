@@ -8,6 +8,7 @@ use clap::Parser;
 use serde::Serialize;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{
+    hash::Hash,
     marker::PhantomData,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     ops::Add,
@@ -33,7 +34,7 @@ where
 
 impl<Metadata> TryFrom<Bundle<Metadata>> for BundleFile<Metadata>
 where
-    Metadata: Serialize,
+    Metadata: Hash + Serialize,
 {
     type Error = anyhow::Error;
 

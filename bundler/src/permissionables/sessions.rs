@@ -1,9 +1,9 @@
 use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
-#[derive(Debug, Default, PartialEq, Eq, Serialize)]
-pub struct Sessions(HashMap<String, Vec<(u32, u32)>>);
+#[derive(Debug, Default, PartialEq, Eq, Hash, Serialize)]
+pub struct Sessions(BTreeMap<String, Vec<(u32, u32)>>);
 
 impl Sessions {
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
@@ -65,12 +65,12 @@ impl FromIterator<SessionRow> for Sessions {
 mod tests {
     use super::Sessions;
     use sqlx::MySqlPool;
-    use std::collections::{HashMap, HashSet};
+    use std::collections::{BTreeMap, BTreeSet};
 
     #[sqlx::test(migrations = "tests/migrations")]
     async fn fetch_empty(ispyb_pool: MySqlPool) {
         let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
-        let expected = Sessions(HashMap::new());
+        let expected = Sessions(BTreeMap::new());
         assert_eq!(expected, sessions);
     }
 
@@ -83,7 +83,7 @@ mod tests {
     )]
     async fn fetch_direct(ispyb_pool: MySqlPool) {
         let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
-        let mut expected = HashMap::new();
+        let mut expected = BTreeMap::new();
         expected.insert("foo".to_string(), vec![(100, 1), (100, 2)]);
         expected.insert("bar".to_string(), vec![(101, 1)]);
         assert_eq!(
@@ -105,14 +105,14 @@ mod tests {
     )]
     async fn fetch_indirect(ispyb_pool: MySqlPool) {
         let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
-        let mut expected = HashMap::new();
+        let mut expected = BTreeMap::new();
         expected.insert(
             "foo".to_string(),
-            HashSet::from([(100, 1), (100, 2), (100, 3), (101, 1), (101, 2)]),
+            BTreeSet::from([(100, 1), (100, 2), (100, 3), (101, 1), (101, 2)]),
         );
         expected.insert(
             "bar".to_string(),
-            HashSet::from([(100, 1), (100, 2), (100, 3)]),
+            BTreeSet::from([(100, 1), (100, 2), (100, 3)]),
         );
         assert_eq!(
             expected,
@@ -138,14 +138,14 @@ mod tests {
     )]
     async fn fetch_both(ispyb_pool: MySqlPool) {
         let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
-        let mut expected = HashMap::new();
+        let mut expected = BTreeMap::new();
         expected.insert(
             "foo".to_string(),
-            HashSet::from([(100, 1), (100, 2), (100, 3), (101, 1), (101, 2)]),
+            BTreeSet::from([(100, 1), (100, 2), (100, 3), (101, 1), (101, 2)]),
         );
         expected.insert(
             "bar".to_string(),
-            HashSet::from([(100, 1), (100, 2), (100, 3), (101, 1)]),
+            BTreeSet::from([(100, 1), (100, 2), (100, 3), (101, 1)]),
         );
         assert_eq!(
             expected,
