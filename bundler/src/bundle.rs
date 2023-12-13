@@ -79,6 +79,10 @@ where
         Ok(Self::new(metadata, proposals, sessions))
     }
 
+    pub fn revision(&self) -> &str {
+        &self.manifest.revision
+    }
+
     pub fn to_tar_gz(&self) -> Result<Vec<u8>, anyhow::Error> {
         let mut bundle_builder = tar::Builder::new(GzEncoder::new(Vec::new(), Compression::best()));
 
