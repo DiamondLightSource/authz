@@ -2,18 +2,25 @@ use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq, Eq, Serialize)]
-pub struct Proposals(HashMap<u32, Vec<u32>>);
+#[derive(Debug, Default, PartialEq, Eq, Serialize)]
+pub struct Proposals(HashMap<String, Vec<u32>>);
 
 impl Proposals {
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let proposal_rows = query_as!(
             ProposalRow,
             "
-            SELECT DISTINCT
-                proposalId as proposal_id,
-                personId as person_id
-            FROM ProposalHasPerson
+            SELECT
+                proposalId AS proposal_id,
+                login AS fed_id
+            FROM (
+                    SELECT
+                        DISTINCT proposalId,
+                        personId
+                    FROM
+                        ProposalHasPerson
+                ) AS UniqueProposalHasPerson
+                INNER JOIN Person USING (personId)
             "
         )
         .fetch_all(ispyb_pool)
@@ -24,22 +31,23 @@ impl Proposals {
 }
 
 struct ProposalRow {
-    person_id: u32,
+    fed_id: Option<String>,
     proposal_id: u32,
 }
 
 impl FromIterator<ProposalRow> for Proposals {
     fn from_iter<T: IntoIterator<Item = ProposalRow>>(iter: T) -> Self {
-        let mut proposals = HashMap::<u32, Vec<u32>>::default();
-
+        let mut proposals = Self::default();
         for proposal_row in iter {
-            proposals
-                .entry(proposal_row.person_id)
-                .or_default()
-                .push(proposal_row.proposal_id)
+            if let Some(fed_id) = proposal_row.fed_id {
+                proposals
+                    .0
+                    .entry(fed_id)
+                    .or_default()
+                    .push(proposal_row.proposal_id)
+            }
         }
-
-        Self(proposals)
+        proposals
     }
 }
 
@@ -47,7 +55,7 @@ impl FromIterator<ProposalRow> for Proposals {
 mod tests {
     use super::Proposals;
     use sqlx::MySqlPool;
-    use std::collections::HashMap;
+    use std::collections::{HashMap, HashSet};
 
     #[sqlx::test(migrations = "tests/migrations")]
     async fn fetch_empty(ispyb_pool: MySqlPool) {
@@ -58,13 +66,23 @@ mod tests {
 
     #[sqlx::test(
         migrations = "tests/migrations",
-        fixtures(path = "../../tests/fixtures", scripts("proposal_membership"))
+        fixtures(
+            path = "../../tests/fixtures",
+            scripts("proposal_membership", "persons")
+        )
     )]
     async fn fetch_some(ispyb_pool: MySqlPool) {
         let proposals = Proposals::fetch(&ispyb_pool).await.unwrap();
-        let mut expected = Proposals(HashMap::new());
-        expected.0.insert(10, vec![100, 101, 102]);
-        expected.0.insert(11, vec![100]);
-        assert_eq!(expected, proposals);
+        let mut expected = HashMap::new();
+        expected.insert("foo".to_string(), HashSet::from([100, 101, 102]));
+        expected.insert("bar".to_string(), HashSet::from([100]));
+        assert_eq!(
+            expected,
+            proposals
+                .0
+                .into_iter()
+                .map(|(k, v)| (k, v.into_iter().collect()))
+                .collect()
+        );
     }
 }
