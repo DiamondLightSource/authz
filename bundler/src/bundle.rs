@@ -2,6 +2,10 @@ use crate::permissionables::{proposals::Proposals, sessions::Sessions};
 use flate2::{write::GzEncoder, Compression};
 use serde::Serialize;
 use sqlx::MySqlPool;
+use std::{
+    collections::hash_map::DefaultHasher,
+    hash::{Hash, Hasher},
+};
 use tar::Header;
 
 #[derive(Debug, Serialize)]
@@ -10,7 +14,7 @@ struct WasmModule {
     pub module: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Hash, Serialize)]
 pub struct NoMetadata;
 
 #[derive(Debug, Serialize)]
@@ -48,12 +52,18 @@ where
 
 impl<Metadata> Bundle<Metadata>
 where
-    Metadata: Serialize,
+    Metadata: Hash + Serialize,
 {
     pub fn new(metadata: Metadata, proposals: Proposals, sessions: Sessions) -> Self {
+        let mut hasher = DefaultHasher::new();
+        metadata.hash(&mut hasher);
+        proposals.hash(&mut hasher);
+        sessions.hash(&mut hasher);
+        let hash = hasher.finish();
+
         Self {
             manifest: Manifest {
-                revision: crate::built_info::PKG_VERSION.to_string(),
+                revision: format!("{}:{}", crate::built_info::PKG_VERSION, hash),
                 roots: vec!["diamond".to_string()],
                 wasm: vec![],
                 metadata,

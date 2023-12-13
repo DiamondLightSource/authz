@@ -1,9 +1,9 @@
 use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
-#[derive(Debug, Default, PartialEq, Eq, Serialize)]
-pub struct Proposals(HashMap<String, Vec<u32>>);
+#[derive(Debug, Default, PartialEq, Eq, Hash, Serialize)]
+pub struct Proposals(BTreeMap<String, Vec<u32>>);
 
 impl Proposals {
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
@@ -55,12 +55,12 @@ impl FromIterator<ProposalRow> for Proposals {
 mod tests {
     use super::Proposals;
     use sqlx::MySqlPool;
-    use std::collections::{HashMap, HashSet};
+    use std::collections::{BTreeMap, BTreeSet};
 
     #[sqlx::test(migrations = "tests/migrations")]
     async fn fetch_empty(ispyb_pool: MySqlPool) {
         let proposals = Proposals::fetch(&ispyb_pool).await.unwrap();
-        let expected = Proposals(HashMap::new());
+        let expected = Proposals(BTreeMap::new());
         assert_eq!(expected, proposals);
     }
 
@@ -73,9 +73,9 @@ mod tests {
     )]
     async fn fetch_some(ispyb_pool: MySqlPool) {
         let proposals = Proposals::fetch(&ispyb_pool).await.unwrap();
-        let mut expected = HashMap::new();
-        expected.insert("foo".to_string(), HashSet::from([100, 101, 102]));
-        expected.insert("bar".to_string(), HashSet::from([100]));
+        let mut expected = BTreeMap::new();
+        expected.insert("foo".to_string(), BTreeSet::from([100, 101, 102]));
+        expected.insert("bar".to_string(), BTreeSet::from([100]));
         assert_eq!(
             expected,
             proposals
