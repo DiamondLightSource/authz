@@ -3,15 +3,24 @@ mod bundle;
 mod permissionables;
 
 use crate::bundle::{Bundle, NoMetadata};
-use axum::{body::Bytes, extract::State, routing::get, serve, Router};
+use axum::{
+    body::Bytes,
+    extract::State,
+    http::{HeaderMap, StatusCode},
+    response::IntoResponse,
+    routing::get,
+    serve, Router,
+};
+use axum_extra::TypedHeader;
 use clap::Parser;
+use headers::{ETag, HeaderMapExt, IfNoneMatch};
 use serde::Serialize;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{
     hash::Hash,
-    marker::PhantomData,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     ops::Add,
+    str::FromStr,
     sync::Arc,
     time::Duration,
 };
@@ -28,8 +37,8 @@ struct BundleFile<Metadata>
 where
     Metadata: Serialize,
 {
+    bundle: Bundle<Metadata>,
     file: Bytes,
-    _metadata: PhantomData<Metadata>,
 }
 
 impl<Metadata> TryFrom<Bundle<Metadata>> for BundleFile<Metadata>
@@ -41,7 +50,7 @@ where
     fn try_from(bundle: Bundle<Metadata>) -> Result<Self, Self::Error> {
         Ok(Self {
             file: bundle.to_tar_gz()?.into(),
-            _metadata: PhantomData,
+            bundle,
         })
     }
 }
@@ -115,6 +124,25 @@ async fn update_bundle(
     }
 }
 
-async fn bundle_endpoint(State(current_bundle): State<CurrentBundle>) -> Bytes {
-    current_bundle.as_ref().read().await.file.clone()
+async fn bundle_endpoint(
+    State(current_bundle): State<CurrentBundle>,
+    if_none_match: Option<TypedHeader<IfNoneMatch>>,
+) -> impl IntoResponse {
+    let etag = ETag::from_str(&format!(
+        r#""{}""#,
+        current_bundle.as_ref().read().await.bundle.revision()
+    ))
+    .unwrap();
+    let mut headers = HeaderMap::new();
+    headers.typed_insert(etag.clone());
+    match if_none_match {
+        Some(TypedHeader(if_none_match)) if !if_none_match.precondition_passes(&etag) => {
+            (StatusCode::NOT_MODIFIED, headers, Bytes::new())
+        }
+        _ => (
+            StatusCode::OK,
+            headers,
+            current_bundle.as_ref().read().await.file.clone(),
+        ),
+    }
 }
