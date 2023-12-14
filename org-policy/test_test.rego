@@ -1,6 +1,6 @@
-package diamondlightsource_test
+package diamond.policy_test
 
-import data.diamondlightsource
+import data.diamond.policy
 import future.keywords
 
 # Recommended pattern for naming:
@@ -10,13 +10,13 @@ import future.keywords
 # For linter, To format all code in this directory run opa fmt ./* --write
 
 test_default_disallowed if {
-	not diamondlightsource.hello_world with input as {}
+	not policy.hello_world with input as {}
 }
 
 test_hello_world_if_hello_world if {
-	diamondlightsource.hello_world with input as {"hello": "world"}
+	policy.hello_world with input as {"hello": "world"}
 }
 
 test_not_hello_world_if_hello_notworld if {
-	not diamondlightsource.hello_world with input as {"hello": "earth"}
+	not policy.hello_world with input as {"hello": "earth"}
 }
