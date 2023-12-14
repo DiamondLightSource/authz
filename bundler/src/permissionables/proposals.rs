@@ -74,8 +74,8 @@ mod tests {
     async fn fetch_some(ispyb_pool: MySqlPool) {
         let proposals = Proposals::fetch(&ispyb_pool).await.unwrap();
         let mut expected = BTreeMap::new();
-        expected.insert("foo".to_string(), BTreeSet::from([100, 101, 102]));
-        expected.insert("bar".to_string(), BTreeSet::from([100]));
+        expected.insert("foo".to_string(), BTreeSet::from([30, 31, 32]));
+        expected.insert("bar".to_string(), BTreeSet::from([30]));
         assert_eq!(
             expected,
             proposals

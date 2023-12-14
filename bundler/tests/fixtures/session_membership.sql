@@ -1,3 +1,3 @@
 INSERT INTO
     `Session_has_Person` (`sessionId`, `personId`)
-VALUES (1000, 10), (1001, 10), (1003, 11);
+VALUES (40, 20), (41, 20), (43, 21);
