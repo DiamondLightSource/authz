@@ -50,6 +50,8 @@ where
     sessions: Sessions,
 }
 
+const BUNDLE_PREFIX: &str = "diamond/data";
+
 impl<Metadata> Bundle<Metadata>
 where
     Metadata: Hash + Serialize,
@@ -64,7 +66,7 @@ where
         Self {
             manifest: Manifest {
                 revision: format!("{}:{}", crate::built_info::PKG_VERSION, hash),
-                roots: vec!["diamond".to_string()],
+                roots: vec![BUNDLE_PREFIX.to_string()],
                 wasm: vec![],
                 metadata,
             },
@@ -94,7 +96,7 @@ where
         let mut proposals_header = Header::from_bytes(&proposals);
         bundle_builder.append_data(
             &mut proposals_header,
-            "diamond/users/proposals/data.json",
+            format!("{BUNDLE_PREFIX}/users/proposals/data.json"),
             proposals.as_slice(),
         )?;
 
@@ -102,7 +104,7 @@ where
         let mut sessions_header = Header::from_bytes(&sessions);
         bundle_builder.append_data(
             &mut sessions_header,
-            "diamond/users/sessions/data.json",
+            format!("{BUNDLE_PREFIX}/users/sessions/data.json"),
             sessions.as_slice(),
         )?;
 
