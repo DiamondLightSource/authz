@@ -1,3 +1,3 @@
 INSERT INTO
     `ProposalHasPerson` (`proposalId`, `personId`)
-VALUES (100, 10), (101, 10), (102, 10), (100, 11);
+VALUES (30, 20), (31, 20), (32, 20), (30, 21);

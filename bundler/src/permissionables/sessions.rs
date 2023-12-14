@@ -84,8 +84,8 @@ mod tests {
     async fn fetch_direct(ispyb_pool: MySqlPool) {
         let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
         let mut expected = BTreeMap::new();
-        expected.insert("foo".to_string(), vec![(100, 1), (100, 2)]);
-        expected.insert("bar".to_string(), vec![(101, 1)]);
+        expected.insert("foo".to_string(), vec![(30, 10), (30, 11)]);
+        expected.insert("bar".to_string(), vec![(31, 10)]);
         assert_eq!(
             expected,
             sessions
@@ -108,11 +108,11 @@ mod tests {
         let mut expected = BTreeMap::new();
         expected.insert(
             "foo".to_string(),
-            BTreeSet::from([(100, 1), (100, 2), (100, 3), (101, 1), (101, 2)]),
+            BTreeSet::from([(30, 10), (30, 11), (30, 12), (31, 10), (31, 11)]),
         );
         expected.insert(
             "bar".to_string(),
-            BTreeSet::from([(100, 1), (100, 2), (100, 3)]),
+            BTreeSet::from([(30, 10), (30, 11), (30, 12)]),
         );
         assert_eq!(
             expected,
@@ -141,11 +141,11 @@ mod tests {
         let mut expected = BTreeMap::new();
         expected.insert(
             "foo".to_string(),
-            BTreeSet::from([(100, 1), (100, 2), (100, 3), (101, 1), (101, 2)]),
+            BTreeSet::from([(30, 10), (30, 11), (30, 12), (31, 10), (31, 11)]),
         );
         expected.insert(
             "bar".to_string(),
-            BTreeSet::from([(100, 1), (100, 2), (100, 3), (101, 1)]),
+            BTreeSet::from([(30, 10), (30, 11), (30, 12), (31, 10)]),
         );
         assert_eq!(
             expected,
