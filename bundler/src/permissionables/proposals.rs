@@ -2,10 +2,12 @@ use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::BTreeMap;
 
+/// A mapping of users to their proposals
 #[derive(Debug, Default, PartialEq, Eq, Hash, Serialize)]
 pub struct Proposals(BTreeMap<String, Vec<u32>>);
 
 impl Proposals {
+    /// Fetches [`Proposals`] from ISPyB
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let proposal_rows = query_as!(
             ProposalRow,
@@ -30,8 +32,11 @@ impl Proposals {
     }
 }
 
+/// A row from ISPyB detailing the proposals a user is associated with
 struct ProposalRow {
+    /// The FedID of the user
     fed_id: Option<String>,
+    /// The proposal number
     proposal_id: u32,
 }
 

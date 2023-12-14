@@ -2,10 +2,12 @@ use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::BTreeMap;
 
+/// A mapping of users to their sessions, possibly via proposals
 #[derive(Debug, Default, PartialEq, Eq, Hash, Serialize)]
 pub struct Sessions(BTreeMap<String, Vec<(u32, u32)>>);
 
 impl Sessions {
+    /// Fetches [`Sessions`] from ISPyB
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let session_rows = query_as!(
             SessionRow,
@@ -40,9 +42,13 @@ impl Sessions {
     }
 }
 
+/// A row from ISPyB detailing the sessions a user is associcated with
 struct SessionRow {
+    /// The FedID of the user
     fed_id: Option<String>,
+    /// The proposal number of the visit
     proposal_id: u32,
+    /// The number of the visit within the proposal
     visit_number: Option<u32>,
 }
 

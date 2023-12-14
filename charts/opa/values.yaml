@@ -12,6 +12,9 @@ opa:
     services:
       diamond-bundler:
         url: https://authz.diamond.ac.uk
+      ghcr:
+        url: https://ghcr.io
+        type: oci
     bundles:
       diamond-permissionables:
         services: diamond-bundler
@@ -19,6 +22,12 @@ opa:
         polling:
           min_delay_seconds: 10
           max_delay_seconds: 60
+      diamond-policies:
+        services: ghcr
+        resource: ghcr.io/diamondlightsource/authz-policy:0.0.2
+        polling:
+          min_delay_seconds: 30
+          max_delay_seconds: 120
 
 serviceAccount:
   create: false

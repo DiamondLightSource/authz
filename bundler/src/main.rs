@@ -1,5 +1,13 @@
+#![forbid(unsafe_code)]
+#![doc=include_str!("../README.md")]
+#![warn(missing_docs)]
+#![warn(clippy::missing_docs_in_private_items)]
+
+/// Metadata about the crate, courtesy of built
 mod built_info;
+/// An Open Policy Agent bundle containing permissionables
 mod bundle;
+/// Permissionable relations from the ISPyB database
 mod permissionables;
 
 use crate::bundle::{Bundle, NoMetadata};
@@ -33,11 +41,14 @@ use tower_http::trace::TraceLayer;
 use tracing_subscriber::util::SubscriberInitExt;
 use url::Url;
 
+/// A wrapper containing a [`Bundle`] and the serialzied gzipped archive
 struct BundleFile<Metadata>
 where
     Metadata: Serialize,
 {
+    /// The bundle on which the archive is based
     bundle: Bundle<Metadata>,
+    /// The serialized bundle as a gzipped tar archive
     file: Bytes,
 }
 
@@ -55,17 +66,23 @@ where
     }
 }
 
+/// A thread safe, mutable, wrapper around the [`BundleFile`]
 type CurrentBundle = Arc<RwLock<BundleFile<NoMetadata>>>;
 
+/// Bundler acts as a Open Policy Agent bundle server, providing permissionable data from the ISPyB database
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about= None)]
 struct Cli {
+    /// The port to which this application should bind
     #[arg(short, long, env = "BUNDLER_PORT", default_value_t = 80)]
     port: u16,
+    /// The URL of the ISPyB instance which should be connected to
     #[arg(long, env = "BUNDLER_DATABASE_URL")]
     database_url: Url,
+    /// The [`tracing::Level`] to log at
     #[arg(long, env = "BUNDLER_LOG_LEVEL", default_value_t = tracing::Level::INFO)]
     log_level: tracing::Level,
+    /// The interval at which ISPyB should be polled
     #[arg(long, env = "BUNDLER_POLLING_INTERVAL", default_value_t=humantime::Duration::from(Duration::from_secs(60)))]
     polling_interval: humantime::Duration,
 }
@@ -102,12 +119,14 @@ async fn main() {
     tasks.join_next().await.unwrap().unwrap()
 }
 
+/// Bind to the provided socket address and serve the application endpoints
 async fn serve_app(port: u16, app: Router) {
     let socket_addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, port));
     let listener = TcpListener::bind(socket_addr).await.unwrap();
     serve(listener, app).await.unwrap()
 }
 
+/// Periodically update the bundle with new data from ISPyB
 async fn update_bundle(
     current_bundle: impl AsRef<RwLock<BundleFile<NoMetadata>>>,
     ispyb_pool: MySqlPool,
@@ -124,6 +143,9 @@ async fn update_bundle(
     }
 }
 
+/// Returns the Open Policy Agent bundle in gzipped tar format
+///
+/// ETag matching is supported via the 'If-None-Match' header, requests containing this header will not recieve any data if it matches the current bundle version
 async fn bundle_endpoint(
     State(current_bundle): State<CurrentBundle>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,

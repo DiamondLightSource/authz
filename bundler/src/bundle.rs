@@ -8,27 +8,38 @@ use std::{
 };
 use tar::Header;
 
+/// A compiled Web Assembly module
 #[derive(Debug, Serialize)]
 struct WasmModule {
+    /// The entrypoint of the bundle
     pub entrypoint: String,
+    /// The path to the WebAssembly module
     pub module: String,
 }
 
+/// A placeholder to be used when no metadata is required
 #[derive(Debug, Hash, Serialize)]
 pub struct NoMetadata;
 
+/// The manifest file, which contains data about the bundle and optional additonal metadata
 #[derive(Debug, Serialize)]
 struct Manifest<Metadata>
 where
     Metadata: Serialize,
 {
+    /// The revision of the bundle, comprising of the crate version number and the bundle hash
     revision: String,
+    /// The directory prefixes of the data contained within the bundle
     roots: Vec<String>,
+    /// A set of WebAssembly modules included in the bundle
     wasm: Vec<WasmModule>,
+    /// Optional extra metadata
     metadata: Metadata,
 }
 
+/// An extension trait used to implement header creation from byte slices
 trait FromByteSlice {
+    #[allow(clippy::missing_docs_in_private_items)]
     fn from_bytes(slice: &[u8]) -> Self;
 }
 
@@ -41,22 +52,29 @@ impl FromByteSlice for Header {
     }
 }
 
+/// The contents of the Open Policy Agent bundle
 pub struct Bundle<Metadata>
 where
     Metadata: Serialize,
 {
+    /// The manifest file, which contains data about the bundle and optional additonal metadata
     manifest: Manifest<Metadata>,
+    /// A mapping of users to their proposals
     proposals: Proposals,
+    /// A mapping of users to their sessions
     sessions: Sessions,
+    /// A mapping of users to their permissions via groups
     permissions: Permissions,
 }
 
+/// The prefix applied to data files in the bundle. Open Policy Agent does not support loading bundles with overlapping prefixes
 const BUNDLE_PREFIX: &str = "diamond/data";
 
 impl<Metadata> Bundle<Metadata>
 where
     Metadata: Hash + Serialize,
 {
+    /// Creates a [`Bundle`] from known [`Proposals`], [`Sessions`] and [`Permissions`]
     pub fn new(
         metadata: Metadata,
         proposals: Proposals,
@@ -83,6 +101,7 @@ where
         }
     }
 
+    /// Fetches [`Proposals`], [`Sessions`] and [`Permissions`] for ISPyB and constructs a [`Bundle`]
     pub async fn fetch(metadata: Metadata, ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let proposals = Proposals::fetch(ispyb_pool).await?;
         let sessions = Sessions::fetch(ispyb_pool).await?;
@@ -90,10 +109,12 @@ where
         Ok(Self::new(metadata, proposals, sessions, permissions))
     }
 
+    /// The current revision of the bundle, as recorded in the [`Manifest`]
     pub fn revision(&self) -> &str {
         &self.manifest.revision
     }
 
+    /// Serializes the [`Bundle`] as a gzipped tar archive, for import by Open Policy Agent
     pub fn to_tar_gz(&self) -> Result<Vec<u8>, anyhow::Error> {
         let mut bundle_builder = tar::Builder::new(GzEncoder::new(Vec::new(), Compression::best()));
 
