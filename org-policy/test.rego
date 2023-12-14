@@ -1,4 +1,4 @@
-package diamondlightsource
+package diamond.policy
 
 import future.keywords
 
