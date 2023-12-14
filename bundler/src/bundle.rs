@@ -1,4 +1,4 @@
-use crate::permissionables::{proposals::Proposals, sessions::Sessions};
+use crate::permissionables::{permissions::Permissions, proposals::Proposals, sessions::Sessions};
 use flate2::{write::GzEncoder, Compression};
 use serde::Serialize;
 use sqlx::MySqlPool;
@@ -48,6 +48,7 @@ where
     manifest: Manifest<Metadata>,
     proposals: Proposals,
     sessions: Sessions,
+    permissions: Permissions,
 }
 
 const BUNDLE_PREFIX: &str = "diamond/data";
@@ -56,11 +57,17 @@ impl<Metadata> Bundle<Metadata>
 where
     Metadata: Hash + Serialize,
 {
-    pub fn new(metadata: Metadata, proposals: Proposals, sessions: Sessions) -> Self {
+    pub fn new(
+        metadata: Metadata,
+        proposals: Proposals,
+        sessions: Sessions,
+        permissions: Permissions,
+    ) -> Self {
         let mut hasher = DefaultHasher::new();
         metadata.hash(&mut hasher);
         proposals.hash(&mut hasher);
         sessions.hash(&mut hasher);
+        permissions.hash(&mut hasher);
         let hash = hasher.finish();
 
         Self {
@@ -72,13 +79,15 @@ where
             },
             proposals,
             sessions,
+            permissions,
         }
     }
 
     pub async fn fetch(metadata: Metadata, ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let proposals = Proposals::fetch(ispyb_pool).await?;
         let sessions = Sessions::fetch(ispyb_pool).await?;
-        Ok(Self::new(metadata, proposals, sessions))
+        let permissions = Permissions::fetch(ispyb_pool).await?;
+        Ok(Self::new(metadata, proposals, sessions, permissions))
     }
 
     pub fn revision(&self) -> &str {
@@ -106,6 +115,14 @@ where
             &mut sessions_header,
             format!("{BUNDLE_PREFIX}/users/sessions/data.json"),
             sessions.as_slice(),
+        )?;
+
+        let permissions = serde_json::to_vec(&self.permissions)?;
+        let mut permissions_header = Header::from_bytes(&permissions);
+        bundle_builder.append_data(
+            &mut permissions_header,
+            format!("{BUNDLE_PREFIX}/users/permissions/data.json"),
+            permissions.as_slice(),
         )?;
 
         Ok(bundle_builder.into_inner()?.finish()?)
