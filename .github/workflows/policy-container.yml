@@ -32,7 +32,7 @@ jobs:
           version: latest
       
       - name: Build OPA Policy  # If this is a tag, use it as a revision string
-        run: opa build ./org-policy -r ${{ github.ref_name }}
+        run: opa build -b org-policy -r ${{ github.ref_name }} --ignore *_test.rego
 
       - name: Test OPA Bundle
         run: opa test -b bundle.tar.gz
