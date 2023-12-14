@@ -1,0 +1,70 @@
+name: Bundler Docs
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    services:
+      ispyb:
+        image: ghcr.io/diamondlightsource/ispyb-database:v3.0.0
+        ports:
+          - 3306:3306
+        env:
+          MARIADB_ROOT_PASSWORD: rootpassword
+        options: >
+          --health-cmd "/usr/local/bin/healthcheck.sh --defaults-file=/ispyb/.my.cnf --connect"
+    env:
+      DATABASE_URL: mysql://root:rootpassword@localhost/ispyb_build
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          default: true
+
+      - name: Cache Rust Build
+        uses: Swatinem/rust-cache@v2.7.1
+
+      - name: Build docs
+        uses: actions-rs/cargo@v1.0.3
+        with:
+          command: doc
+          args: >
+            --no-deps
+            --all-features
+            --document-private-items
+            --manifest-path bundler/Cargo.toml
+
+      - name: Fix file permissions for pages
+        run: chmod -R +rX bundler/target/doc
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v2.0.0
+        with:
+          path: bundler/target/doc
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4.0.0
+
+      - name: Publish docs to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3.0.0

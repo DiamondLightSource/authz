@@ -4,11 +4,12 @@ metadata:
   name: authz-bundler
   title: Authorization Bundler
   description: An Open Policy Agent bundle server, providing access to permissionable data from ISPyB
+  annotations:
+    diamond.ac.uk/viewdocs-url: https://diamondlightsource.github.io/authz/bundler
 spec:
   owner: user:enu43627
 
 ---
-
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
@@ -17,6 +18,7 @@ metadata:
   description: An Open Policy Agent bundle server, providing access to permissionable data from ISPyB
   annotations:
     github.com/project-slug: garryod/authz
+    diamond.ac.uk/viewdocs-url: https://diamondlightsource.github.io/authz/bundler
 spec:
   type: service
   lifecycle: experimental
@@ -26,7 +28,6 @@ spec:
     - resource:ispyb-database
 
 ---
-
 apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
@@ -43,4 +44,3 @@ spec:
     info:
       title: AuthZ Bundler API
       version: 0.0.1
-
