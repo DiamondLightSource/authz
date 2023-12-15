@@ -17,13 +17,13 @@ opa:
         type: oci
     bundles:
       diamond-permissionables:
-        services: diamond-bundler
+        service: diamond-bundler
         resource: bundle.tar.gz
         polling:
           min_delay_seconds: 10
           max_delay_seconds: 60
       diamond-policies:
-        services: ghcr
+        service: ghcr
         resource: ghcr.io/diamondlightsource/authz-policy:0.0.2
         polling:
           min_delay_seconds: 30
