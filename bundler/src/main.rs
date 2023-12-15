@@ -2,13 +2,14 @@
 #![doc=include_str!("../README.md")]
 #![warn(missing_docs)]
 #![warn(clippy::missing_docs_in_private_items)]
-
 /// Metadata about the crate, courtesy of built
 mod built_info;
 /// An Open Policy Agent bundle containing permissionables
 mod bundle;
 /// Permissionable relations from the ISPyB database
 mod permissionables;
+/// A [`tower::Service`] which enforces a bearer token requirement
+mod require_bearer;
 
 use crate::bundle::{Bundle, NoMetadata};
 use axum::{
@@ -22,6 +23,7 @@ use axum::{
 use axum_extra::TypedHeader;
 use clap::Parser;
 use headers::{ETag, HeaderMapExt, IfNoneMatch};
+use require_bearer::RequireBearerLayer;
 use serde::Serialize;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{
@@ -76,6 +78,9 @@ struct Cli {
     /// The port to which this application should bind
     #[arg(short, long, env = "BUNDLER_PORT", default_value_t = 80)]
     port: u16,
+    /// If enabled, refuse any bundle requests which do not contain this bearer token
+    #[arg(long, env = "BUNDLER_REQUIRE_TOKEN")]
+    require_token: Option<String>,
     /// The URL of the ISPyB instance which should be connected to
     #[arg(long, env = "BUNDLER_DATABASE_URL")]
     database_url: Url,
@@ -106,6 +111,7 @@ async fn main() {
     ));
     let app = Router::new()
         .route("/bundle.tar.gz", get(bundle_endpoint))
+        .route_layer(RequireBearerLayer::new(args.require_token))
         .fallback(fallback_endpoint)
         .layer(TraceLayer::new_for_http())
         .with_state(current_bundle.clone());
