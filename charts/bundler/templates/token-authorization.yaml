@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: token-authorization
+  namespace: authz-warehouse
+spec:
+  encryptedData:
+    bearer: AgCVPvjq7vUJgWZM2B/O15IX82Cm5+hq1xElZ9ViB5Bf4shheItYR11YeLieJqXL/iCAzuFBFQwEWZ0lVY67J0n1AdfsmOSLd0lp/4ep4WOST1evpXg2eEGNv2Ucbn2thMmOfrB2zQbc4Diqc6WFcL8M+S68ESHnWB9fJX8/MtAyF7ZxgeYXql7nPiPuebdSIPVSHoHMGrmoCOmDaw1+sc15XCdojlRLTozAyW+U7dNsdPLo7Nqf3kXbQyHFEDhfc9cP6LUuxn8SdiEe7WYrAMncf6rt6r+rM/3ZgfkY2uVV1xZoAUe1T7wIAUpz3CKQl0/qvGJWTexIpa1awraK/Dpj+RRKwrhvS5+ON96GD2IVYrM3BOoVMXWXFLBHjTtYto3YOhRLOa2ADZVmdbQbNMQ5ATo0QIWQPIXoaABrKrmmAwm41lvOEIU46koPsJAhx4pV6iYk+OJ6ffLhXfaSczPizUhG+3duE+aTm2B55/lGivfc+/MyzYv4iY616Lteo7T8p79XPbkiJjclCxTwqrt9EGvfF1/E/qvmMKJMS41Uy8JjWynKgwthtnV7Kh8GCjWlXk6hthzINXUUgMgUwycne/KYle8ufoMEn3w3ccp5F626ZfULtqGxytCxj1RATJYx1+prxsqf8xlWQMoenisH9VeFpDqqNrN2v9flCTL+EJ8FDNqV48MVVPOip8iub+3TLe6mPtQE5XBXT0vvNaXMQmdlGzvq6wSiNpBJTp+9tlOUx6M=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: token-authorization
+      namespace: authz-warehouse
+
