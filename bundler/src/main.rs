@@ -106,6 +106,7 @@ async fn main() {
     ));
     let app = Router::new()
         .route("/bundle.tar.gz", get(bundle_endpoint))
+        .fallback(fallback_endpoint)
         .layer(TraceLayer::new_for_http())
         .with_state(current_bundle.clone());
 
@@ -167,4 +168,9 @@ async fn bundle_endpoint(
             current_bundle.as_ref().read().await.file.clone(),
         ),
     }
+}
+
+/// Returns a HTTP 404 status code when a non-existant route is queried
+async fn fallback_endpoint() -> impl IntoResponse {
+    StatusCode::NOT_FOUND
 }
