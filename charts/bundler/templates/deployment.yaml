@@ -38,6 +38,11 @@ spec:
                   key: {{ .Values.bundler.database.passwordSecret.key }}
             - name: BUNDLER_DATABASE_URL
               value: {{ include "bundler.databaseURL" . }}
+            - name: BUNDLER_REQUIRE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.bundler.requireTokenSecret.name }}
+                  key: {{ .Values.bundler.requireTokenSecret.key }}
             - name: BUNDLER_POLLING_INTERVAL
               value: {{ .Values.bundler.pollingInterval }}
           ports:

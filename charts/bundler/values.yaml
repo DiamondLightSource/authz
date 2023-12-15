@@ -16,6 +16,9 @@ bundler:
     passwordSecret:
       name: ispyb
       key: password
+  requireTokenSecret:
+    name: token-authorization
+    key: bearer
   pollingInterval: 60s
 
 serviceAccount:
