@@ -12,6 +12,7 @@ services:
       DATABASE_URL: mysql://root:rootpassword@ispyb/ispyb_build
       BUNDLER_DATABASE_URL: mysql://root:rootpassword@ispyb/ispyb_build
       BUNDLER_LOG_LEVEL: DEBUG
+      BUNDLER_TRACING_URL: http://jaeger:4317
 
   opa:
     image: docker.io/openpolicyagent/opa:0.59.0
@@ -31,3 +32,9 @@ services:
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: rootpassword
+
+  jaeger:
+    image: docker.io/jaegertracing/all-in-one:1.52.0
+    restart: unless-stopped
+    ports:
+      - 16686:16686
