@@ -24,10 +24,12 @@ use axum_extra::TypedHeader;
 use clap::Parser;
 use clio::ClioPath;
 use headers::{ETag, HeaderMapExt, IfNoneMatch};
+use opentelemetry::trace::TracerProvider as _;
 use require_bearer::RequireBearerLayer;
 use serde::Serialize;
 use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use std::{
+    any::Any,
     fmt::Debug,
     fs::File,
     hash::Hash,
@@ -45,7 +47,7 @@ use tokio::{
 };
 use tower_http::trace::TraceLayer;
 use tracing::instrument;
-use tracing_subscriber::util::SubscriberInitExt;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use url::Url;
 
 /// A wrapper containing a [`Bundle`] and the serialzied gzipped archive
@@ -104,6 +106,9 @@ struct ServeArgs {
     /// The interval at which ISPyB should be polled
     #[arg(long, env = "BUNDLER_POLLING_INTERVAL", default_value_t=humantime::Duration::from(Duration::from_secs(60)))]
     polling_interval: humantime::Duration,
+    /// The URL of the Jaeger instance to send traces to
+    #[arg(long, env = "BUNDLER_JAEGER_URL")]
+    jaeger_url: Option<Url>,
 }
 
 /// Arguments to output the schema with
@@ -127,10 +132,7 @@ async fn main() {
 
 /// Runs the service, pulling fresh bundles from ISPyB and serving them via the API
 async fn serve(args: ServeArgs) {
-    tracing_subscriber::FmtSubscriber::builder()
-        .with_max_level(args.log_level)
-        .finish()
-        .init();
+    let _telemetry = setup_telemetry(args.jaeger_url);
 
     let ispyb_pool = connect_ispyb(args.database_url).await.unwrap();
     let current_bundle = fetch_initial_bundle(&ispyb_pool).await.unwrap();
@@ -149,6 +151,30 @@ async fn serve(args: ServeArgs) {
     ));
     tasks.spawn(serve_endpoints(args.port, app));
     tasks.join_next().await.unwrap().unwrap()
+}
+
+/// The name given to the service in tracing
+const SERVICE_NAME: &str = "bundler";
+
+/// Sets up Logging & Tracing using jaeger if available
+fn setup_telemetry(jaeger_url: Option<Url>) -> Result<Option<impl Any>, anyhow::Error> {
+    let log_layer = tracing_subscriber::fmt::Layer::default();
+    if let Some(jaeger_url) = jaeger_url {
+        let trace_provider = opentelemetry_jaeger::new_agent_pipeline()
+            .with_service_name(SERVICE_NAME)
+            .with_endpoint(jaeger_url)
+            .build_batch(opentelemetry_sdk::runtime::Tokio)?;
+        tracing_subscriber::Registry::default()
+            .with(log_layer)
+            .with(tracing_opentelemetry::layer().with_tracer(trace_provider.tracer(SERVICE_NAME)))
+            .init();
+        Ok(Some(trace_provider))
+    } else {
+        tracing_subscriber::Registry::default()
+            .with(log_layer)
+            .init();
+        Ok(None)
+    }
 }
 
 /// Creates a connection pool to the ISPyB instance at the provided [`Url`]
