@@ -201,7 +201,6 @@ async fn serve_endpoints(port: u16, app: Router) {
 }
 
 /// Periodically update the bundle with new data from ISPyB
-#[instrument(skip(current_bundle))]
 async fn update_bundle(
     current_bundle: impl AsRef<RwLock<BundleFile<NoMetadata>>>,
     ispyb_pool: MySqlPool,
@@ -211,6 +210,8 @@ async fn update_bundle(
 
     loop {
         sleep_until(next_fetch).await;
+        let update_span = tracing::info_span!("update_bundle");
+        let _update_span = update_span.enter();
         next_fetch = next_fetch.add(polling_interval);
         let bundle = Bundle::fetch(NoMetadata, &ispyb_pool).await.unwrap();
         let bundle_file = BundleFile::try_from(bundle).unwrap();
