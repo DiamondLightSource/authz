@@ -2,6 +2,7 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::BTreeMap;
+use tracing::instrument;
 
 /// A mapping of users to their sessions, possibly via proposals
 #[derive(Debug, Default, PartialEq, Eq, Hash, Serialize, JsonSchema)]
@@ -9,6 +10,7 @@ pub struct Sessions(BTreeMap<String, Vec<(u32, u32)>>);
 
 impl Sessions {
     /// Fetches [`Sessions`] from ISPyB
+    #[instrument(name = "fetch_sessions")]
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let session_rows = query_as!(
             RawSessionRow,
