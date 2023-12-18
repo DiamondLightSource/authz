@@ -5,9 +5,11 @@ use serde::Serialize;
 use sqlx::MySqlPool;
 use std::{
     collections::{hash_map::DefaultHasher, BTreeMap},
+    fmt::Debug,
     hash::{Hash, Hasher},
 };
 use tar::Header;
+use tracing::instrument;
 
 /// A compiled Web Assembly module
 #[derive(Debug, Serialize)]
@@ -73,7 +75,7 @@ const BUNDLE_PREFIX: &str = "diamond/data";
 
 impl<Metadata> Bundle<Metadata>
 where
-    Metadata: Hash + Serialize,
+    Metadata: Debug + Hash + Serialize,
 {
     /// Creates a [`Bundle`] from known [`Proposals`], [`Sessions`] and [`Permissions`]
     pub fn new(
@@ -103,6 +105,7 @@ where
     }
 
     /// Fetches [`Proposals`], [`Sessions`] and [`Permissions`] for ISPyB and constructs a [`Bundle`]
+    #[instrument(name = "fetch_bundle")]
     pub async fn fetch(metadata: Metadata, ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let proposals = Proposals::fetch(ispyb_pool).await?;
         let sessions = Sessions::fetch(ispyb_pool).await?;
