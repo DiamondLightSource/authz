@@ -26,6 +26,8 @@ services:
     volumes:
       - ./config.yml:/config.yml:cached,z
       - ../org-policy/:/org-policy:cached,z
+    environment:
+      TRACING_ADDRESS: jaeger:4317
 
   ispyb:
     image: ghcr.io/diamondlightsource/ispyb-database:v3.0.0
