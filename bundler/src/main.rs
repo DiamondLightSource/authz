@@ -222,8 +222,6 @@ async fn update_bundle(
 
     loop {
         sleep_until(next_fetch).await;
-        let update_span = tracing::info_span!("update_bundle");
-        let _update_span = update_span.enter();
         next_fetch = next_fetch.add(polling_interval);
         let bundle = Bundle::fetch(NoMetadata, &ispyb_pool).await.unwrap();
         let bundle_file = BundleFile::try_from(bundle).unwrap();
