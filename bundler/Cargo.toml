@@ -13,7 +13,7 @@ flate2 = { version = "1.0.28" }
 headers = { version = "0.4.0" }
 humantime = { version = "2.1.0" }
 serde = { version = "1.0.193", features = ["derive"] }
-serde_json = { version = "1.0.108" }
+serde_json = { version = "1.0.109" }
 sqlx = { version = "0.7.3", features = [
     "runtime-tokio",
     "tls-rustls",
