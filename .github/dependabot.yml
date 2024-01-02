@@ -5,18 +5,40 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 100
+    groups:
+      minor:
+        update-types:
+          - minor
+          - patch
+    
   - package-ecosystem: docker
     directory: bundler
     schedule:
       interval: weekly
     open-pull-requests-limit: 100
+    groups:
+      minor:
+        update-types:
+          - minor
+          - patch
+    
   - package-ecosystem: docker
     directory: .devcontainer
     schedule:
       interval: weekly
     open-pull-requests-limit: 100
+    groups:
+      minor:
+        update-types:
+          - minor
+          - patch
+    
   - package-ecosystem: cargo
     directory: bundler
     schedule:
       interval: weekly
     open-pull-requests-limit: 100
+    groups:
+      patch:
+        update-types:
+          - patch
