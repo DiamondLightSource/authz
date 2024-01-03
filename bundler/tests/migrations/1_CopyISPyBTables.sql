@@ -15,3 +15,5 @@ CREATE TABLE Permission LIKE ispyb_build.Permission;
 
 CREATE TABLE
     UserGroup_has_Permission LIKE ispyb_build.UserGroup_has_Permission;
+
+CREATE TABLE Proposal LIKE ispyb_build.Proposal
