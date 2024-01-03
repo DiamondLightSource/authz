@@ -24,7 +24,7 @@ services:
       --watch
       /org-policy
     volumes:
-      - ./config.yml:/config.yml:cached,z
+      - ./opa.yml:/config.yml:cached,z
       - ../org-policy/:/org-policy:cached,z
     environment:
       TRACING_ADDRESS: jaeger:4317
