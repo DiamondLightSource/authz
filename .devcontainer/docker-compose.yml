@@ -3,8 +3,8 @@ version: "3.8"
 services:
   bundler:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
     volumes:
       - ..:/workspace:cached,z
     command: sleep infinity
