@@ -327,6 +327,7 @@ dependencies = [
  "humantime",
  "opentelemetry",
  "opentelemetry-otlp",
+ "opentelemetry-semantic-conventions",
  "opentelemetry_sdk",
  "schemars",
  "serde",

@@ -12,7 +12,7 @@ services:
       DATABASE_URL: mysql://root:rootpassword@ispyb/ispyb_build
       BUNDLER_DATABASE_URL: mysql://root:rootpassword@ispyb/ispyb_build
       BUNDLER_LOG_LEVEL: DEBUG
-      BUNDLER_TRACING_URL: http://collector:4317
+      BUNDLER_OTEL_COLLECTOR_URL: http://collector:4317
 
   opa:
     image: docker.io/openpolicyagent/opa:0.59.0
