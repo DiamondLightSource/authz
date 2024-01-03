@@ -1,0 +1,5 @@
+mkdocs
+mkdocs-techdocs-core
+mkdocs-include-markdown-plugin
+mkdocs-include-dir-to-nav
+mkdocs-awesome-pages-plugin
