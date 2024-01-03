@@ -1,4 +1,4 @@
-FROM docker.io/library/rust:1.77.1-bullseye AS build
+FROM docker.io/library/rust:1.77.1-bookworm AS build
 
 ARG DATABASE_URL
 
