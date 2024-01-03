@@ -5,7 +5,7 @@ metadata:
   title: Authorization Bundler
   description: An Open Policy Agent bundle server, providing access to permissionable data from ISPyB
   annotations:
-    diamond.ac.uk/viewdocs-url: https://diamondlightsource.github.io/authz/bundler
+    backstage.io/techdocs-ref: dir:.
 spec:
   owner: user:enu43627
 

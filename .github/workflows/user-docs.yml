@@ -32,3 +32,29 @@ jobs:
         with:
           name: user-docs
           path: site
+
+  publish_s3:
+    if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get docs artifact
+        uses: actions/download-artifact@v4.1.0
+        with:
+          name: user-docs
+          path: site
+
+      - name: Publish docs to s3 bucket
+        if: github.ref == 'refs/heads/main'
+        run: >
+          timeout -v 10m
+          npx @techdocs/cli publish
+          --entity default/system/auth-bundler
+          --publisher-type awsS3
+          --storage-name techdocs
+          --awsEndpoint https://s3.echo.stfc.ac.uk
+          --awsS3ForcePathStyle
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TECHDOCS_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TECHDOCS_S3_SECRET_ACCESS_KEY }}
+          AWS_REGION: ""
