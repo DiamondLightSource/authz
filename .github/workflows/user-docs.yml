@@ -1,0 +1,34 @@
+name: User Docs
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5.0.0
+        with:
+          python-version: 3.12
+
+      - name: Install Python Dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Build User Docs
+        run: mkdocs build
+
+      - name: Fix file permissions for pages
+        run: chmod -R +rX site
+
+      - name: Upload User Docs Artifact
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: user-docs
+          path: site
