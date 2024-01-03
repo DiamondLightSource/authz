@@ -12,7 +12,7 @@ services:
       DATABASE_URL: mysql://root:rootpassword@ispyb/ispyb_build
       BUNDLER_DATABASE_URL: mysql://root:rootpassword@ispyb/ispyb_build
       BUNDLER_LOG_LEVEL: DEBUG
-      BUNDLER_TRACING_URL: http://jaeger:4317
+      BUNDLER_TRACING_URL: http://collector:4317
 
   opa:
     image: docker.io/openpolicyagent/opa:0.59.0
@@ -27,13 +27,21 @@ services:
       - ./opa.yml:/config.yml:cached,z
       - ../org-policy/:/org-policy:cached,z
     environment:
-      TRACING_ADDRESS: jaeger:4317
+      TRACING_ADDRESS: collector:4317
 
   ispyb:
     image: ghcr.io/diamondlightsource/ispyb-database:v3.0.0
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: rootpassword
+
+  collector:
+    image: docker.io/otel/opentelemetry-collector:0.91.0
+    restart: unless-stopped
+    ports:
+      - 55679:55679
+    volumes:
+      - ./collector.yml:/etc/otelcol/config.yaml
 
   jaeger:
     image: docker.io/jaegertracing/all-in-one:1.52.0
