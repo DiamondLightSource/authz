@@ -15,6 +15,18 @@ To use the OPA instance in your deployment you should add the following to the `
 
 You may additionally wish to add a condition, e.g. `opa.enabled`. If added you will need to set the corresponding value to true when you [Configure your Values](#configure-values)
 
+## Create Secret
+
+The default OPA configuration expects a secret named `bundler` containing `bundler-token`, this should be set to the Bearer Token required by the bundler service. The token can be obtained by reaching out via the [`#auth_auth` slack channel](https://diamondlightsource.slack.com/archives/C03P6QB9589). To create the secret in your namespace simply run:
+
+```bash
+kubectl create secret generic bundler --from-literal=bundler-token=<BUNDLER_BEARER_TOKEN>
+```
+
+!!! tip
+
+    Sealed secrets can be used to securely store secrets alongside your configuration
+
 ## Configure Values
 
 The default values of the chart will deploy a single OPA instance which serves the latest Diamond Policy with Permissonable Data from the bundler.
