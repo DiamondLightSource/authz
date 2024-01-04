@@ -8,26 +8,9 @@ nameOverride: ""
 fullnameOverride: ""
 
 opa:
-  config:
-    services:
-      diamond-bundler:
-        url: https://authz.diamond.ac.uk
-      ghcr:
-        url: https://ghcr.io
-        type: oci
-    bundles:
-      diamond-permissionables:
-        service: diamond-bundler
-        resource: bundle.tar.gz
-        polling:
-          min_delay_seconds: 10
-          max_delay_seconds: 60
-      diamond-policies:
-        service: ghcr
-        resource: ghcr.io/diamondlightsource/authz-policy:0.0.4
-        polling:
-          min_delay_seconds: 30
-          max_delay_seconds: 120
+  configOverride: {}
+  extraServices: {}
+  extraBundles: {}
 
 serviceAccount:
   create: false

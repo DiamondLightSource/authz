@@ -4,5 +4,29 @@ metadata:
   name: opa-config
 data:
   config.yaml: |
-    {{ toYaml .Values.opa.config | nindent 4 }}
+    {{- if .Values.opa.configOverride }}
+    {{ .Values.opa.configOverride | toYaml | nindent 6 }}
+    {{- else }}
+    services:
+      diamond-bundler:
+        url: https://authz.diamond.ac.uk
+      ghcr:
+        url: https://ghcr.io
+        type: oci
+      {{ .Values.opa.extraServices | toYaml | nindent 8 }}
+    bundles:
+      diamond-permissionables:
+        service: diamond-bundler
+        resource: bundle.tar.gz
+        polling:
+          min_delay_seconds: 10
+          max_delay_seconds: 60
+      diamond-policies:
+        service: ghcr
+        resource: ghcr.io/diamondlightsource/authz-policy:0.0.4
+        polling:
+          min_delay_seconds: 30
+          max_delay_seconds: 120
+      {{ .Values.opa.extraBundles | toYaml | nindent 8 }}
+    {{- end }}
 
