@@ -8,8 +8,8 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: opa-http
+      targetPort: query
       protocol: TCP
-      name: http
+      name: query
   selector:
     {{- include "opa.selectorLabels" . | nindent 4 }}

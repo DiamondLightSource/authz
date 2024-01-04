@@ -32,11 +32,13 @@ spec:
         - name: {{ include "opa.name" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}:{{ include "opa.imageTag" . }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - run
             - --server
+            - --diagnostic-addr
+            - 0.0.0.0:8282
             - --config-file
             - /etc/opa-config/config.yaml
           {{- if .Values.opa.envOverride }}
@@ -57,17 +59,20 @@ spec:
             - name: opa-config
               mountPath: /etc/opa-config
           ports:
-            - name: http
-              containerPort: 8181
+            - name: query
+              containerPort: {{ include "opa.queryPort" . }}
+              protocol: TCP
+            - name: diagnostic
+              containerPort: 8282
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /health
-              port: http
+              port: diagnostic
           readinessProbe:
             httpGet:
               path: /health
-              port: http
+              port: diagnostic
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
