@@ -10,6 +10,9 @@ data:
     services:
       diamond-bundler:
         url: https://authz.diamond.ac.uk
+        credentials:
+          bearer:
+            token: ${BUNDLER_BEARER_TOKEN}
       ghcr:
         url: https://ghcr.io
         type: oci

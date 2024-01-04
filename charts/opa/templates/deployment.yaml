@@ -39,6 +39,20 @@ spec:
             - --server
             - --config-file
             - /etc/opa-config/config.yaml
+          {{- if .Values.opa.envOverride }}
+          env:
+          {{- .Values.opa.envOverride | toYaml | nindent 12 }}
+          {{- else }}
+          env:
+            - name: BUNDLER_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                    name: bundler
+                    key: bearer-token
+            {{- if .Values.opa.extraEnv }}
+            {{- .Values.opa.extraEnv | toYaml | nindent 12 }}
+            {{- end }}
+          {{- end }}
           volumeMounts:
             - name: opa-config
               mountPath: /etc/opa-config
