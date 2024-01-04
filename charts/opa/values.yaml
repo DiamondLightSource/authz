@@ -1,7 +1,9 @@
 image:
   repository: docker.io/openpolicyagent/opa
   pullPolicy: IfNotPresent
-  tag: 0.59.0
+  tagOverride: ""
+  version: 0.59.0
+  envoy: false
 
 imagePullSecrets: []
 nameOverride: ""
@@ -13,6 +15,7 @@ opa:
   extraBundles: {}
   envOverride: []
   extraEnv: []
+  portOverride: ""
 
 serviceAccount:
   create: false
