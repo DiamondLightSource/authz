@@ -11,6 +11,8 @@ opa:
   configOverride: {}
   extraServices: {}
   extraBundles: {}
+  envOverride: []
+  extraEnv: []
 
 serviceAccount:
   create: false
