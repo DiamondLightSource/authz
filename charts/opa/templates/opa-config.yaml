@@ -5,7 +5,7 @@ metadata:
 data:
   config.yaml: |
     {{- if .Values.opa.configOverride }}
-    {{ .Values.opa.configOverride | toYaml | nindent 6 }}
+    {{- .Values.opa.configOverride | toYaml | nindent 4 }}
     {{- else }}
     services:
       diamond-bundler:
@@ -16,7 +16,9 @@ data:
       ghcr:
         url: https://ghcr.io
         type: oci
-      {{ .Values.opa.extraServices | toYaml | nindent 8 }}
+      {{- if .Values.opa.extraServices }}
+      {{- .Values.opa.extraServices | toYaml | nindent 6 }}
+      {{- end }}
     bundles:
       diamond-permissionables:
         service: diamond-bundler
@@ -30,6 +32,11 @@ data:
         polling:
           min_delay_seconds: 30
           max_delay_seconds: 120
-      {{ .Values.opa.extraBundles | toYaml | nindent 8 }}
+      {{- if .Values.opa.extraBundles }}
+      {{- .Values.opa.extraBundles | toYaml | nindent 6 }}
+      {{- end }}
+    {{- if .Values.opa.extraConfig }}
+    {{- .Values.opa.extraConfig | toYaml | nindent 4 }}
+    {{- end }}
     {{- end }}
 
