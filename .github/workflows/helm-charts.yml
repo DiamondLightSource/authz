@@ -1,4 +1,4 @@
-name: OPA Chart
+name: Helm Charts
 
 on:
   push:
@@ -35,15 +35,20 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        chart:
+          - opa
+          - bundler
     steps:
       - name: Checkout source
         uses: actions/checkout@v4.1.1
 
       - name: Package Chart
-        run: helm package charts/opa
+        run: helm package charts/${{ matrix.chart }}
 
       - name: Generate Image Name
-        run: echo IMAGE_REPOSITORY=oci://ghcr.io/$(echo "${{ github.repository }}-opa" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]') >> $GITHUB_ENV
+        run: echo IMAGE_REPOSITORY=oci://ghcr.io/$(echo "${{ github.repository }}-${{ matrix.chart }}" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]') >> $GITHUB_ENV
 
       - name: Log in to GitHub Docker Registry
         if: github.event_name != 'pull_request'
@@ -55,4 +60,4 @@ jobs:
 
       - name: Publish Chart
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-        run: helm push $(ls opa-*.tgz) ${{ env.IMAGE_REPOSITORY }}
+        run: helm push $(ls ${{ matrix.chart }}-*.tgz) ${{ env.IMAGE_REPOSITORY }}
