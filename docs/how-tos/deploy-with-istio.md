@@ -17,7 +17,7 @@ opa:
   config:
     plugins:
       envoy_ext_authz_grpc:
-        path: #  Make this the root of your built policy
+        path: path/to/your/policy/root
 ```
 
 ## Enable Envoy Sidecar injection
@@ -42,7 +42,7 @@ kind: EnvoyFilter
 metadata:
   name: authz-envoyfilter
 spec:
-#   workloadSelector:  # Optionally apply only to a subset of Envoy sidecars in the namespace
+#   workloadSelector:  # Apply to a subset of Pods
 #     labels:
 #       app: reviews
   configPatches:
