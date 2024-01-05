@@ -9,6 +9,7 @@ fullnameOverride: ""
 
 opa:
   configOverride: {}
+  extraConfig: {}
   extraServices: {}
   extraBundles: {}
   envOverride: []
