@@ -5,6 +5,29 @@ on:
   pull_request:
 
 jobs:
+  test:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3.5
+
+      - name: Setup chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Lint
+        run: >
+          ct
+          lint
+          --target-branch=${{ github.event.repository.default_branch }}
+          --validate-maintainers=false
+
   build_publish:
     # Deduplicate jobs from pull requests and branch pushes within the same repo.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
