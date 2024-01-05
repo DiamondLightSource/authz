@@ -5,6 +5,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        "bierner.markdown-mermaid",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
         "rust-lang.rust-analyzer",
         "tamasfe.even-better-toml",

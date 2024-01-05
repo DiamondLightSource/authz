@@ -3,18 +3,19 @@ site_url: https://0.0.0.0/
 repo_url: https://github.com/DiamondLightSource/authz
 edit_uri: edit/main/docs/
 plugins:
-  - techdocs-core
-  - include-markdown
-  - include_dir_to_nav
-  - awesome-pages
+    - techdocs-core
+    - include-markdown
+    - include_dir_to_nav
+    - awesome-pages
+    - mermaid2
 
 nav:
-  - Home: index.md
-  - Tutorials:
-      - tutorials
-  - How Tos:
-      - how-tos
-  - Explanations:
-      - explanations
-  - References:
-      - references
+    - Home: index.md
+    - Tutorials:
+          - tutorials
+    - How Tos:
+          - how-tos
+    - Explanations:
+          - explanations
+    - References:
+          - references
