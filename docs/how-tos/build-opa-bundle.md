@@ -8,7 +8,7 @@ See also [the OPA documentation on Rego](https://www.openpolicyagent.org/docs/la
 
 ## Writing policy
 
-Below is an example of rego policy that calls out to a `module` in package `diamond` which defines two functions: `user_on_session(proposalNumber, visitNumber)` and `user_on_proposal(proposalNumber)`. While OPA typically expects all policy to be defined within a single bundle, in an attempt to abstract the moving target of Diamond Authentication and to simplify adoption, these functions will be defined in `org-policy` in this repository. 
+Below is an example of rego policy that uses a dependent package named `diamond` which defines granular authorization rules: it is assumed that the dependent package defines two methods: `user_on_session(proposalNumber, visitNumber)` and `user_on_proposal(proposalNumber)`. While OPA typically expects all policy to be defined within a single bundle, in an attempt to abstract the moving target of Diamond Authentication and to simplify adoption, these functions will be defined in `org-policy` in this repository and made available as a skeleton to write policy against.
 
 In this example the policy is being used for an example service which serves data over HTTP:
 
@@ -105,20 +105,11 @@ test_allow_user_on_proposal if {
 	allow with input as {"parsed_path": ["0"]} with data.diamond.user_on_proposal as user_on_proposal
 }
 ```
-
-In order to safely inject this mocked function, a dummy function must be defined in the namespace with the same name and arity. This can be done with a file that will not be built into the final bundle: here for example, `mocks_test.rego`
-
-```rego
-package diamond
-
-default user_on_proposal(_) := false
-default user_on_session(_, _) := false
-```
 The following github action workflow:
 
 - Runs on every pull_request or push to a branch (but only once)
 - Lints the policy in `org-policy` directory using the `regal` rego linter
-- Runs any tests in the `org-policy` directory, loading any policy files in the directory to e.g. inject the mocked functions
+- Runs any tests in the `org-policy` directory
 
 ```yaml
 name: Policy Test
@@ -166,8 +157,8 @@ jobs:
 The following github action
 
 - Runs on every pull_request or push to a branch (but only once)
-- Builds all policy in `org-policy` directory, except that in files matching `*_test.rego` (i.e., excluding any tests or any mocked functions, which can be injected from othe r bundles)
-- If the push to a branch had a tag created for the repository:
+- Builds all policy in `org-policy` directory, except that in files matching `*_test.rego` (i.e., excluding any tests)
+- If the push to a branch had a tag created for the repository, creates an OCI bundle that is release on the Github Container Registry [for consumption by a configured instance](configure-opa.md)
 
 ```yaml
 name: Policy Container
