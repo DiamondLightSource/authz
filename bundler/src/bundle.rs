@@ -1,9 +1,10 @@
 use crate::permissionables::{permissions::Permissions, proposals::Proposals, sessions::Sessions};
 use flate2::{write::GzEncoder, Compression};
+use schemars::{schema::RootSchema, schema_for, JsonSchema};
 use serde::Serialize;
 use sqlx::MySqlPool;
 use std::{
-    collections::hash_map::DefaultHasher,
+    collections::{hash_map::DefaultHasher, BTreeMap},
     hash::{Hash, Hasher},
 };
 use tar::Header;
@@ -147,5 +148,14 @@ where
         )?;
 
         Ok(bundle_builder.into_inner()?.finish()?)
+    }
+
+    /// Produces a set of schemas associated with the data in the bundle
+    pub fn schemas() -> BTreeMap<String, RootSchema> {
+        BTreeMap::from([
+            (Proposals::schema_name(), schema_for!(Proposals)),
+            (Sessions::schema_name(), schema_for!(Sessions)),
+            (Permissions::schema_name(), schema_for!(Permissions)),
+        ])
     }
 }
