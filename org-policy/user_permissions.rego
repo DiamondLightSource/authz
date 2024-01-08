@@ -2,24 +2,25 @@ package diamond
 
 import future.keywords
 
+profile := http.send({
+	"url": opa.runtime().env.PROFILE_ENDPOINT,
+	"method": "GET",
+	"headers": {"authorization": input.attributes.request.http.headers.authorization},
+})
+
+subject := profile.sub
+
 # METADATA
 # entrypoint: true
-default allow := false
-
-allow if {
-	user_on_proposal
+user_on_session(proposalNumber, visitNumber) if {
+	some allowed_session in data.users.sessions[subject]
+	allowed_session[0] == proposalNumber
+	allowed_session[1] == visitNumber
 }
 
-allow if {
-	user_on_session
-}
-
-user_on_session if {
-	some session in data.sessions[input.user]
-	session[0] == input.session
-}
-
-user_on_proposal if {
-	some proposal in data.proposals[input.user]
-	proposal == input.proposal
+# METADATA
+# entrypoint: true
+user_on_proposal(proposalNumber) if {
+	some allowed_proposal in data.users.proposals[subject]
+	allowed_proposal == proposalNumber
 }
