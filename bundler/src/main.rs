@@ -139,10 +139,11 @@ async fn serve(args: ServeArgs) {
     ));
     let app = Router::new()
         .route("/bundle.tar.gz", get(bundle_endpoint))
+        .with_state(current_bundle.clone())
         .route_layer(RequireBearerLayer::new(args.require_token))
+        .route("/healthz", get(health_endpoint))
         .fallback(fallback_endpoint)
-        .layer(TraceLayer::new_for_http())
-        .with_state(current_bundle.clone());
+        .layer(TraceLayer::new_for_http());
 
     let mut tasks = tokio::task::JoinSet::new();
     tasks.spawn(update_bundle(
@@ -202,6 +203,13 @@ async fn bundle_endpoint(
             current_bundle.as_ref().read().await.file.clone(),
         ),
     }
+}
+
+/// Returns an HTTP 200 response when requested.
+///
+/// Failures in the bundle update and serialization result in service crash, so ability to serve this endpoint implies liveness
+async fn health_endpoint() -> impl IntoResponse {
+    StatusCode::OK
 }
 
 /// Returns a HTTP 404 status code when a non-existant route is queried
