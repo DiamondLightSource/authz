@@ -1,9 +1,10 @@
+use schemars::JsonSchema;
 use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::BTreeMap;
 
 /// A mapping of users to their permissions via groups
-#[derive(Debug, Default, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Default, PartialEq, Eq, Hash, Serialize, JsonSchema)]
 pub struct Permissions(BTreeMap<String, Vec<String>>);
 
 impl Permissions {
