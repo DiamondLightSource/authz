@@ -7,13 +7,13 @@ edition = "2021"
 anyhow = "1.0.79"
 axum = { version = "0.7.3" }
 axum-extra = { version = "0.9.1", features = ["typed-header"] }
-clap = { version = "4.4.12", features = ["derive", "env"] }
+clap = { version = "4.4.13", features = ["derive", "env"] }
 dotenvy = { version = "0.15.7" }
 flate2 = { version = "1.0.28" }
 headers = { version = "0.4.0" }
 humantime = { version = "2.1.0" }
-serde = { version = "1.0.194", features = ["derive"] }
-serde_json = { version = "1.0.110" }
+serde = { version = "1.0.195", features = ["derive"] }
+serde_json = { version = "1.0.111" }
 sqlx = { version = "0.7.3", features = [
     "runtime-tokio",
     "tls-rustls",
