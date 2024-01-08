@@ -1,0 +1,53 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: opa
+          scrape_interval: 15s
+          metrics_path: /metrics
+          scheme: http
+          static_configs:
+            - targets:
+                - opa:8181
+
+processors:
+  batch:
+
+exporters:
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: :8889
+    namespace: default
+
+service:
+  extensions:
+    - health_check
+    - zpages
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - batch
+      exporters:
+        - otlp/jaeger
+    metrics:
+      receivers:
+        - otlp
+        - prometheus
+      processors:
+        - batch
+      exporters:
+        - prometheus
+
+extensions:
+  health_check:
+  zpages:
+    endpoint: :55679
