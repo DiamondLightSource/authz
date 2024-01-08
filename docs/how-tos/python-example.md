@@ -86,13 +86,3 @@ env:
       key: oidc-client
 [...]
 ```
-
-## Using the fastapi-opa middleware with an alternative Authentication method
-
-### This is NOT RECOMMENDED.
-
-While it is highly recommended to implement Authentication and Authorization together, in the case that you are already authenticating your requests, e.g. with `oauth2-proxy`, the following configuration allows for a `fastapi-opa` configuration without embedded authentication. 
-
-```python
-opa_config = OPAConfig(authentication=[], opa_host=os.getenv("OPA_HOST"))
-```
