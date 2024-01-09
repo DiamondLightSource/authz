@@ -11,7 +11,7 @@ pub struct SubjectPermissions(BTreeMap<String, Vec<String>>);
 
 impl SubjectPermissions {
     /// Fetches [`SubjectAttributes`] from ISPyB
-    #[instrument(name = "fetch_permissions")]
+    #[instrument(name = "fetch_subject_permissions")]
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let permisions_rows = query_as!(
             PermissionRow,
