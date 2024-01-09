@@ -13,7 +13,7 @@ subject := profile.sub
 # METADATA
 # entrypoint: true
 user_on_session(proposalNumber, visitNumber) if {
-	some allowed_session in data.diamond.users.sessions[subject]
+	some allowed_session in data.diamond.data.users.sessions[subject]
 	allowed_session[0] = proposalNumber
 	allowed_session[1] = visitNumber
 }
@@ -21,6 +21,6 @@ user_on_session(proposalNumber, visitNumber) if {
 # METADATA
 # entrypoint: true
 user_on_proposal(proposalNumber) if {
-	some allowed_proposal in data.diamond.users.proposals[subject]
+	some allowed_proposal in data.diamond.data.users.proposals[subject]
 	allowed_proposal = proposalNumber
 }
