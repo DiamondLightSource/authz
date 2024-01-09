@@ -11,7 +11,7 @@ pub struct SubjectProposals(BTreeMap<String, Vec<u32>>);
 
 impl SubjectProposals {
     /// Fetches [`Proposals`] from ISPyB
-    #[instrument(name = "fetch_proposals")]
+    #[instrument(name = "fetch_subject_proposals")]
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let proposal_rows = query_as!(
             RawProposalRow,

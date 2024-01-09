@@ -27,7 +27,7 @@ pub struct Subject {
     /// The proposals the subject is associated with
     proposals: Vec<u32>,
     /// The sessions the subject is associated with
-    sessions: Vec<(u32, u32)>,
+    sessions: Vec<u32>,
 }
 
 impl Subjects {
