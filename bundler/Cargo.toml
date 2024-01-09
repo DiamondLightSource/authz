@@ -9,6 +9,7 @@ axum = { version = "0.7.3" }
 axum-extra = { version = "0.9.1", features = ["typed-header"] }
 clap = { version = "4.4.13", features = ["derive", "env"] }
 clio = { version = "0.3.5", features = ["clap-parse"] }
+derive_more = { version = "0.99.17" }
 dotenvy = { version = "0.15.7" }
 flate2 = { version = "1.0.28" }
 headers = { version = "0.4.0" }
