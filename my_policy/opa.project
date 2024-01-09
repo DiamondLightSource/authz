@@ -1,0 +1,10 @@
+name: application_policy
+source: src
+tests: test
+dependencies:
+    diamond_policy:  # TODO: Make git dependency, then make OCI dependency when possible
+        location: file:/../org-policy/
+        namespace: false
+build:
+    entrypoints:
+    - "application.policy.allow"
