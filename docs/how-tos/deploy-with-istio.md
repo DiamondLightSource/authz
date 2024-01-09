@@ -116,6 +116,6 @@ spec:
             grpc_service:
               # EnvoyGrpc has issue with requiring http2, use of GoogleGrpc seems to be standard
               google_grpc:
-                target_uri: {{ include "opa.fullname" . }}:9191
+                target_uri: {{ include "opa.fullname" . }}:9191  # N.B. Must be the name of your OPA service in the namespace
                 stat_prefix: "ext_authz"
 ```
