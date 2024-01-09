@@ -12,12 +12,20 @@ subject := profile.sub
 
 # METADATA
 # entrypoint: true
-user_on_session(proposalNumber, visitNumber) if {
-	[proposalNumber, visitNumber] in data.diamond.data.users.sessions[subject]
+can_read_from_session(proposalNumber, visitNumber) if {
+	user_on_session(proposalNumber, visitNumber)
 }
 
 # METADATA
 # entrypoint: true
+can_write_to_session(proposalNumber, visitNumber) if {
+	user_on_session(proposalNumber, visitNumber)
+}
+
+user_on_session(proposalNumber, visitNumber) if {
+	[proposalNumber, visitNumber] in data.diamond.data.users.sessions[subject]
+}
+
 user_on_proposal(proposalNumber) if {
 	proposalNumber in data.diamond.data.users.proposals[subject]
 }
