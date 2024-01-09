@@ -8,7 +8,7 @@ See also [the OPA documentation on Rego](https://www.openpolicyagent.org/docs/la
 
 ## Writing policy
 
-Below is an example of rego policy that uses a dependent package named `diamond` which defines granular authorization rules: it is assumed that the dependent package defines two methods: `user_on_session(proposalNumber, visitNumber)` and `user_on_proposal(proposalNumber)`. While OPA typically expects all policy to be defined within a single bundle, in an attempt to abstract the moving target of Diamond Authentication and to simplify adoption, these functions will be defined in `org-policy` in this repository and made available as a skeleton to write policy against.
+Below is an example of rego policy that uses a dependent package named `diamond` which defines granular authorization rules: it is assumed that the dependent package defines two methods: `user_on_session(proposalNumber, visitNumber)` and `user_on_proposal(proposalNumber)`. While OPA typically expects all policy to be defined within a single bundle, in an attempt to abstract the moving target of Diamond Authentication and to simplify adoption, these functions will be defined in `org-policy` in this repository and made available to write policy against.
 
 In this example the policy is being used for an example service which serves data over HTTP:
 
@@ -91,7 +91,7 @@ The following test file mocks the `data.diamond.user_on_proposal` function for t
 ```rego
 package my_policy
 
-import future.keywords
+import rego.v1
 
 user_on_proposal(proposalNumber) if {
 	proposalNumber = "0"
