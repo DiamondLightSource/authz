@@ -1,14 +1,15 @@
+use derive_more::{Deref, DerefMut};
 use schemars::JsonSchema;
 use serde::Serialize;
 use sqlx::{query_as, MySqlPool};
 use std::collections::BTreeMap;
 use tracing::instrument;
 
-/// A mapping of users to their sessions, possibly via proposals
-#[derive(Debug, Default, PartialEq, Eq, Hash, Serialize, JsonSchema)]
-pub struct Sessions(BTreeMap<String, Vec<(u32, u32)>>);
+/// A mapping of subjects to their sessions, possibly via proposals
+#[derive(Debug, Default, Deref, DerefMut, PartialEq, Eq, Hash, Serialize, JsonSchema)]
+pub struct SubjectSessions(BTreeMap<String, Vec<(u32, u32)>>);
 
-impl Sessions {
+impl SubjectSessions {
     /// Fetches [`Sessions`] from ISPyB
     #[instrument(name = "fetch_sessions")]
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
@@ -16,7 +17,7 @@ impl Sessions {
             RawSessionRow,
             "
             SELECT
-                login as fed_id,
+                login as subject,
                 proposalNumber AS proposal_number,
                 visit_number
             FROM
@@ -28,7 +29,7 @@ impl Sessions {
                 Proposal.externalId IS NOT NULL
             UNION
             SELECT
-                login as fed_id,
+                login as subject,
                 proposalNumber AS proposal_number,
                 visit_number
             FROM (
@@ -52,10 +53,10 @@ impl Sessions {
     }
 }
 
-/// A row from ISPyB detailing the sessions a user is associcated with
+/// A row from ISPyB detailing the sessions a subject is associcated with
 struct SessionRow {
-    /// The FedID of the user
-    fed_id: String,
+    /// The unique identifier of the subject
+    subject: String,
     /// The proposal number of the visit
     proposal_number: u32,
     /// The number of the visit within the proposal
@@ -64,7 +65,7 @@ struct SessionRow {
 
 #[allow(clippy::missing_docs_in_private_items)]
 struct RawSessionRow {
-    fed_id: Option<String>,
+    subject: Option<String>,
     proposal_number: Option<String>,
     visit_number: Option<u32>,
 }
@@ -74,7 +75,7 @@ impl TryFrom<RawSessionRow> for SessionRow {
 
     fn try_from(value: RawSessionRow) -> Result<Self, Self::Error> {
         Ok(Self {
-            fed_id: value.fed_id.ok_or(anyhow::anyhow!("FedId was NULL"))?,
+            subject: value.subject.ok_or(anyhow::anyhow!("FedId was NULL"))?,
             proposal_number: value
                 .proposal_number
                 .ok_or(anyhow::anyhow!("Proposal number was NULL"))?
@@ -84,14 +85,13 @@ impl TryFrom<RawSessionRow> for SessionRow {
     }
 }
 
-impl FromIterator<RawSessionRow> for Sessions {
+impl FromIterator<RawSessionRow> for SubjectSessions {
     fn from_iter<T: IntoIterator<Item = RawSessionRow>>(iter: T) -> Self {
         let mut sessions = Self::default();
         for session_row in iter {
             if let Ok(session_row) = SessionRow::try_from(session_row) {
                 sessions
-                    .0
-                    .entry(session_row.fed_id)
+                    .entry(session_row.subject)
                     .or_default()
                     .push((session_row.proposal_number, session_row.visit_number));
             }
@@ -102,26 +102,26 @@ impl FromIterator<RawSessionRow> for Sessions {
 
 #[cfg(test)]
 mod tests {
-    use super::Sessions;
+    use super::SubjectSessions;
     use sqlx::MySqlPool;
     use std::collections::{BTreeMap, BTreeSet};
 
     #[sqlx::test(migrations = "tests/migrations")]
     async fn fetch_empty(ispyb_pool: MySqlPool) {
-        let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
-        let expected = Sessions(BTreeMap::new());
+        let sessions = SubjectSessions::fetch(&ispyb_pool).await.unwrap();
+        let expected = SubjectSessions(BTreeMap::new());
         assert_eq!(expected, sessions);
     }
 
     #[sqlx::test(
         migrations = "tests/migrations",
         fixtures(
-            path = "../../tests/fixtures",
+            path = "../../../tests/fixtures",
             scripts("session_membership", "beamline_sessions", "persons", "proposals")
         )
     )]
     async fn fetch_direct(ispyb_pool: MySqlPool) {
-        let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
+        let sessions = SubjectSessions::fetch(&ispyb_pool).await.unwrap();
         let mut expected = BTreeMap::new();
         expected.insert("foo".to_string(), vec![(10030, 10), (10030, 11)]);
         expected.insert("bar".to_string(), vec![(10031, 10)]);
@@ -138,12 +138,12 @@ mod tests {
     #[sqlx::test(
         migrations = "tests/migrations",
         fixtures(
-            path = "../../tests/fixtures",
+            path = "../../../tests/fixtures",
             scripts("proposal_membership", "beamline_sessions", "persons", "proposals")
         )
     )]
     async fn fetch_indirect(ispyb_pool: MySqlPool) {
-        let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
+        let sessions = SubjectSessions::fetch(&ispyb_pool).await.unwrap();
         let mut expected = BTreeMap::new();
         expected.insert(
             "foo".to_string(),
@@ -172,7 +172,7 @@ mod tests {
     #[sqlx::test(
         migrations = "tests/migrations",
         fixtures(
-            path = "../../tests/fixtures",
+            path = "../../../tests/fixtures",
             scripts(
                 "session_membership",
                 "proposal_membership",
@@ -183,7 +183,7 @@ mod tests {
         )
     )]
     async fn fetch_both(ispyb_pool: MySqlPool) {
-        let sessions = Sessions::fetch(&ispyb_pool).await.unwrap();
+        let sessions = SubjectSessions::fetch(&ispyb_pool).await.unwrap();
         let mut expected = BTreeMap::new();
         expected.insert(
             "foo".to_string(),

@@ -1,4 +1,3 @@
-use crate::permissionables::{permissions::Permissions, proposals::Proposals, sessions::Sessions};
 use flate2::{write::GzEncoder, Compression};
 use schemars::{schema::RootSchema, schema_for, JsonSchema};
 use serde::Serialize;
@@ -10,6 +9,8 @@ use std::{
 };
 use tar::Header;
 use tracing::instrument;
+
+use crate::permissionables::subjects::Subjects;
 
 /// A compiled Web Assembly module
 #[derive(Debug, Serialize)]
@@ -62,12 +63,8 @@ where
 {
     /// The manifest file, which contains data about the bundle and optional additonal metadata
     manifest: Manifest<Metadata>,
-    /// A mapping of users to their proposals
-    proposals: Proposals,
-    /// A mapping of users to their sessions
-    sessions: Sessions,
-    /// A mapping of users to their permissions via groups
-    permissions: Permissions,
+    /// A mapping of subjects to their attributes
+    subjects: Subjects,
 }
 
 /// The prefix applied to data files in the bundle. Open Policy Agent does not support loading bundles with overlapping prefixes
@@ -77,18 +74,11 @@ impl<Metadata> Bundle<Metadata>
 where
     Metadata: Debug + Hash + Serialize,
 {
-    /// Creates a [`Bundle`] from known [`Proposals`], [`Sessions`] and [`Permissions`]
-    pub fn new(
-        metadata: Metadata,
-        proposals: Proposals,
-        sessions: Sessions,
-        permissions: Permissions,
-    ) -> Self {
+    /// Creates a [`Bundle`] from known [`Subjects`]
+    pub fn new(metadata: Metadata, subjects: Subjects) -> Self {
         let mut hasher = DefaultHasher::new();
         metadata.hash(&mut hasher);
-        proposals.hash(&mut hasher);
-        sessions.hash(&mut hasher);
-        permissions.hash(&mut hasher);
+        subjects.hash(&mut hasher);
         let hash = hasher.finish();
 
         Self {
@@ -98,19 +88,15 @@ where
                 wasm: vec![],
                 metadata,
             },
-            proposals,
-            sessions,
-            permissions,
+            subjects,
         }
     }
 
-    /// Fetches [`Proposals`], [`Sessions`] and [`Permissions`] for ISPyB and constructs a [`Bundle`]
+    /// Fetches [`Subjects`] from ISPyB and constructs a [`Bundle`]
     #[instrument(name = "fetch_bundle")]
     pub async fn fetch(metadata: Metadata, ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
-        let proposals = Proposals::fetch(ispyb_pool).await?;
-        let sessions = Sessions::fetch(ispyb_pool).await?;
-        let permissions = Permissions::fetch(ispyb_pool).await?;
-        Ok(Self::new(metadata, proposals, sessions, permissions))
+        let subjects = Subjects::fetch(ispyb_pool).await?;
+        Ok(Self::new(metadata, subjects))
     }
 
     /// The current revision of the bundle, as recorded in the [`Manifest`]
@@ -126,28 +112,12 @@ where
         let mut manifest_header = Header::from_bytes(&manifest);
         bundle_builder.append_data(&mut manifest_header, ".manifest", manifest.as_slice())?;
 
-        let proposals = serde_json::to_vec(&self.proposals)?;
-        let mut proposals_header = Header::from_bytes(&proposals);
+        let subjects = serde_json::to_vec(&self.subjects)?;
+        let mut subjects_header = Header::from_bytes(&subjects);
         bundle_builder.append_data(
-            &mut proposals_header,
-            format!("{BUNDLE_PREFIX}/users/proposals/data.json"),
-            proposals.as_slice(),
-        )?;
-
-        let sessions = serde_json::to_vec(&self.sessions)?;
-        let mut sessions_header = Header::from_bytes(&sessions);
-        bundle_builder.append_data(
-            &mut sessions_header,
-            format!("{BUNDLE_PREFIX}/users/sessions/data.json"),
-            sessions.as_slice(),
-        )?;
-
-        let permissions = serde_json::to_vec(&self.permissions)?;
-        let mut permissions_header = Header::from_bytes(&permissions);
-        bundle_builder.append_data(
-            &mut permissions_header,
-            format!("{BUNDLE_PREFIX}/users/permissions/data.json"),
-            permissions.as_slice(),
+            &mut subjects_header,
+            format!("{BUNDLE_PREFIX}/subjects/data.json"),
+            subjects.as_slice(),
         )?;
 
         Ok(bundle_builder.into_inner()?.finish()?)
@@ -155,10 +125,6 @@ where
 
     /// Produces a set of schemas associated with the data in the bundle
     pub fn schemas() -> BTreeMap<String, RootSchema> {
-        BTreeMap::from([
-            (Proposals::schema_name(), schema_for!(Proposals)),
-            (Sessions::schema_name(), schema_for!(Sessions)),
-            (Permissions::schema_name(), schema_for!(Permissions)),
-        ])
+        BTreeMap::from([(Subjects::schema_name(), schema_for!(Subjects))])
     }
 }
