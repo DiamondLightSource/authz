@@ -1,4 +1,4 @@
-package diamond
+package diamond.policy
 
 import rego.v1
 
@@ -13,14 +13,11 @@ subject := profile.sub
 # METADATA
 # entrypoint: true
 user_on_session(proposalNumber, visitNumber) if {
-	some allowed_session in data.diamond.data.users.sessions[subject]
-	allowed_session[0] = proposalNumber
-	allowed_session[1] = visitNumber
+	[proposalNumber, visitNumber] in data.diamond.data.users.sessions[subject]
 }
 
 # METADATA
 # entrypoint: true
 user_on_proposal(proposalNumber) if {
-	some allowed_proposal in data.diamond.data.users.proposals[subject]
-	allowed_proposal = proposalNumber
+	proposalNumber in data.diamond.data.users.proposals[subject]
 }
