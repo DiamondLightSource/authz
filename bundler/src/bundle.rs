@@ -10,7 +10,7 @@ use std::{
 use tar::Header;
 use tracing::instrument;
 
-use crate::permissionables::{sessions::Sessions, subjects::Subjects};
+use crate::permissionables::{proposals::Proposals, sessions::Sessions, subjects::Subjects};
 
 /// A compiled Web Assembly module
 #[derive(Debug, Serialize)]
@@ -67,6 +67,8 @@ where
     subjects: Subjects,
     /// A mapping of sessions to their various attributes
     sessions: Sessions,
+    /// A mapping of proposals to their various attributes
+    proposals: Proposals,
 }
 
 /// The prefix applied to data files in the bundle. Open Policy Agent does not support loading bundles with overlapping prefixes
@@ -77,11 +79,17 @@ where
     Metadata: Debug + Hash + Serialize,
 {
     /// Creates a [`Bundle`] from known [`Subjects`]
-    pub fn new(metadata: Metadata, subjects: Subjects, sessions: Sessions) -> Self {
+    pub fn new(
+        metadata: Metadata,
+        subjects: Subjects,
+        sessions: Sessions,
+        proposals: Proposals,
+    ) -> Self {
         let mut hasher = DefaultHasher::new();
         metadata.hash(&mut hasher);
         subjects.hash(&mut hasher);
         sessions.hash(&mut hasher);
+        proposals.hash(&mut hasher);
         let hash = hasher.finish();
 
         Self {
@@ -93,6 +101,7 @@ where
             },
             subjects,
             sessions,
+            proposals,
         }
     }
 
@@ -101,7 +110,8 @@ where
     pub async fn fetch(metadata: Metadata, ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let subjects = Subjects::fetch(ispyb_pool).await?;
         let sessions = Sessions::fetch(ispyb_pool).await?;
-        Ok(Self::new(metadata, subjects, sessions))
+        let proposals = Proposals::fetch(ispyb_pool).await?;
+        Ok(Self::new(metadata, subjects, sessions, proposals))
     }
 
     /// The current revision of the bundle, as recorded in the [`Manifest`]
@@ -133,6 +143,14 @@ where
             sessions.as_slice(),
         )?;
 
+        let proposals = serde_json::to_vec(&self.proposals)?;
+        let mut proposals_header = Header::from_bytes(&proposals);
+        bundle_builder.append_data(
+            &mut proposals_header,
+            format!("{BUNDLE_PREFIX}/proposals/data.json"),
+            proposals.as_slice(),
+        )?;
+
         Ok(bundle_builder.into_inner()?.finish()?)
     }
 
@@ -141,6 +159,7 @@ where
         BTreeMap::from([
             (Subjects::schema_name(), schema_for!(Subjects)),
             (Sessions::schema_name(), schema_for!(Sessions)),
+            (Proposals::schema_name(), schema_for!(Proposals)),
         ])
     }
 }
