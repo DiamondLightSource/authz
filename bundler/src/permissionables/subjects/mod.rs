@@ -13,6 +13,7 @@ use schemars::JsonSchema;
 use serde::Serialize;
 use sqlx::MySqlPool;
 use std::collections::{BTreeMap, HashSet};
+use tokio::try_join;
 use tracing::instrument;
 
 /// A mapping of subjects to their various attributes
@@ -33,9 +34,11 @@ pub struct Subject {
 impl Subjects {
     #[instrument(name = "fetch_subjects")]
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
-        let mut permissions = SubjectPermissions::fetch(ispyb_pool).await?;
-        let mut proposals = SubjectProposals::fetch(ispyb_pool).await?;
-        let mut sessions = SubjectSessions::fetch(ispyb_pool).await?;
+        let (mut permissions, mut proposals, mut sessions) = try_join!(
+            SubjectPermissions::fetch(ispyb_pool),
+            SubjectProposals::fetch(ispyb_pool),
+            SubjectSessions::fetch(ispyb_pool)
+        )?;
 
         let mut subjects = Self::default();
         for subject in permissions

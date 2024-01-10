@@ -8,6 +8,7 @@ use std::{
     hash::{Hash, Hasher},
 };
 use tar::Header;
+use tokio::try_join;
 use tracing::instrument;
 
 use crate::permissionables::{
@@ -115,10 +116,12 @@ where
     /// Fetches [`Subjects`] from ISPyB and constructs a [`Bundle`]
     #[instrument(name = "fetch_bundle")]
     pub async fn fetch(metadata: Metadata, ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
-        let subjects = Subjects::fetch(ispyb_pool).await?;
-        let sessions = Sessions::fetch(ispyb_pool).await?;
-        let proposals = Proposals::fetch(ispyb_pool).await?;
-        let beamlines = Beamlines::fetch(ispyb_pool).await?;
+        let (subjects, sessions, proposals, beamlines) = try_join!(
+            Subjects::fetch(ispyb_pool),
+            Sessions::fetch(ispyb_pool),
+            Proposals::fetch(ispyb_pool),
+            Beamlines::fetch(ispyb_pool),
+        )?;
         Ok(Self::new(
             metadata, subjects, sessions, proposals, beamlines,
         ))
