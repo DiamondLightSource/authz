@@ -10,7 +10,9 @@ use std::{
 use tar::Header;
 use tracing::instrument;
 
-use crate::permissionables::{proposals::Proposals, sessions::Sessions, subjects::Subjects};
+use crate::permissionables::{
+    beamlines::Beamlines, proposals::Proposals, sessions::Sessions, subjects::Subjects,
+};
 
 /// A compiled Web Assembly module
 #[derive(Debug, Serialize)]
@@ -69,6 +71,8 @@ where
     sessions: Sessions,
     /// A mapping of proposals to their various attributes
     proposals: Proposals,
+    /// A mapping of beamlines to their various attributes
+    beamlines: Beamlines,
 }
 
 /// The prefix applied to data files in the bundle. Open Policy Agent does not support loading bundles with overlapping prefixes
@@ -84,12 +88,14 @@ where
         subjects: Subjects,
         sessions: Sessions,
         proposals: Proposals,
+        beamlines: Beamlines,
     ) -> Self {
         let mut hasher = DefaultHasher::new();
         metadata.hash(&mut hasher);
         subjects.hash(&mut hasher);
         sessions.hash(&mut hasher);
         proposals.hash(&mut hasher);
+        beamlines.hash(&mut hasher);
         let hash = hasher.finish();
 
         Self {
@@ -102,6 +108,7 @@ where
             subjects,
             sessions,
             proposals,
+            beamlines,
         }
     }
 
@@ -111,7 +118,10 @@ where
         let subjects = Subjects::fetch(ispyb_pool).await?;
         let sessions = Sessions::fetch(ispyb_pool).await?;
         let proposals = Proposals::fetch(ispyb_pool).await?;
-        Ok(Self::new(metadata, subjects, sessions, proposals))
+        let beamlines = Beamlines::fetch(ispyb_pool).await?;
+        Ok(Self::new(
+            metadata, subjects, sessions, proposals, beamlines,
+        ))
     }
 
     /// The current revision of the bundle, as recorded in the [`Manifest`]
@@ -151,6 +161,14 @@ where
             proposals.as_slice(),
         )?;
 
+        let beamlines = serde_json::to_vec(&self.beamlines)?;
+        let mut beamlines_header = Header::from_bytes(&beamlines);
+        bundle_builder.append_data(
+            &mut beamlines_header,
+            format!("{BUNDLE_PREFIX}/beamlines/data.json"),
+            beamlines.as_slice(),
+        )?;
+
         Ok(bundle_builder.into_inner()?.finish()?)
     }
 
@@ -160,6 +178,7 @@ where
             (Subjects::schema_name(), schema_for!(Subjects)),
             (Sessions::schema_name(), schema_for!(Sessions)),
             (Proposals::schema_name(), schema_for!(Proposals)),
+            (Beamlines::schema_name(), schema_for!(Beamlines)),
         ])
     }
 }
