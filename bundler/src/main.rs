@@ -221,7 +221,10 @@ fn setup_telemetry(
 /// Creates a connection pool to the ISPyB instance at the provided [`Url`]
 #[instrument]
 async fn connect_ispyb(database_url: Url) -> Result<MySqlPool, sqlx::Error> {
-    MySqlPoolOptions::new().connect(database_url.as_str()).await
+    tracing::info!("Establishing connection with ISPyB");
+    let connection = MySqlPoolOptions::new().connect(database_url.as_str()).await;
+    tracing::info!("Connection established wiht ISPyB");
+    connection
 }
 
 /// Fetches the intial [`Bundle`] from ISPyB and produces the correspoinding [`BundleFile`]
@@ -229,15 +232,22 @@ async fn connect_ispyb(database_url: Url) -> Result<MySqlPool, sqlx::Error> {
 async fn fetch_initial_bundle(
     ispyb_pool: &MySqlPool,
 ) -> Result<Arc<RwLock<BundleFile<NoMetadata>>>, anyhow::Error> {
-    Ok(Arc::new(RwLock::new(BundleFile::try_from(
+    tracing::info!("Fetching initial bundle");
+    let bundle = Arc::new(RwLock::new(BundleFile::try_from(
         Bundle::fetch(NoMetadata, ispyb_pool).await.unwrap(),
-    )?)))
+    )?));
+    tracing::info!(
+        "Using bundle with revison: {}",
+        bundle.as_ref().read().await.bundle.revision()
+    );
+    Ok(bundle)
 }
 
 /// Bind to the provided socket address and serve the application endpoints
 async fn serve_endpoints(port: u16, app: Router) {
     let socket_addr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, port));
     let listener = TcpListener::bind(socket_addr).await.unwrap();
+    tracing::info!("Serving HTTP API on {}", socket_addr);
     axum::serve(listener, app).await.unwrap()
 }
 
@@ -252,9 +262,22 @@ async fn update_bundle(
     loop {
         sleep_until(next_fetch).await;
         next_fetch = next_fetch.add(polling_interval);
+        tracing::info!("Updating bundle");
         let bundle = Bundle::fetch(NoMetadata, &ispyb_pool).await.unwrap();
         let bundle_file = BundleFile::try_from(bundle).unwrap();
+        let old_revision = current_bundle
+            .as_ref()
+            .read()
+            .await
+            .bundle
+            .revision()
+            .to_owned();
         *current_bundle.as_ref().write().await = bundle_file;
+        tracing::info!(
+            "Updated bundle from {} to {}",
+            old_revision,
+            current_bundle.as_ref().read().await.bundle.revision()
+        );
     }
 }
 
@@ -265,7 +288,6 @@ async fn bundle_endpoint(
     State(current_bundle): State<CurrentBundle>,
     if_none_match: Option<TypedHeader<IfNoneMatch>>,
 ) -> impl IntoResponse {
-    tracing::info!(counter.bundle_requests = 1);
     let etag = ETag::from_str(&format!(
         r#""{}""#,
         current_bundle.as_ref().read().await.bundle.revision()
@@ -273,6 +295,11 @@ async fn bundle_endpoint(
     .unwrap();
     let mut headers = HeaderMap::new();
     headers.typed_insert(etag.clone());
+    tracing::info!(
+        "Request had If-None-Match of {:?}, current ETag is {:?}",
+        if_none_match,
+        etag
+    );
     match if_none_match {
         Some(TypedHeader(if_none_match)) if !if_none_match.precondition_passes(&etag) => {
             (StatusCode::NOT_MODIFIED, headers, Bytes::new())
