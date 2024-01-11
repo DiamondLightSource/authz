@@ -44,7 +44,9 @@ use tokio::{
     sync::RwLock,
     time::{sleep_until, Instant},
 };
-use tower_http::trace::{DefaultOnFailure, DefaultOnRequest, DefaultOnResponse, TraceLayer};
+use tower_http::trace::{
+    DefaultMakeSpan, DefaultOnFailure, DefaultOnRequest, DefaultOnResponse, TraceLayer,
+};
 use tracing::instrument;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use url::Url;
@@ -143,6 +145,7 @@ async fn serve(args: ServeArgs) {
         .fallback(fallback_endpoint)
         .layer(
             TraceLayer::new_for_http()
+                .make_span_with(DefaultMakeSpan::new().level(tracing::Level::INFO))
                 .on_request(DefaultOnRequest::default().level(tracing::Level::INFO))
                 .on_response(DefaultOnResponse::new().level(tracing::Level::INFO))
                 .on_failure(DefaultOnFailure::new().level(tracing::Level::INFO)),
