@@ -18,6 +18,7 @@ impl Proposals {
             "
             SELECT
                 proposalNumber as proposal_number,
+                visit_number,
                 sessionId as session_id
             FROM
                 BLSession
@@ -37,13 +38,15 @@ impl Proposals {
 #[derive(Debug, Default, PartialEq, Eq, Hash, Serialize, JsonSchema)]
 pub struct Proposal {
     /// The sessions which took place within the proposal
-    sessions: Vec<u32>,
+    sessions: BTreeMap<u32, u32>,
 }
 
 /// A row from ISPyB detailing the sessions in a proposal
 struct ProposalRow {
     /// The proposal number
     proposal_number: u32,
+    /// The number of the visit on the proposal
+    visit_number: u32,
     /// An opaque identifier of the session
     session_id: u32,
 }
@@ -51,6 +54,7 @@ struct ProposalRow {
 #[allow(clippy::missing_docs_in_private_items)]
 struct RawProposalRow {
     proposal_number: Option<String>,
+    visit_number: Option<u32>,
     session_id: u32,
 }
 
@@ -63,6 +67,7 @@ impl TryFrom<RawProposalRow> for ProposalRow {
                 .proposal_number
                 .ok_or(anyhow::anyhow!("Proposal Number was NULL"))?
                 .parse()?,
+            visit_number: value.visit_number.unwrap_or_default(),
             session_id: value.session_id,
         })
     }
@@ -77,7 +82,7 @@ impl FromIterator<RawProposalRow> for Proposals {
                     .entry(proposal_row.proposal_number)
                     .or_default()
                     .sessions
-                    .push(proposal_row.session_id)
+                    .insert(proposal_row.visit_number, proposal_row.session_id);
             }
         }
         proposals
@@ -110,13 +115,13 @@ mod tests {
         expected.insert(
             10030,
             Proposal {
-                sessions: vec![40, 41, 42],
+                sessions: BTreeMap::from([(10, 40), (11, 41), (12, 42)]),
             },
         );
         expected.insert(
             10031,
             Proposal {
-                sessions: vec![43, 44],
+                sessions: BTreeMap::from([(10, 43), (11, 44)]),
             },
         );
         assert_eq!(expected, beamlines.0);
