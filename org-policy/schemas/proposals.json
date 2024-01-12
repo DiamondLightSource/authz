@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Proposals",
+    "description": "A mapping of proposals to their various attributes",
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/definitions/Proposal"
+    },
+    "definitions": {
+      "Proposal": {
+        "description": "The various attributes of a proposal",
+        "type": "object",
+        "required": [
+          "sessions"
+        ],
+        "properties": {
+          "sessions": {
+            "description": "The sessions which took place within the proposal",
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          }
+        }
+      }
+    }
+  }
+  

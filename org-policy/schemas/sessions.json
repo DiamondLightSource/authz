@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Sessions",
+    "description": "A mapping of sessions to their various attributes",
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/definitions/Session"
+    },
+    "definitions": {
+      "Session": {
+        "description": "The various attributes of a session",
+        "type": "object",
+        "required": [
+          "beamline",
+          "proposal_number",
+          "visit_number"
+        ],
+        "properties": {
+          "beamline": {
+            "description": "The beamline the session took place on",
+            "type": "string"
+          },
+          "proposal_number": {
+            "description": "The number of the proposal this session belongs to",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "visit_number": {
+            "description": "The number of the visit within the proposal this session belongs to",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      }
+    }
+  }
+  

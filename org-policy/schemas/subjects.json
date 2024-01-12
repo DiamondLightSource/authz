@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Subjects",
+    "description": "A mapping of subjects to their various attributes",
+    "type": "object",
+    "additionalProperties": {
+      "$ref": "#/definitions/Subject"
+    },
+    "definitions": {
+      "Subject": {
+        "description": "The various attributes of a subject",
+        "type": "object",
+        "required": [
+          "permissions",
+          "proposals",
+          "sessions"
+        ],
+        "properties": {
+          "permissions": {
+            "description": "The permissions given to a subject",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "proposals": {
+            "description": "The proposals the subject is associated with",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "sessions": {
+            "description": "The sessions the subject is associated with",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          }
+        }
+      }
+    }
+  }
+  
