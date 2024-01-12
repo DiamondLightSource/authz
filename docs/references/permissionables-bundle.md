@@ -1,15 +1,69 @@
 # Permissionables Bundle
 
-The permissioanbles bundle supplied by the Bundler contains three mappings; User Permissions, User Proposals, and User Sessions.
+The permissioanbles bundle supplied by the Bundler contains four mappings; Subject Attributes, Session Attributes, Proposal Attributes, and Beamline Attributes.
 
-## User Permissions
+## Subject Attributes
 
-User permissions are exposed at `diamond.data.users.permissions`. They are provided as a mapping where the key is the `FedID` of the user with values corresponding to a list of `permission type`s.
+Subject attributes are exposed at `diamond.data.subjects`. They are provided as a mapping where the key is the IdP `subject` identifier of the Subject with value objects containing:
 
-## User Proposals
+- A list of `title`s of the Permissions the Subject has been granted
+- A list of `number`s of the Proposals the Subject is associated with
+- A list of `number`s of the Sessions the Subject is associated with
 
-User proposals are exposed at `diamond.data.users.proposals`. They are provided as a mapping where the key is the `FedID` of the user with values corresponding to a list of `proposal number`s.
+An example struct is shown below:
 
-## User Sessions 
+```json
+{
+    "permissions": ["i22_admin"],
+    "proposals": [12345],
+    "sessions": [54321, 65432]
+}
+```
 
-User visits are exposed at `diamond.data.users.sessions`. They are provided as a mapping where the key is the `FedID` of the user with values corresponding to a list of tuples of `proposal number` and `visit number`.
+## Session Attributes
+
+Session attributes are exposed at `diamond.data.sessions`. They are provided as a mapping where the key is an opaque `number` of the Session with value objects containing:
+
+- The `number` of the associated Proposal
+- The `number` of the associated Visit within the Proposal
+- The `name` of the associated Beamline
+
+An example struct is shown below:
+
+```json
+{
+    "proposal_number": 12345,
+    "visit_number": 4,
+    "beamline": "i22"
+}
+```
+
+## Proposal Attributes
+
+Proposal attributes are exposed at `diamond.data.proposals`. They are provided as a mapping where the key is `number` of the Proposal with value objects containing:
+
+- A list of `number`s of the Sessions which occured under this proposal
+
+An example struct is shown below:
+
+```json
+{
+    "sessions": {
+        "1": 54321,
+        "2": 65432
+    }
+}
+```
+## Beamline Attributes
+
+Beamline attributes are exposed at `diamond.data.beamlines`. They are provided as a mapping where the key is the `name` of the Bubject with value objects containing:
+
+- A list of `number`s of the Sessions which have occured on the Beamline
+
+An example struct is shown below:
+
+```json
+{
+    "sessions": [54321, 65432]
+}
+```
