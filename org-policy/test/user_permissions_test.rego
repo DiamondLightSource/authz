@@ -7,7 +7,7 @@ example_profile := {"sub": "laborum7"}
 
 example_beamlines := {"Ut_b_b": {"sessions": [81672043]}}
 
-example_proposals := {18759398: {"sessions": {1: 81672043}}}
+example_proposals := {"18759398": {"sessions": {"1": 81672043}}}
 
 example_sessions := {"81672043": {
 	"beamline": "Ut_b_b",
@@ -22,11 +22,11 @@ example_subjects := {"laborum7": {
 }}
 
 test_default_not_allow if {
-	not policy.user_on_session(18759398, 1) with policy.profile as {}
+	not policy.subject_on_session(18759398, 1) with policy.profile as {}
 }
 
 test_not_allow_without_user if {
-	not policy.user_on_session(18759398, 1) with policy.profile as {}
+	not policy.subject_on_session(18759398, 1) with policy.profile as {}
 		with data.diamond.data.sessions as example_sessions
 		with data.diamond.data.proposals as example_proposals
 		with data.diamond.data.beamlines as example_beamlines
@@ -34,7 +34,7 @@ test_not_allow_without_user if {
 }
 
 test_not_allow_with_empty_context if {
-	not policy.user_on_session(18759398, 1) with policy.profile as example_profile
+	not policy.subject_on_session(18759398, 1) with policy.profile as example_profile
 		with data.diamond.data.sessions as {}
 		with data.diamond.data.proposals as {}
 		with data.diamond.data.beamlines as {}
@@ -42,7 +42,7 @@ test_not_allow_with_empty_context if {
 }
 
 test_allow_if_user_on_session if {
-	policy.user_on_session(18759398, 1) with policy.profile as example_profile
+	policy.subject_on_session(18759398, 1) with policy.profile as example_profile
 		with data.diamond.data.sessions as example_sessions
 		with data.diamond.data.proposals as example_proposals
 		with data.diamond.data.beamlines as {}
@@ -50,7 +50,7 @@ test_allow_if_user_on_session if {
 }
 
 test_allow_if_user_on_sessions if {
-	policy.user_on_session(18759398, 1) with policy.profile as example_profile
+	policy.subject_on_session(18759398, 1) with policy.profile as example_profile
 		with data.diamond.data.proposals as example_proposals
 		with data.diamond.data.beamlines as {}
 		with data.diamond.data.subjects as example_subjects
@@ -69,8 +69,8 @@ test_allow_if_user_on_sessions if {
 }
 
 test_allow_if_user_on_proposals if {
-	policy.user_on_session(18759398, 1) with policy.profile as example_profile
-		with data.diamond.data.proposals as {18759398: {"sessions": {1: 81672043}}, 18759399: {"sessions": {1: 81672044}}}
+	policy.subject_on_session(18759398, 1) with policy.profile as example_profile
+		with data.diamond.data.proposals as {"18759398": {"sessions": {"1": 81672043}}, "18759399": {"sessions": {"1": 81672044}}}
 		with data.diamond.data.beamlines as {}
 		with data.diamond.data.subjects as example_subjects
 		with data.diamond.data.sessions as {

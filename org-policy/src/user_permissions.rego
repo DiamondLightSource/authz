@@ -18,14 +18,13 @@ profile := http.send({
 subject := profile.sub
 
 can_read_from_session(proposal_number, session_number) if {
-	user_on_session(proposal_number, session_number)
+	subject_on_session(proposal_number, session_number)
 }
 
 can_write_to_session(proposal_number, session_number) if {
-	user_on_session(proposal_number, session_number)
+	subject_on_session(proposal_number, session_number)
 }
 
-user_on_session(proposal_number, session_number) if {
-	data.diamond.data.proposals[proposal_number].sessions[session_number] in data.diamond.data.subjects[subject].sessions
+subject_on_session(proposal_number, session_number) if {
+	data.diamond.data.proposals[sprintf("%d", [proposal_number])].sessions[sprintf("%d", [session_number])] in data.diamond.data.subjects[subject].sessions
 }
-
