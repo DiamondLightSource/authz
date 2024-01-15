@@ -31,7 +31,7 @@ jobs:
           default: true
 
       - name: Cache Rust Build
-        uses: Swatinem/rust-cache@v2.7.1
+        uses: Swatinem/rust-cache@v2.7.3
 
       - name: Build docs
         uses: actions-rs/cargo@v1.0.3
@@ -67,4 +67,4 @@ jobs:
 
       - name: Publish docs to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4.0.2
+        uses: actions/deploy-pages@v4.0.3
