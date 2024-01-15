@@ -77,16 +77,14 @@ test_allow_user_on_proposal if {
 
 ## Automating testing
 
-!!! example "Github action for testing/linting policy"
+!!! example "Github action for testing and linting policy"
 
-    {%
-        include-markdown "../references/building-policy.md"
-        heading-offset=1
-    %}
-
-- Runs on every pull_request or push to a branch (but only once)
-- Lints all policy, runs all test cases
-- Checks that policy can be built into a valid bundled)
+  ```yaml
+  {%
+        include "../../.github/workflows/policy-code.yml"
+        heading-offset=0
+  %}
+  ```
 
 ## Building policy
 
@@ -100,17 +98,15 @@ Below is a minimal `.manifest`, defining the package root below which it will at
 }
 ```
 
-## Automating building
-
 Note: Some IDE git integrations do not commit hidden files like `.manifest` automatically, and you may need to add it to a commit manually.
 
-!!! example "Github action for building policy into OCI bundle and pushing to GHCR"
+## Automating building
 
-    {%
-        include-markdown "../references/publishing-policy.md"
-        heading-offset=1
-    %}
+!!! example "Github action for building and releasing OPA policy as OCI bundle on GHCR"
 
-- Runs on every pull_request or push to a branch (but only once)
-- Builds all policy in `policy/` directory, except that in files matching `*_test.rego` (i.e., excluding any tests) into a bundle
-- If the push to a branch had a tag created for the repository, pushes bundle as an OCI image that is release on the Github Container Registry [for consumption by a configured instance](configure-opa.md)
+  ```yaml
+  {%
+        include "../../.github/workflows/policy-container.yml"
+        heading-offset=3
+  %}
+  ```

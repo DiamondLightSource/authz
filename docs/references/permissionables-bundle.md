@@ -42,7 +42,7 @@ An example struct is shown below:
 
 Proposal attributes are exposed at `diamond.data.proposals`. They are provided as a mapping where the key is `number` of the Proposal with value objects containing:
 
-- A list of `number`s of the Sessions which occured under this proposal
+- A list of `number`s of the Sessions which occurred under this proposal
 
 An example struct is shown below:
 
@@ -56,9 +56,9 @@ An example struct is shown below:
 ```
 ## Beamline Attributes
 
-Beamline attributes are exposed at `diamond.data.beamlines`. They are provided as a mapping where the key is the `name` of the Bubject with value objects containing:
+Beamline attributes are exposed at `diamond.data.beamlines`. They are provided as a mapping where the key is the `name` of the Subject with value objects containing:
 
-- A list of `number`s of the Sessions which have occured on the Beamline
+- A list of `number`s of the Sessions which have occurred on the Beamline
 
 An example struct is shown below:
 
