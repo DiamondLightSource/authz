@@ -52,7 +52,7 @@ sequenceDiagram
 
 ## Adjust the OPA deployment
 
-To allow the Envoy sidecar to communicate with the OPA istance, it must use and configure the OPA-Envoy plugin, which requires the following changes to the `values.yaml` of the Helm chart that has opa as a dependency:
+To allow the Envoy sidecar to communicate with the OPA instance, it must use and configure the OPA-Envoy plugin, which requires the following changes to the `values.yaml` of the Helm chart that has opa as a dependency:
 
 ```yaml
 opa:

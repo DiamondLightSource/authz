@@ -29,7 +29,7 @@ kubectl create secret generic bundler --from-literal=bundler-token=<BUNDLER_BEAR
 
 ## Configure Values
 
-The default values of the chart will deploy a single OPA instance which serves the latest Diamond Policy with Permissonable Data from the bundler.
+The default values of the chart will deploy a single OPA instance which serves the latest Diamond Policy with Permissionable Data from the bundler.
 
 You will likely want to modify the `opa.config` entry to include the policy bundle for your application, see [How To Configure OPA](configure-opa.md) for instructions on creating an appropriate configuration.
 

@@ -6,7 +6,7 @@ This guide will explain how to write, test and build rego language policy into a
 
 See also [the OPA documentation on Rego](https://www.openpolicyagent.org/docs/latest/policy-language/), [the basics of Rego](https://www.openpolicyagent.org/docs/latest/policy-language/#the-basics) and the [opa playground](https://play.openpolicyagent.org/).
 
-## Writing Policy
+## Writing policy
 
 A possible pattern for writing policy is to build it from the same repository as your application, in a `policy` directory. This keeps your policy close to the relevant code for reference, and versions the two together easily.
 
@@ -44,7 +44,7 @@ allow if {
 
 The request that the rules are being evaluated against can be access from the reserved keyword `input`, while any other policy or bundled data can be access under the reserved keyword `data`: for example, policy written in the `diamond.policy` package is accessible under `data.diamond.policy`. The structure of `input` will vary depending on how OPA is called, and an example can typically be found in the documentation.
 
-## Testing Policy
+## Testing policy
 
 - Tests for policy should be defined in `foo_test.rego` if they are testing functionality from module `foo.rego`.
 - Tests should be in a package `bar_test` if they are testing policy in package `bar` (this is a requirement for the `regal` linter)
@@ -75,19 +75,7 @@ test_allow_user_on_proposal if {
 }
 ```
 
-## Building OPA policy
-
-To build your OPA policy into an OCI bundle to be served from the github container registry, rather than mounting the .rego source directly requires the addition of a `.manifest` file to your policy root directory.
-
-Below is a minimal `.manifest`, defining the package root below which it will attempt to override the namespace. It is recommended to use a package structure which will not collide with mounted data or other policy, such as `<name of service>/policy` for your policy.
-
-```json
-{
-    "roots": ["my/service/policy"]
-}
-```
-
-#### Note: Some IDE git integrations do not commit hidden files like `.manifest` automatically, and you may need to add it to a commit manually.
+## Automating testing
 
 !!! example "Github action for testing/linting policy"
 
@@ -99,6 +87,22 @@ Below is a minimal `.manifest`, defining the package root below which it will at
 - Runs on every pull_request or push to a branch (but only once)
 - Lints all policy, runs all test cases
 - Checks that policy can be built into a valid bundled)
+
+## Building policy
+
+To build your OPA policy into an OCI bundle to be served from the github container registry, rather than mounting the .rego source directly requires the addition of a `.manifest` file to your policy root directory.
+
+Below is a minimal `.manifest`, defining the package root below which it will attempt to override the namespace. It is recommended to use a package structure which will not collide with mounted data or other policy, such as `<name of service>/policy` for your policy.
+
+```json
+{
+    "roots": ["my/service/policy"]
+}
+```
+
+## Automating building
+
+Note: Some IDE git integrations do not commit hidden files like `.manifest` automatically, and you may need to add it to a commit manually.
 
 !!! example "Github action for building policy into OCI bundle and pushing to GHCR"
 

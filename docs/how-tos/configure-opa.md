@@ -2,11 +2,13 @@
 
 ## Preface
 
-This guide will explain how to configure Open Policy Agent (OPA) to fetch the data & policy nessacary to make authorization decisions for your application at Diamond. Typically the following three `bundles` are required:
+This guide will explain how to configure Open Policy Agent (OPA) to fetch the data & policy necessary to make authorization decisions for your application at Diamond. Typically the following three `bundles` are required:
 
 - Permissionable Data - containing data about what a given user has access to and is permitted to do
 - Diamond Policy - containing high level organisational level rules
-- Application Policy - containing your application specific rules
+- Application Policy - containing your application specific rules####
+
+Note that if [using ODM to resolve dependencies](use-permissionables.md), Diamond Policy and your Application Policy are built into a single bundle.
 
 ## Permissionable Data Bundle
 
@@ -44,7 +46,7 @@ services:
         type: oci
 ```
 
-The fully qualifed path of the OCI image - `ghcr.io/diamondlightsource/authz-policy:latest` - must be used. The following bundle configuration should therefore be used:
+The fully qualified path of the OCI image - `ghcr.io/diamondlightsource/authz-policy:latest` - must be used. The following bundle configuration should therefore be used:
 
 ```yaml
 bundles:
@@ -58,7 +60,7 @@ bundles:
 
 ## Application Policy Bundle
 
-Assuming your application is also hosted on GitHub you can upload your policy bundle to `ghcr` and re-use the service from the [diamond policy bundle section](#diamond-policy-bundle). Similarly to before, the fully qualifed path of the OCI image - e.g. `ghcr.io/diamondlightsource/your-application-policy:latest` - must be used. You should poll for this on a regular basis, between `30` and `120` seconds is considered a reasonable value. The following bundle configuration should therefore be used:
+Assuming your application is also hosted on GitHub you can upload your policy bundle to `ghcr` and re-use the service from the [diamond policy bundle section](#diamond-policy-bundle). Similarly to before, the fully qualified path of the OCI image - e.g. `ghcr.io/diamondlightsource/your-application-policy:latest` - must be used. You should poll for this on a regular basis, between `30` and `120` seconds is considered a reasonable value. The following bundle configuration should therefore be used:
 
 ```yaml
 bundles:
