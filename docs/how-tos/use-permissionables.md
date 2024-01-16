@@ -36,8 +36,8 @@ If the `diamond.policy` bundle and `diamond.data` bundle (from the bundle server
 
 In this example the policy is being used for an example service which serves data over HTTP:
 
-- The path service.diamond.ac.uk/$proposalNumber/$visitNumber lists a collection of data files.  
-- The path service.diamond.ac.uk/$proposalNumber/$visitNumber/$fileName downloads a file from the service.
+- The path `service.diamond.ac.uk/$proposalNumber/$visitNumber` lists a collection of data files, collected on the visit.  
+- The path `service.diamond.ac.uk/$proposalNumber/$visitNumber/$fileName` downloads a file from the service.
 
 It is assumed that the user has already been authenticated, and user authentication information is contained within the headers of the request. The exact form of the authentication information, and how to parse it is left to the `diamond.policy` package to define. The `input` to the OPA instance might include the following structure:
 
