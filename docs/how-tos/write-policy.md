@@ -1,4 +1,4 @@
-# Writing OPA policy
+# Write policy
 
 ## Preface
 

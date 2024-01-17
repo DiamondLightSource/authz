@@ -1,4 +1,4 @@
-# Writing OPA policy against Diamond Permissions
+# Write OPA policy against Diamond Attributes
 
 ## Preface
 
@@ -80,5 +80,5 @@ This allows a user on a session to both see all the files on that session and do
 
 Note: ODM does not currently have a github action
 
-When building policy manually, first run `odm update`, which fetches all dependencies, then proceed as described in the [writing policy docs](write-opa-policy.md)
+When building policy manually, first run `odm update`, which fetches all dependencies, then proceed as described in the [writing policy docs](write-policy.md)
 

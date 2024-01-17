@@ -8,7 +8,7 @@ This guide will explain how to configure Open Policy Agent (OPA) to fetch the da
 - Diamond Policy - containing high level organisational level rules
 - Application Policy - containing your application specific rules####
 
-Note that if [using ODM to resolve dependencies](use-permissionables.md), Diamond Policy and your Application Policy are built into a single bundle.
+Note that if [using ODM to resolve dependencies](use-diamond-attributes.md), Diamond Policy and your Application Policy are built into a single bundle.
 
 ## Permissionable Data Bundle
 

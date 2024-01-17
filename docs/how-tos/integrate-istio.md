@@ -1,4 +1,4 @@
-# Deploy with Istio
+# Integrate with Istio
 
 ## Preface
 

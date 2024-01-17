@@ -1,4 +1,4 @@
-# Python Example
+# Integrate with Python
 
 ## Preface
 
@@ -19,7 +19,7 @@ sequenceDiagram
     end
 ```
 
-However, as Authorization without trusted Authentication information is effectively useless, the `fastapi-opa` middleware moves this Authentication layer into the service application, giving the full sequence diagram below. While less involved than the full sequence diagram using [the Istio Service Mesh](deploy-with-istio.md), note that the total activation of the service that is to be deployed is larger, more involved and requires handling of the OAuth client-secret for Authentication.
+However, as Authorization without trusted Authentication information is effectively useless, the `fastapi-opa` middleware moves this Authentication layer into the service application, giving the full sequence diagram below. While less involved than the full sequence diagram using [the Istio Service Mesh](integrate-istio.md) note that the total activation of the service that is to be deployed is larger, more involved and requires handling of the OAuth client-secret for Authentication.
 
 ```mermaid
 sequenceDiagram
