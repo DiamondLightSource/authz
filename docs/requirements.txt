@@ -1,5 +1,7 @@
 mkdocs
-mkdocs-techdocs-core>=1.3
+mkdocs-material
+mdx_truly_sane_lists
+pymdown-extensions
 mkdocs-include-markdown-plugin
 mkdocs-awesome-pages-plugin
-mkdocs-mermaid2-plugin
+mkdocs-plugin-inline-svg-mod
