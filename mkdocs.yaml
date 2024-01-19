@@ -3,37 +3,4 @@ site_url: https://dev-portal.diamond.ac.uk
 repo_url: https://gitlab.diamond.ac.uk/sscc-docs/developer-guide
 edit_uri: edit/main/docs/
 plugins:
-    - search
-    - include-markdown
-    - awesome-pages
-    - inline-svg
-markdown_extensions:
-    - admonition
-    - mdx_truly_sane_lists
-    - pymdownx.betterem
-    - pymdownx.caret
-    - pymdownx.critic
-    - pymdownx.details
-    - pymdownx.emoji
-    - pymdownx.inlinehilite
-    - pymdownx.magiclink
-    - pymdownx.mark
-    - pymdownx.smartsymbols
-    - pymdownx.snippets
-    - pymdownx.superfences:
-          custom_fences:
-              - name: mermaid
-                class: mermaid
-                format: !!python/name:pymdownx.superfences.fence_code_format
-    - pymdownx.highlight
-    - pymdownx.tabbed
-    - pymdownx.tasklist
-    - pymdownx.tilde
-    - toc:
-          permalink: true
-theme:
-    name: material
-    features:
-        - navigation.footer
-        - navigation.indexes
-        - content.action.edit
+    - techdocs-diamond

@@ -1,7 +1,2 @@
 mkdocs
-mkdocs-material
-mdx_truly_sane_lists
-pymdown-extensions
-mkdocs-include-markdown-plugin
-mkdocs-awesome-pages-plugin
-mkdocs-plugin-inline-svg-mod
+mkdocs-techdocs-diamond
