@@ -1,4 +1,4 @@
-FROM docker.io/library/rust:1.75.0-bullseye
+FROM docker.io/library/rust:1.75.0-bookworm
 
 RUN rustup component add rustfmt clippy 
 
@@ -7,4 +7,4 @@ RUN apt-get update \
 
 COPY docs/requirements.txt /tmp/docs-requirements.txt
 
-RUN pip install -r /tmp/docs-requirements.txt
+RUN pip install -r /tmp/docs-requirements.txt --break-system-packages
