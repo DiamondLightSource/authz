@@ -2,9 +2,9 @@
 
 An Open Policy Agent (OPA) Bundle Server, supplying permissionalble data from the Diamond Light Source ISPyB database
 
-# Rust code explanation
+## Rust code explanation
 
-## Information flow and division of responsibility between files.
+### Information flow and division of responsibility between files.
 
 The *main* responsibilities are handled in `main.rs`, that is:
 - serving the application through an endpoint 
@@ -25,7 +25,8 @@ The are made up of query results from *ISPYB*:
 - sessions
 The queries are done with [sqlx](https://github.com/launchbadge/sqlx), Rust async library for interactions with SQL databases.
 
-## Flowchart
+### Flowchart
+
 ```mermaid
 flowchart TD
 R[request] --> M{Middleware}
@@ -39,5 +40,6 @@ B -->|SELECT proposals SQL query| I[ISPYB database]
 B -->|SELECT sessions SQL query| I[ISPYB database]
 ```
 
-## Roadmap
+### Roadmap
+
 ?
