@@ -31,18 +31,14 @@ The are made up of query results from _ISPYB_:
 ### Flowchart
 
 ```mermaid
-flowchart TD
-R[request] --> M{Middleware}
-M -->|log request with Open Telemetry| T(telemetry)
-M -->|verify bearer token| V(bearer token verifier)
-M --> A[main]
-A -->|get data| B(bundle)
-A -->|schedule refresh| B
-B -->|SELECT permissions SQL query| I[ISPYB database]
-B -->|SELECT proposals SQL query| I[ISPYB database]
-B -->|SELECT sessions SQL query| I[ISPYB database]
+sequenceDiagram
+  Request-->>Middleware: Initial validation
+  Middleware-->>Telemetry: log request with Open Telemetry
+  Middleware-->>Bearer token verifier: verify bearer token
+  Middleware-->>Main: pass the request body
+  Main-->>Bundle: get data
+  Main-->>Bundle: schedule refresh
+  Bundle-->>ISPYB database: SELECT permissions SQL query
+  Bundle-->>ISPYB database: SELECT proposals SQL query
+  Bundle-->>ISPYB database: SELECT sessions SQL query
 ```
-
-### Roadmap
-
-?
