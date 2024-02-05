@@ -12,7 +12,7 @@ COPY ./ ./
 RUN touch src/main.rs \
     && cargo build --release
 
-FROM gcr.io/distroless/cc-debian12@sha256:6714977f9f02632c31377650c15d89a7efaebf43bab0f37c712c30fc01edb973 AS deploy
+FROM gcr.io/distroless/cc-debian12@sha256:4049e8f163161818a52e028c3c110ee0ba9d71a14760ad2838aabba52b3f9782 AS deploy
 
 COPY --from=build /app/target/release/bundler /bundler
 
