@@ -1,0 +1,6 @@
+site_name: Diamond Developer Guide
+site_url: https://dev-portal.diamond.ac.uk
+repo_url: https://gitlab.diamond.ac.uk/sscc-docs/developer-guide
+edit_uri: edit/main/docs/
+plugins:
+    - techdocs-diamond
