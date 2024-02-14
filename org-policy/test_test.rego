@@ -1,7 +1,7 @@
 package diamond.policy_test
 
 import data.diamond.policy
-import future.keywords
+import rego.v1
 
 # Recommended pattern for naming:
 # Tests for foo.rego are stored in foo_test.rego
