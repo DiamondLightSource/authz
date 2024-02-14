@@ -1,6 +1,6 @@
 package diamond.policy
 
-import future.keywords
+import rego.v1
 
 # METADATA
 # description: 'hello_world only if {"hello": "world"}'
