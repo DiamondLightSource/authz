@@ -47,7 +47,7 @@ jobs:
         run: chmod -R +rX bundler/target/doc
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3.0.0
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: bundler/target/doc
 
@@ -67,4 +67,4 @@ jobs:
 
       - name: Publish docs to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4.0.3
+        uses: actions/deploy-pages@v4.0.4
