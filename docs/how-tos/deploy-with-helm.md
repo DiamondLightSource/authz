@@ -17,7 +17,7 @@ You may additionally wish to add a condition, e.g. `opa.enabled`. If added you w
 
 ## Create Secret
 
-The default OPA configuration expects a secret named `bundler` containing `bundler-token`, this should be set to the Bearer Token required by the bundler service. The token can be obtained by reaching out via the [`#auth_auth` slack channel](https://diamondlightsource.slack.com/archives/C03P6QB9589). To create the secret in your namespace simply run:
+The default OPA configuration expects a secret named `bundler` containing `bearer-token`, this should be set to the Bearer Token required by the bundler service. The token can be obtained by reaching out via the [`#auth_auth` slack channel](https://diamondlightsource.slack.com/archives/C03P6QB9589). To create the secret in your namespace simply run:
 
 ```bash
 kubectl create secret generic bundler --from-literal=bundler-token=<BUNDLER_BEARER_TOKEN>
