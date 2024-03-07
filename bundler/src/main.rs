@@ -78,8 +78,8 @@ where
 
 /// A thread safe, mutable, wrapper around the [`BundleFile`]
 type CurrentBundle = Arc<RwLock<BundleFile<NoMetadata>>>;
-/// Bundler acts as a Open Policy Agent bundle server, providing permissionable data from the ISPyB database
 
+/// Bundler acts as a Open Policy Agent bundle server, providing permissionable data from the ISPyB database
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about= None)]
 enum Cli {
