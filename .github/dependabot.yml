@@ -42,6 +42,7 @@ updates:
       opentelemetry:
         patterns:
           - opentelemetry*
+          - tracing-opentelemetry
       patch:
         update-types:
           - patch
