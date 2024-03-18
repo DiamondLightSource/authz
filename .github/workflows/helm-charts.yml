@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.1.2
         with:
           fetch-depth: 0
 
@@ -42,7 +42,7 @@ jobs:
           - bundler
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.1.2
 
       - name: Package Chart
         run: helm package charts/${{ matrix.chart }}
@@ -52,7 +52,7 @@ jobs:
 
       - name: Log in to GitHub Docker Registry
         if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3.0.0
+        uses: docker/login-action@v3.1.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
