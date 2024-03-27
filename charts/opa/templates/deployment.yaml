@@ -46,15 +46,17 @@ spec:
           {{- if .Values.opa.envOverride }}
           env:
           {{- .Values.opa.envOverride | toYaml | nindent 12 }}
-          {{- else }}
+          {{- else if or .Values.opa.bundlerSecret .Values.opa.extraEnv }}
           env:
+            {{- if .Values.opa.bundlerSecret }}
             - name: BUNDLER_BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
-                    name: bundler
-                    key: bearer-token
+                    name: {{ .Values.opa.bundlerSecret.name }}
+                    key: {{ .Values.opa.bundlerSecret.key }}
+            {{- end -}}
             {{- if .Values.opa.extraEnv }}
-            {{- .Values.opa.extraEnv | toYaml | nindent 12 }}
+              {{- .Values.opa.extraEnv | toYaml | nindent 12 }}
             {{- end }}
           {{- end }}
           volumeMounts:
