@@ -10,6 +10,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 opa:
+  logLevel: info
   configOverride: {}
   extraConfig: {}
   extraServices: {}
