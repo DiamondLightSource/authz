@@ -18,6 +18,7 @@ opa:
       key: bearer-token
   orgPolicy:
     enabled: false
+    userinfoEndpoint: https://auth.diamond.ac.uk/cas/oidc/oidcProfile
   configOverride: {}
   extraConfig: {}
   extraServices: {}
