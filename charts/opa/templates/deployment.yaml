@@ -46,14 +46,14 @@ spec:
           {{- if .Values.opa.envOverride }}
           env:
           {{- .Values.opa.envOverride | toYaml | nindent 12 }}
-          {{- else if or .Values.opa.bundlerSecret .Values.opa.extraEnv }}
+          {{- else if or .Values.opa.orgData.bundlerSecret .Values.opa.extraEnv }}
           env:
-            {{- if .Values.opa.bundlerSecret }}
+            {{- if and .Values.opa.orgData.enabled .Values.opa.orgData.bundlerSecret }}
             - name: BUNDLER_BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
-                    name: {{ .Values.opa.bundlerSecret.name }}
-                    key: {{ .Values.opa.bundlerSecret.key }}
+                    name: {{ .Values.opa.orgData.bundlerSecret.name }}
+                    key: {{ .Values.opa.orgData.bundlerSecret.key }}
             {{- end -}}
             {{- if .Values.opa.extraEnv }}
               {{- .Values.opa.extraEnv | toYaml | nindent 12 }}
