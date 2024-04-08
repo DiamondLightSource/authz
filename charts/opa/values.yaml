@@ -11,9 +11,13 @@ fullnameOverride: ""
 
 opa:
   logLevel: info
-  bundlerSecret:
-    name: bundler
-    key: bearer-token
+  orgData:
+    enabled: true
+    bundlerSecret:
+      name: bundler
+      key: bearer-token
+  orgPolicy:
+    enabled: false
   configOverride: {}
   extraConfig: {}
   extraServices: {}

@@ -19,22 +19,28 @@ data:
       {{- if .Values.opa.extraServices }}
       {{- .Values.opa.extraServices | toYaml | nindent 6 }}
       {{- end }}
+    {{- if or .Values.opa.orgData.enabled .Values.opa.orgPolicy.enabled .Values.opa.extraBundles }}
     bundles:
+      {{- if .Values.opa.orgData.enabled }}
       diamond-permissionables:
         service: diamond-bundler
         resource: bundle.tar.gz
         polling:
           min_delay_seconds: 10
           max_delay_seconds: 60
+      {{- end }}
+      {{- if .Values.opa.orgPolicy.enabled }}
       diamond-policies:
         service: ghcr
         resource: ghcr.io/diamondlightsource/authz-policy:0.0.4
         polling:
           min_delay_seconds: 30
           max_delay_seconds: 120
+      {{- end }}
       {{- if .Values.opa.extraBundles }}
       {{- .Values.opa.extraBundles | toYaml | nindent 6 }}
       {{- end }}
+    {{- end }}
     {{- if .Values.opa.extraConfig }}
     {{- .Values.opa.extraConfig | toYaml | nindent 4 }}
     {{- end }}
