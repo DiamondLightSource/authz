@@ -55,6 +55,10 @@ spec:
                     name: {{ .Values.opa.orgData.bundlerSecret.name }}
                     key: {{ .Values.opa.orgData.bundlerSecret.key }}
             {{- end -}}
+            {{- if and .Values.opa.orgPolicy.enabled .Values.opa.orgPolicy.userinfoEndpoint }}
+            - name: USERINFO_ENDPOINT
+              value: {{ .Values.opa.orgPolicy.userinfoEndpoint }}
+            {{- end }}
             {{- if .Values.opa.extraEnv }}
               {{- .Values.opa.extraEnv | toYaml | nindent 12 }}
             {{- end }}
