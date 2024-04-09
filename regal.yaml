@@ -1,0 +1,4 @@
+rules:
+  idiomatic:
+    no-defined-entrypoint:
+      level: ignore

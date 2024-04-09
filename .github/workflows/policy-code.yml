@@ -19,7 +19,12 @@ jobs:
           version: latest
 
       - name: Lint
-        run: regal lint --format github ./org-policy
+        run: >
+          regal
+          lint
+          --format github
+          --config-file regal.yaml
+          ./org-policy
 
   test:
     # Deduplicate jobs from pull requests and branch pushes within the same repo.
