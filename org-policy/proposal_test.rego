@@ -1,7 +1,6 @@
 package diamond.policy.proposal_test
 
 import data.diamond.policy.proposal
-import data.diamond.policy.token
 import rego.v1
 
 diamond_data := {
@@ -26,19 +25,13 @@ diamond_data := {
 }
 
 test_member_allowed if {
-	proposal.allow with token.subject as "alice"
-		with input as {"parameters": {"proposal": 1}}
-		with data.diamond.data as diamond_data
+	proposal.access_proposal("alice", 1) with data.diamond.data as diamond_data
 }
 
 test_super_admin_allowed if {
-	proposal.allow with token.subject as "carol"
-		with input as {"parameters": {"proposal": 1, "visit": 1}}
-		with data.diamond.data as diamond_data
+	proposal.access_proposal("carol", 1) with data.diamond.data as diamond_data
 }
 
 test_non_member_denied if {
-	not proposal.allow with token.subject as "oscar"
-		with input as {"parameters": {"proposal": 1}}
-		with data.diamond.data as diamond_data
+	not proposal.access_proposal("oscar", 1) with data.diamond.data as diamond_data
 }

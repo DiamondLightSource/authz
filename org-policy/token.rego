@@ -2,10 +2,10 @@ package diamond.policy.token
 
 import rego.v1
 
-subject := profile.sub if {
+verify(token) := profile.sub if {
 	profile := http.send({
 		"url": opa.runtime().env.USERINFO_ENDPOINT,
 		"method": "GET",
-		"headers": {"authorization": input.token},
+		"headers": {"authorization": token},
 	})
 }
