@@ -1,7 +1,6 @@
 package diamond.policy.session_test
 
 import data.diamond.policy.session
-import data.diamond.policy.token
 import rego.v1
 
 diamond_data := {
@@ -47,31 +46,21 @@ diamond_data := {
 }
 
 test_session_member_allowed if {
-	session.allow with token.subject as "bob"
-		with input as {"parameters": {"proposal": 1, "visit": 1}}
-		with data.diamond.data as diamond_data
+	session.access_session("bob", 1, 1) with data.diamond.data as diamond_data
 }
 
 test_proposal_member_allowed if {
-	session.allow with token.subject as "alice"
-		with input as {"parameters": {"proposal": 1, "visit": 1}}
-		with data.diamond.data as diamond_data
+	session.access_session("alice", 1, 1) with data.diamond.data as diamond_data
 }
 
 test_beamline_admin_allowed if {
-	session.allow with token.subject as "bob"
-		with input as {"parameters": {"proposal": 1, "visit": 2}}
-		with data.diamond.data as diamond_data
+	session.access_session("bob", 1, 2) with data.diamond.data as diamond_data
 }
 
 test_super_admin_allowed if {
-	session.allow with token.subject as "carol"
-		with input as {"parameters": {"proposal": 1, "visit": 2}}
-		with data.diamond.data as diamond_data
+	session.access_session("carol", 1, 2) with data.diamond.data as diamond_data
 }
 
 test_non_member_denied if {
-	not session.allow with token.subject as "oscar"
-		with input as {"parameters": {"proposal": 1, "visit": 1}}
-		with data.diamond.data as diamond_data
+	not session.access_session("oscar", 1, 1) with data.diamond.data as diamond_data
 }
