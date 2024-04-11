@@ -45,4 +45,3 @@ data:
     {{- .Values.opa.extraConfig | toYaml | nindent 4 }}
     {{- end }}
     {{- end }}
-
