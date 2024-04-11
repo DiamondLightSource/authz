@@ -1,0 +1,172 @@
+name: Docs
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  user_lint:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4.0.0
+        with:
+          node-version: 18
+
+      - name: Install Yarn dependencies
+        uses: borales/actions-yarn@v4.2.0
+        with:
+          cmd: global add markdownlint-cli2 markdown-it-admon
+
+      - name: Lint with markdownlint-cli2
+        run: >
+          markdownlint-cli2
+          **/*.{md,markdown}
+
+  user_build:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs: user_lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5.0.0
+        with:
+          python-version: 3.12
+
+      - name: Install Python Dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Build User Docs
+        run: mkdocs build
+
+      - name: Fix file permissions for pages
+        run: chmod -R +rX site
+
+      - name: Upload User Docs Artifact
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: user-docs
+          path: site
+
+  publish_user_s3:
+    if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
+    needs: user_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get docs artifact
+        uses: actions/download-artifact@v4.1.0
+        with:
+          name: user-docs
+          path: site
+
+      - name: Publish docs to s3 bucket
+        if: github.ref == 'refs/heads/main'
+        run: >
+          timeout -v 10m
+          npx @techdocs/cli publish
+          --entity default/system/auth-bundler
+          --publisher-type awsS3
+          --storage-name techdocs
+          --awsEndpoint https://s3.echo.stfc.ac.uk
+          --awsS3ForcePathStyle
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.TECHDOCS_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.TECHDOCS_S3_SECRET_ACCESS_KEY }}
+          AWS_REGION: ""
+
+  bundler_build:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    services:
+      ispyb:
+        image: ghcr.io/diamondlightsource/ispyb-database:v3.0.0
+        ports:
+          - 3306:3306
+        env:
+          MARIADB_ROOT_PASSWORD: rootpassword
+        options: >
+          --health-cmd "/usr/local/bin/healthcheck.sh --defaults-file=/ispyb/.my.cnf --connect"
+    env:
+      DATABASE_URL: mysql://root:rootpassword@localhost/ispyb_build
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.1.2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          default: true
+
+      - name: Cache Rust Build
+        uses: Swatinem/rust-cache@v2.7.3
+
+      - name: Build docs
+        uses: actions-rs/cargo@v1.0.3
+        with:
+          command: doc
+          args: >
+            --no-deps
+            --all-features
+            --document-private-items
+            --manifest-path bundler/Cargo.toml
+
+      - name: Fix file permissions for pages
+        run: chmod -R +rX bundler/target/doc
+
+      - name: Upload Bundler Docs Artifact
+        uses: actions/upload-artifact@v4.0.0
+        with:
+          name: bundler-docs
+          path: bundler/target/doc/bundler
+
+  combine:
+    runs-on: ubuntu-latest
+    needs:
+      - user_build
+      - bundler_build
+    steps:
+      - name: Download User Docs Artifact
+        uses: actions/download-artifact@v4.1.0
+        with:
+          name: user-docs
+          path: docs
+
+      - name: Download User Docs Artifact
+        uses: actions/download-artifact@v4.1.0
+        with:
+          name: bundler-docs
+          path: docs/bundler
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3.0.0
+        with:
+          path: docs
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: combine
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4.0.0
+
+      - name: Publish docs to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4.0.2
