@@ -123,7 +123,5 @@ It is strongly recommeneded you implement automated linting and testing as part 
 !!! example "GitHub Actions lint and test workflow"
 
     ```yaml
-    {%
-          include "../../.github/workflows/policy-code.yml"
-    %}
+    --8<-- ".github/workflows/policy-code.yml"
     ```

@@ -43,7 +43,5 @@ The example below shows how you might write a system package which allows the ac
 The `data.diamond.policy.token.subject` variable is implemented as an HTTP `GET` request to the CAS User Info Endpoint, provided by the `USERINFO_ENDPOINT` environment variable, as below:
 
 ```rego
-{%
-    include "../../org-policy/token.rego"
-%}
+--8<-- "org-policy/token.rego"
 ```
