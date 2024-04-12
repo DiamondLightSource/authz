@@ -17,8 +17,7 @@ We will use the following dependencies:
 
 !!! example
 
-    **`pyproject.toml`**
-    ```toml
+    ```toml title="pyproject.toml"
     [project]
     dependencies = [
         "requests==2.31.0",

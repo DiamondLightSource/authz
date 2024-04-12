@@ -18,8 +18,7 @@ OPA OCI Bundles must contain a JSON formatted Manifest file (`.manifest`) which 
 
 !!! example
 
-    **`.manifest`**:
-    ```json
+    ```json title=".manifest"
     {
         "roots": ["system", "my/helper"]
     }

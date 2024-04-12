@@ -32,8 +32,7 @@ The `rego.v1` import introduces various v1 compatible symantics, it is strongly 
 
 !!! example
 
-    **`system.rego`**:
-    ```rego
+    ```rego title="system.rego"
     package system
 
     import rego.v1

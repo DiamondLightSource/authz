@@ -16,9 +16,7 @@ The example below makes use of the [Diamond Data Bundle](../references/diamond-d
 
 !!! example 
 
-    **`opa.yml`**:
-
-    ```yaml
+    ```yaml title="opa.yml"
     services:
       bundler:
         url: https://bundler.diamond.ac.uk
@@ -61,15 +59,11 @@ To utilize local policy you should mount in the policy volume and setting the `-
 
 !!! example
 
-    **`opa.env`**:
-
-    ```env
+    ```env title="opa.env"
     BUNDLER_BEARER_TOKEN=<BUNDLER_BEARER_TOKEN>
     ```
 
-    **`docker-compose.yml`**:
-
-    ```yaml
+    ```yaml title="docker-compose.yml"
     version: "3.8"
 
     services:

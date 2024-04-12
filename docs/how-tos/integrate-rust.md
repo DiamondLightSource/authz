@@ -19,8 +19,7 @@ We will use the following dependencies:
 
 !!! example
 
-    **`Cargo.toml`**
-    ```toml
+    ```toml title="Cargo.toml"
     [dependencies]
     reqwest = { version = "0.11.27", features = ["json"] }
     serde = { version = "1.0.197", features = ["derive"] }

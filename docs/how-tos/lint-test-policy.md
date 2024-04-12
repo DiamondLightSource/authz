@@ -41,8 +41,7 @@ OPA test packages should be named equivilently to their policy counterpart with 
 
 !!! example
 
-    **`system.rego`**:
-    ```rego
+    ```rego title="system.rego"
     package system
 
     import rego.v1
@@ -54,8 +53,7 @@ OPA test packages should be named equivilently to their policy counterpart with 
     default allow := false
     ```
 
-    **`system_test.rego`**:
-    ```rego
+    ```rego title="system_test.rego"
     package system_test
 
     import data.system
@@ -76,8 +74,7 @@ Test cases should begin with `test_` with a name which describes the expected be
 
 !!! example
 
-    **`system.rego`**:
-    ```rego
+    ```rego title="system.rego"
     package system
 
     import rego.v1
@@ -94,8 +91,7 @@ Test cases should begin with `test_` with a name which describes the expected be
     }
     ```
 
-    **`system_test.rego`**:
-    ```rego
+    ```rego title="system_test.rego"
     package system_test
 
     import data.system

@@ -14,9 +14,7 @@ The example below shows how you might write a system package which extracts the 
 
 !!! example
 
-    **`system.rego`**:
-
-    ```rego
+    ```rego title="system.rego"
     package system
 
     import data.diamond.policy.session
