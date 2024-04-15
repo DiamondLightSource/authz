@@ -19,7 +19,7 @@ jobs:
           node-version: 18
 
       - name: Install Yarn dependencies
-        uses: borales/actions-yarn@v4.2.0
+        uses: borales/actions-yarn@v5.0.0
         with:
           cmd: global add markdownlint-cli2 markdown-it-admon
 
