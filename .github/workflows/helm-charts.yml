@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Helm
-        uses: azure/setup-helm@v3.5
+        uses: azure/setup-helm@v4
 
       - name: Setup chart-testing
         uses: helm/chart-testing-action@v2.6.1
