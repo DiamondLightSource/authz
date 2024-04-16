@@ -2,7 +2,7 @@ image:
   repository: docker.io/openpolicyagent/opa
   pullPolicy: IfNotPresent
   tagOverride: ""
-  version: 0.59.0
+  version: ""
   envoy: false
 
 imagePullSecrets: []
