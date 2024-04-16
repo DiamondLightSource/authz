@@ -52,7 +52,7 @@ spec:
             - name: BUNDLER_BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
-                    name: {{ .Values.opa.orgData.bundlerSecret.name }}
+                    name: {{ tpl .Values.opa.orgData.bundlerSecret.name . }}
                     key: {{ .Values.opa.orgData.bundlerSecret.key }}
             {{- end -}}
             {{- if and .Values.opa.orgPolicy.enabled .Values.opa.orgPolicy.userinfoEndpoint }}
