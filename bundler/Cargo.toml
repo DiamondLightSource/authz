@@ -11,15 +11,15 @@ clap = { version = "4.5.4", features = ["derive", "env"] }
 clio = { version = "0.3.5", features = ["clap-parse"] }
 derive_more = { version = "0.99.17" }
 dotenvy = { version = "0.15.7" }
-flate2 = { version = "1.0.28" }
+flate2 = { version = "1.0.29" }
 headers = { version = "0.4.0" }
 humantime = { version = "2.1.0" }
 opentelemetry = { version = "0.22.0" }
 opentelemetry-otlp = { version = "0.15.0", features = ["metrics", "tokio"] }
 opentelemetry-semantic-conventions = { version = "0.14.0" }
 opentelemetry_sdk = { version = "0.22.1", features = ["rt-tokio"] }
-schemars = { version = "0.8.16" }
-serde = { version = "1.0.198", features = ["derive"] }
+schemars = { version = "0.8.17" }
+serde = { version = "1.0.199", features = ["derive"] }
 serde_json = { version = "1.0.116" }
 sqlx = { version = "0.7.4", features = [
     "runtime-tokio",
