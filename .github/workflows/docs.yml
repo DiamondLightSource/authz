@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.1.3
+        uses: actions/checkout@v4.1.4
 
       - name: Setup Node
         uses: actions/setup-node@v4.0.2
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.1.3
+        uses: actions/checkout@v4.1.4
 
       - name: Setup Python
         uses: actions/setup-python@v5.1.0
@@ -52,7 +52,7 @@ jobs:
         run: chmod -R +rX site
 
       - name: Upload User Docs Artifact
-        uses: actions/upload-artifact@v4.3.2
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: user-docs
           path: site
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get docs artifact
-        uses: actions/download-artifact@v4.1.5
+        uses: actions/download-artifact@v4.1.7
         with:
           name: user-docs
           path: site
@@ -101,7 +101,7 @@ jobs:
       DATABASE_URL: mysql://root:rootpassword@localhost/ispyb_build
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.1.3
+        uses: actions/checkout@v4.1.4
 
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1.0.7
@@ -126,7 +126,7 @@ jobs:
         run: chmod -R +rX bundler/target/doc
 
       - name: Upload Bundler Docs Artifact
-        uses: actions/upload-artifact@v4.3.2
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: bundler-docs
           path: bundler/target/doc/bundler
@@ -138,13 +138,13 @@ jobs:
       - bundler_build
     steps:
       - name: Download User Docs Artifact
-        uses: actions/download-artifact@v4.1.5
+        uses: actions/download-artifact@v4.1.7
         with:
           name: user-docs
           path: docs
 
       - name: Download User Docs Artifact
-        uses: actions/download-artifact@v4.1.5
+        uses: actions/download-artifact@v4.1.7
         with:
           name: bundler-docs
           path: docs/bundler
