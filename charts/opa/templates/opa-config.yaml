@@ -4,8 +4,8 @@ metadata:
   name: opa-config
 data:
   config.yaml: |
-    {{- if .Values.opa.configOverride }}
-    {{- .Values.opa.configOverride | toYaml | nindent 4 }}
+    {{- if .Values.configOverride }}
+    {{- .Values.configOverride | toYaml | nindent 4 }}
     {{- else }}
     services:
       diamond-bundler:
@@ -16,12 +16,12 @@ data:
       ghcr:
         url: https://ghcr.io
         type: oci
-      {{- if .Values.opa.extraServices }}
-      {{- .Values.opa.extraServices | toYaml | nindent 6 }}
+      {{- if .Values.extraServices }}
+      {{- .Values.extraServices | toYaml | nindent 6 }}
       {{- end }}
-    {{- if or .Values.opa.orgData.enabled .Values.opa.orgPolicy.enabled .Values.opa.extraBundles }}
+    {{- if or .Values.orgData.enabled .Values.orgPolicy.enabled .Values.extraBundles }}
     bundles:
-      {{- if .Values.opa.orgData.enabled }}
+      {{- if .Values.orgData.enabled }}
       diamond-permissionables:
         service: diamond-bundler
         resource: bundle.tar.gz
@@ -29,7 +29,7 @@ data:
           min_delay_seconds: 10
           max_delay_seconds: 60
       {{- end }}
-      {{- if .Values.opa.orgPolicy.enabled }}
+      {{- if .Values.orgPolicy.enabled }}
       diamond-policies:
         service: ghcr
         resource: ghcr.io/diamondlightsource/authz-policy:0.0.9
@@ -37,11 +37,11 @@ data:
           min_delay_seconds: 30
           max_delay_seconds: 120
       {{- end }}
-      {{- if .Values.opa.extraBundles }}
-      {{- .Values.opa.extraBundles | toYaml | nindent 6 }}
+      {{- if .Values.extraBundles }}
+      {{- .Values.extraBundles | toYaml | nindent 6 }}
       {{- end }}
     {{- end }}
-    {{- if .Values.opa.extraConfig }}
-    {{- .Values.opa.extraConfig | toYaml | nindent 4 }}
+    {{- if .Values.extraConfig }}
+    {{- .Values.extraConfig | toYaml | nindent 4 }}
     {{- end }}
     {{- end }}
