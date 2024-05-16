@@ -2,7 +2,7 @@
 Expand the name of the chart.
 */}}
 {{- define "opa.name" -}}
-{{- printf "%s-opa" .Chart.Name | default .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
@@ -14,7 +14,7 @@ If release name contains chart name it will be used as a full name.
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- $name := printf "%s-opa" .Chart.Name | default .Values.nameOverride }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -81,7 +81,7 @@ Create the tag to be used to pull the chart
 Determine the query port to be used
 */}}
 {{- define "opa.queryPort" -}}
-{{- if .Values.opa.portOverride }}
+{{- if .Values.portOverride }}
 {{- .Values.image.portOverride }}
 {{- else }}
 {{- if .Values.image.envoy }}

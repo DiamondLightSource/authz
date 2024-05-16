@@ -14,7 +14,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: {{ .Values.opa.config | toJson | sha256sum }}
+        checksum/config: {{ .Values.config | toJson | sha256sum }}
         {{- with .Values.podAnnotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -42,25 +42,25 @@ spec:
             - --config-file
             - /etc/opa-config/config.yaml
             - --log-level
-            - {{ .Values.opa.logLevel }}
-          {{- if .Values.opa.envOverride }}
+            - {{ .Values.logLevel }}
+          {{- if .Values.envOverride }}
           env:
-          {{- .Values.opa.envOverride | toYaml | nindent 12 }}
-          {{- else if or .Values.opa.orgData.bundlerSecret .Values.opa.extraEnv }}
+          {{- .Values.envOverride | toYaml | nindent 12 }}
+          {{- else if or .Values.orgData.bundlerSecret .Values.extraEnv }}
           env:
-            {{- if and .Values.opa.orgData.enabled .Values.opa.orgData.bundlerSecret }}
+            {{- if and .Values.orgData.enabled .Values.orgData.bundlerSecret }}
             - name: BUNDLER_BEARER_TOKEN
               valueFrom:
                 secretKeyRef:
-                    name: {{ tpl .Values.opa.orgData.bundlerSecret.name . }}
-                    key: {{ .Values.opa.orgData.bundlerSecret.key }}
+                    name: {{ tpl .Values.orgData.bundlerSecret.name . }}
+                    key: {{ .Values.orgData.bundlerSecret.key }}
             {{- end -}}
-            {{- if and .Values.opa.orgPolicy.enabled .Values.opa.orgPolicy.userinfoEndpoint }}
+            {{- if and .Values.orgPolicy.enabled .Values.orgPolicy.userinfoEndpoint }}
             - name: USERINFO_ENDPOINT
-              value: {{ .Values.opa.orgPolicy.userinfoEndpoint }}
+              value: {{ .Values.orgPolicy.userinfoEndpoint }}
             {{- end }}
-            {{- if .Values.opa.extraEnv }}
-              {{- .Values.opa.extraEnv | toYaml | nindent 12 }}
+            {{- if .Values.extraEnv }}
+              {{- .Values.extraEnv | toYaml | nindent 12 }}
             {{- end }}
           {{- end }}
           volumeMounts:

@@ -9,23 +9,22 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-opa:
-  logLevel: info
-  orgData:
-    enabled: true
-    bundlerSecret:
-      name: bundler
-      key: bearer-token
-  orgPolicy:
-    enabled: false
-    userinfoEndpoint: https://auth.diamond.ac.uk/cas/oidc/oidcProfile
-  configOverride: {}
-  extraConfig: {}
-  extraServices: {}
-  extraBundles: {}
-  envOverride: []
-  extraEnv: []
-  portOverride: ""
+logLevel: info
+orgData:
+  enabled: true
+  bundlerSecret:
+    name: bundler
+    key: bearer-token
+orgPolicy:
+  enabled: false
+  userinfoEndpoint: https://auth.diamond.ac.uk/cas/oidc/oidcProfile
+configOverride: {}
+extraConfig: {}
+extraServices: {}
+extraBundles: {}
+envOverride: []
+extraEnv: []
+portOverride: ""
 
 serviceAccount:
   create: false
