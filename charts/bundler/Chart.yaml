@@ -3,7 +3,7 @@ name: bundler
 description: A Open Policy Agent (OPA) Data Bundle Server providing permissionable data from ISPyB
 type: application
 version: 0.1.2
-appVersion: 0.0.9
+appVersion: 0.0.10
 maintainers:
   - name: garryod
     email: "garry.o'donnell@diamond.ac.uk"
