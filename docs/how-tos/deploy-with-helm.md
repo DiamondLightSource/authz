@@ -87,7 +87,7 @@ Configuration for additional services and bundles can be supplied via the `opa.e
                 resource: gcr.io/diamond-pubreg/my-application/policy
                 polling:
                     min_delay_seconds: 30
-                    max_deplay_seconds: 120
+                    max_delay_seconds: 120
         extraEnv:
             - name: MY_BUNDLE_SERVER_BEARER_TOKEN 
               valueFrom:

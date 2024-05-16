@@ -18,7 +18,7 @@ package token
 import rego.v1
 
 fetch_jwks(url) := http.send({
-    "url": jwks_url,
+    "url": url,
     "method": "GET",
     "force_cache": true,
     "force_cache_duration_seconds": 3600,
