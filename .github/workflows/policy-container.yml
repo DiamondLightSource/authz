@@ -14,7 +14,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.1.5
+        uses: actions/checkout@v4.1.6
 
       - name: Generate Image Name
         run: echo IMAGE_REPOSITORY=ghcr.io/$(echo "${{ github.repository }}-policy" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]') >> $GITHUB_ENV
