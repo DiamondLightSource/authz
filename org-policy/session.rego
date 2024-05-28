@@ -3,6 +3,13 @@ package diamond.policy.session
 import data.diamond.policy.proposal
 import rego.v1
 
+beamline(proposal_number, visit_number) := beamline if {
+	proposal := data.diamond.data.proposals[format_int(proposal_number, 10)] # regal ignore:external-reference
+	session_id := proposal.sessions[format_int(visit_number, 10)]
+	session := data.diamond.data.sessions[format_int(session_id, 10)] # regal ignore:external-reference
+	beamline := session.beamline
+}
+
 # Allow if subject has super_admin permission
 access_session(subject, proposal_number, visit_number) if {
 	"super_admin" in data.diamond.data.subjects[subject].permissions # regal ignore:external-reference
@@ -19,13 +26,6 @@ access_session(subject, proposal_number, visit_number) if {
 	subject_session := data.diamond.data.sessions[format_int(session_id, 10)] # regal ignore:external-reference
 	subject_session.proposal_number == proposal_number
 	subject_session.visit_number == visit_number
-}
-
-beamline(proposal_number, visit_number) := beamline if {
-	proposal := data.diamond.data.proposals[format_int(proposal_number, 10)] # regal ignore:external-reference
-	session_id := proposal.sessions[format_int(visit_number, 10)]
-	session := data.diamond.data.sessions[format_int(session_id, 10)] # regal ignore:external-reference
-	beamline := session.beamline
 }
 
 # Allow if on session on b07 and subject has b07_admin permission
