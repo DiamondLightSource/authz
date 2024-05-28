@@ -14,10 +14,10 @@ dotenvy = { version = "0.15.7" }
 flate2 = { version = "1.0.30" }
 headers = { version = "0.4.0" }
 humantime = { version = "2.1.0" }
-opentelemetry = { version = "0.22.0" }
-opentelemetry-otlp = { version = "0.15.0", features = ["metrics", "tokio"] }
-opentelemetry-semantic-conventions = { version = "0.14.0" }
-opentelemetry_sdk = { version = "0.22.1", features = ["rt-tokio"] }
+opentelemetry = { version = "0.23.0" }
+opentelemetry-otlp = { version = "0.16.0", features = ["metrics", "tokio"] }
+opentelemetry-semantic-conventions = { version = "0.15.0" }
+opentelemetry_sdk = { version = "0.23.0", features = ["rt-tokio"] }
 schemars = { version = "0.8.21" }
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = { version = "1.0.117" }
