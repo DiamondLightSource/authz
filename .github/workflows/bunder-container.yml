@@ -23,7 +23,7 @@ jobs:
           - 3306:3306
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.1.6
+        uses: actions/checkout@v4.1.7
 
       - name: Generate Image Name
         run: echo IMAGE_REPOSITORY=ghcr.io/$(echo "${{ github.repository }}-bundler" | tr '[:upper:]' '[:lower:]' | tr '[_]' '[\-]') >> $GITHUB_ENV
@@ -51,7 +51,7 @@ jobs:
           driver-opts: network=host
 
       - name: Build & Publish Image
-        uses: docker/build-push-action@v5.3.0
+        uses: docker/build-push-action@v5.4.0
         with:
           build-args: DATABASE_URL=mysql://root:rootpassword@localhost:3306/ispyb_build
           context: bundler/
