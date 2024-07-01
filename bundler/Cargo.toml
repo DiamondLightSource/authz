@@ -7,7 +7,7 @@ edition = "2021"
 anyhow = { version = "1.0.86" }
 axum = { version = "0.7.5" }
 axum-extra = { version = "0.9.3", features = ["typed-header"] }
-clap = { version = "4.5.7", features = ["derive", "env"] }
+clap = { version = "4.5.8", features = ["derive", "env"] }
 clio = { version = "0.3.5", features = ["clap-parse"] }
 derive_more = { version = "0.99.18" }
 dotenvy = { version = "0.15.7" }
@@ -20,7 +20,7 @@ opentelemetry-semantic-conventions = { version = "0.15.0" }
 opentelemetry_sdk = { version = "0.23.0", features = ["rt-tokio"] }
 schemars = { version = "0.8.21" }
 serde = { version = "1.0.203", features = ["derive"] }
-serde_json = { version = "1.0.117" }
+serde_json = { version = "1.0.119" }
 sqlx = { version = "0.7.4", features = [
     "runtime-tokio",
     "tls-rustls",
