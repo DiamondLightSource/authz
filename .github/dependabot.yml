@@ -10,7 +10,7 @@ updates:
         update-types:
           - minor
           - patch
-    
+
   - package-ecosystem: docker
     directory: bundler
     schedule:
@@ -21,7 +21,7 @@ updates:
         update-types:
           - minor
           - patch
-    
+
   - package-ecosystem: docker
     directory: .devcontainer
     schedule:
@@ -32,7 +32,7 @@ updates:
         update-types:
           - minor
           - patch
-    
+
   - package-ecosystem: cargo
     directory: bundler
     schedule:
