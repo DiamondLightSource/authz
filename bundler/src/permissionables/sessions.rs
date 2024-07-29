@@ -115,8 +115,8 @@ mod tests {
     #[sqlx::test(
         migrations = "tests/migrations",
         fixtures(
-            path = "../../tests/fixtures",
-            scripts("beamline_sessions", "proposals")
+            "../../tests/fixtures/beamline_sessions.sql",
+            "../../tests/fixtures/proposals.sql"
         )
     )]
     async fn fetch_some(ispyb_pool: MySqlPool) {

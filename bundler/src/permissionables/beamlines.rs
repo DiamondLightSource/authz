@@ -96,7 +96,7 @@ mod tests {
 
     #[sqlx::test(
         migrations = "tests/migrations",
-        fixtures(path = "../../tests/fixtures", scripts("beamline_sessions"))
+        fixtures("../../tests/fixtures/beamline_sessions.sql")
     )]
     async fn fetch_some(ispyb_pool: MySqlPool) {
         let beamlines = Beamlines::fetch(&ispyb_pool).await.unwrap();
