@@ -27,3 +27,10 @@ opa:
     autoscaling:
       enabled: true
       minReplicas: 2
+    ingress:
+      enabled: true
+      hosts:
+        - host: authz.diamond.ac.uk
+          paths:
+            - path: /
+              pathType: Prefix
