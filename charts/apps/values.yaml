@@ -24,3 +24,10 @@ opa:
     orgPolicy:
       enabled: true
       userinfoEndpoint: https://auth.diamond.ac.uk/cas/oidc/oidcProfile
+    ingress:
+      enabled: true
+      hosts:
+        - host: authz.diamond.ac.uk
+          paths:
+            - path: /
+              pathType: Prefix
