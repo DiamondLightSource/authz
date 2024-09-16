@@ -28,6 +28,14 @@ access_session(subject, proposal_number, visit_number) if {
 	subject_session.visit_number == visit_number
 }
 
+# Allow if on session on one of the saxs beamlines and subject has
+# saxs_admin permission
+access_session(subject, proposal_number, visit_number) if {
+    bl := beamline(proposal_number, visit_number)
+    bl in {"i22", "b21", "p38"}
+    "saxs_admin" in data.diamond.data.subjects[subject].permissions # regal ignore:external-reference
+}
+
 # Allow if on session on b07 and subject has b07_admin permission
 access_session(subject, proposal_number, visit_number) if {
 	beamline(proposal_number, visit_number) == "b07"
