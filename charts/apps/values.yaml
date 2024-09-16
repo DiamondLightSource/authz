@@ -1,0 +1,12 @@
+project: ""
+
+destination:
+  name: ""
+  server: ""
+  namespace: ""
+
+bundler:
+  enabled: true
+  repoUrl: https://github.com/DiamondLightSource/authz.git
+  targetRevision: HEAD
+  path: charts/bundler
