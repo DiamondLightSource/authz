@@ -42,6 +42,6 @@ The `data.diamond.policy.token.subject` variable is implemented as an HTTP `GET`
 
 ```rego
 {%
-    include "../../org-policy/token.rego"
+    include "../../policy/diamond/policy/token/token.rego"
 %}
 ```
