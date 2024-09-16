@@ -43,8 +43,8 @@ ingress:
   hosts:
     - host: authz.diamond.ac.uk
       paths:
-        - path: /
-          pathType: Prefix
+        - path: /bundle.tar.gz
+          pathType: ImplementationSpecific
   tls: []
 
 resources: {}
