@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: authz
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    name: argus
+    namespace: authz-warehouse
+  source:
+    path: charts/apps
+    repoURL: https://github.com/DiamondLightSource/authz.git
+    targetRevision: HEAD
+    helm:
+      valuesObject:
+        destination:
+          name: argus
+  sources: []
+  project: authz-warehouse
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
