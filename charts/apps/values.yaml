@@ -10,3 +10,20 @@ bundler:
   repoUrl: https://github.com/DiamondLightSource/authz.git
   targetRevision: HEAD
   path: charts/bundler
+
+opa:
+  enabled: true
+  repoUrl: https://github.com/DiamondLightSource/authz.git
+  targetRevision: HEAD
+  path: charts/opa
+  valuesObject:
+    orgData:
+      bundlerSecret:
+        name: token-authorization
+        key: bearer
+    orgPolicy:
+      enabled: true
+      userinfoEndpoint: https://auth.diamond.ac.uk/cas/oidc/oidcProfile
+    autoscaling:
+      enabled: true
+      minReplicas: 2
