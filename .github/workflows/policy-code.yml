@@ -24,7 +24,7 @@ jobs:
           lint
           --format github
           --config-file regal.yaml
-          ./org-policy
+          ./policy
 
   test:
     # Deduplicate jobs from pull requests and branch pushes within the same repo.
@@ -40,4 +40,4 @@ jobs:
           version: latest
 
       - name: Test
-        run: opa test ./org-policy -v
+        run: opa test ./policy -v

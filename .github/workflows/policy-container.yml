@@ -35,7 +35,7 @@ jobs:
         run: >
           opa
           build
-          --bundle org-policy
+          --bundle policy
           --revision ${{ github.ref_name }}
           --ignore *_test.rego
 
