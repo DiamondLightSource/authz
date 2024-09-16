@@ -1,0 +1,5 @@
+apiVersion: v2
+name: authz
+description: ArgoCD Apps used to deploy Authorization infrastructure
+type: application
+version: 0.1.0
