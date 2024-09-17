@@ -22,7 +22,7 @@ bundler:
   pollingInterval: 60s
 
 serviceAccount:
-  create: false
+  create: true
   annotations: {}
   name: ""
   podAnnotations: {}
