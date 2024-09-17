@@ -2,8 +2,12 @@ apiVersion: v2
 name: opa
 description: An OPA deployment to run alongside applications requiring authorization
 type: application
-version: 0.3.1
+version: 0.4.0
 appVersion: 0.59.0
 maintainers:
   - name: garryod
     email: "garry.o'donnell@diamond.ac.uk"
+dependencies:
+  - name: common
+    version: 2.23.0
+    repository: oci://docker.io/bitnamicharts
