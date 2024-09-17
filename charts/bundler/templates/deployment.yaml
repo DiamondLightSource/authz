@@ -38,6 +38,8 @@ spec:
           args:
             - serve
           env:
+            - name: BUNDLER_PORT
+              value: "80"
             - name: BUNDLER_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
