@@ -22,7 +22,11 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "common.names.fullname" . }}
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ default (include "common.names.fullname" .) .Values.serviceAccount.name }}
+      {{- else }}
+      serviceAccountName: {{ default "default" .Values.serviceAccount.name }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
