@@ -44,6 +44,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4.1.7
 
+      - name: Install chart dependencies
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm dependency update charts/${{ matrix.chart }}
+
       - name: Package Chart
         run: helm package charts/${{ matrix.chart }}
 
