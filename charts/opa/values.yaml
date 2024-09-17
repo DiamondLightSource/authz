@@ -27,7 +27,7 @@ extraEnv: []
 portOverride: ""
 
 serviceAccount:
-  create: false
+  create: true
   name: ""
 
 podAnnotations: {}
