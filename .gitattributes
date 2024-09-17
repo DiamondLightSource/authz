@@ -1,0 +1,2 @@
+*.yaml linguist-detectable
+*.tpl linguist-detectable linguist-language=yaml
