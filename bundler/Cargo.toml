@@ -14,10 +14,10 @@ dotenvy = { version = "0.15.7" }
 flate2 = { version = "1.0.33" }
 headers = { version = "0.4.0" }
 humantime = { version = "2.1.0" }
-opentelemetry = { version = "0.23.0" }
+opentelemetry = { version = "0.25.0" }
 opentelemetry-otlp = { version = "0.16.0", features = ["metrics", "tokio"] }
-opentelemetry-semantic-conventions = { version = "0.15.0" }
-opentelemetry_sdk = { version = "0.23.0", features = ["rt-tokio"] }
+opentelemetry-semantic-conventions = { version = "0.25.0" }
+opentelemetry_sdk = { version = "0.24.1", features = ["rt-tokio"] }
 schemars = { version = "0.8.21" }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = { version = "1.0.128" }
@@ -31,7 +31,7 @@ tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
 tower = { version = "0.4.13" }
 tower-http = { version = "0.6.0", features = ["trace"] }
 tracing = { version = "0.1.40" }
-tracing-opentelemetry = { version = "0.24.0" }
+tracing-opentelemetry = { version = "0.26.0" }
 tracing-subscriber = { version = "0.3.18" }
 url = { version = "2.5.2" }
 
