@@ -28,7 +28,7 @@ sqlx = { version = "0.8.2", features = [
 ] }
 tar = { version = "0.4.41" }
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
-tower = { version = "0.4.13" }
+tower = { version = "0.5.1" }
 tower-http = { version = "0.6.0", features = ["trace"] }
 tracing = { version = "0.1.40" }
 tracing-opentelemetry = { version = "0.24.0" }
