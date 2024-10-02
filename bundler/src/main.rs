@@ -35,6 +35,7 @@ use std::{
     io::Write,
     net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     ops::Add,
+    path::{Path, PathBuf},
     str::FromStr,
     sync::Arc,
     time::Duration,
@@ -84,7 +85,7 @@ type CurrentBundle = Arc<RwLock<BundleFile<NoMetadata>>>;
 #[command(author, version, about, long_about= None)]
 enum Cli {
     /// Run the service providing bundle data
-    Serve(ServeArgs),
+    Serve(Box<ServeArgs>),
     /// Output the bundle schema
     BundleSchema(BundleSchemaArgs),
 }
@@ -110,6 +111,9 @@ struct ServeArgs {
     /// The URL of the OpenTelemetry collector to send traces to
     #[arg(long, env = "BUNDLER_OTEL_COLLECTOR_URL")]
     otel_collector_url: Option<Url>,
+    /// Directory containing any static data files that should be included in the bundle
+    #[arg(long, env = "BUNDLER_STATIC_DATA_DIRECTORY")]
+    static_data_directory: Option<PathBuf>,
 }
 
 /// Arguments to output the schema with
@@ -126,7 +130,7 @@ async fn main() {
     let args = Cli::parse();
 
     match args {
-        Cli::Serve(args) => serve(args).await,
+        Cli::Serve(args) => serve(*args).await,
         Cli::BundleSchema(args) => bundle_schema(args),
     }
 }
@@ -136,7 +140,9 @@ async fn serve(args: ServeArgs) {
     setup_telemetry(args.log_level, args.otel_collector_url).unwrap();
 
     let ispyb_pool = connect_ispyb(args.database_url).await.unwrap();
-    let current_bundle = fetch_initial_bundle(&ispyb_pool).await.unwrap();
+    let current_bundle = fetch_initial_bundle(args.static_data_directory.as_deref(), &ispyb_pool)
+        .await
+        .unwrap();
     let app = Router::new()
         .route("/bundle.tar.gz", get(bundle_endpoint))
         .with_state(current_bundle.clone())
@@ -152,8 +158,10 @@ async fn serve(args: ServeArgs) {
         );
 
     let mut tasks = tokio::task::JoinSet::new();
+    let static_dir = args.static_data_directory.clone();
     tasks.spawn(update_bundle(
         current_bundle,
+        static_dir,
         ispyb_pool,
         args.polling_interval.into(),
     ));
@@ -234,11 +242,14 @@ async fn connect_ispyb(database_url: Url) -> Result<MySqlPool, sqlx::Error> {
 /// Fetches the intial [`Bundle`] from ISPyB and produces the correspoinding [`BundleFile`]
 #[instrument]
 async fn fetch_initial_bundle(
+    static_data: Option<&Path>,
     ispyb_pool: &MySqlPool,
 ) -> Result<Arc<RwLock<BundleFile<NoMetadata>>>, anyhow::Error> {
     tracing::info!("Fetching initial bundle");
     let bundle = Arc::new(RwLock::new(BundleFile::try_from(
-        Bundle::fetch(NoMetadata, ispyb_pool).await.unwrap(),
+        Bundle::fetch(NoMetadata, static_data, ispyb_pool)
+            .await
+            .unwrap(),
     )?));
     tracing::info!(
         "Using bundle with revison: {}",
@@ -258,6 +269,7 @@ async fn serve_endpoints(port: u16, app: Router) {
 /// Periodically update the bundle with new data from ISPyB
 async fn update_bundle(
     current_bundle: impl AsRef<RwLock<BundleFile<NoMetadata>>>,
+    static_data: Option<PathBuf>,
     ispyb_pool: MySqlPool,
     polling_interval: Duration,
 ) {
@@ -267,7 +279,9 @@ async fn update_bundle(
         sleep_until(next_fetch).await;
         next_fetch = next_fetch.add(polling_interval);
         tracing::info!("Updating bundle");
-        let bundle = Bundle::fetch(NoMetadata, &ispyb_pool).await.unwrap();
+        let bundle = Bundle::fetch(NoMetadata, static_data.as_deref(), &ispyb_pool)
+            .await
+            .unwrap();
         let bundle_file = BundleFile::try_from(bundle).unwrap();
         let old_revision = current_bundle
             .as_ref()

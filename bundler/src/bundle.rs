@@ -3,13 +3,15 @@ use schemars::{schema::RootSchema, schema_for, JsonSchema};
 use serde::Serialize;
 use sqlx::MySqlPool;
 use std::{
-    collections::{hash_map::DefaultHasher, BTreeMap},
+    collections::{hash_map::DefaultHasher, BTreeMap, HashMap},
+    ffi::OsStr,
     fmt::Debug,
     hash::{Hash, Hasher},
+    path::Path,
 };
 use tar::Header;
 use tokio::try_join;
-use tracing::instrument;
+use tracing::{instrument, trace, warn};
 
 use crate::permissionables::{
     beamlines::Beamlines, proposals::Proposals, sessions::Sessions, subjects::Subjects,
@@ -74,6 +76,8 @@ where
     proposals: Proposals,
     /// A mapping of beamlines to their various attributes
     beamlines: Beamlines,
+    /// A map (name to data) of static files to include in the bundle
+    static_data: HashMap<String, Vec<u8>>,
 }
 
 /// The prefix applied to data files in the bundle. Open Policy Agent does not support loading bundles with overlapping prefixes
@@ -90,6 +94,7 @@ where
         sessions: Sessions,
         proposals: Proposals,
         beamlines: Beamlines,
+        static_data: HashMap<String, Vec<u8>>,
     ) -> Self {
         let mut hasher = DefaultHasher::new();
         metadata.hash(&mut hasher);
@@ -110,20 +115,35 @@ where
             sessions,
             proposals,
             beamlines,
+            static_data,
         }
     }
 
     /// Fetches [`Subjects`] from ISPyB and constructs a [`Bundle`]
     #[instrument(name = "fetch_bundle")]
-    pub async fn fetch(metadata: Metadata, ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
+    pub async fn fetch(
+        metadata: Metadata,
+        static_data_directory: Option<&Path>,
+        ispyb_pool: &MySqlPool,
+    ) -> Result<Self, sqlx::Error> {
         let (subjects, sessions, proposals, beamlines) = try_join!(
             Subjects::fetch(ispyb_pool),
             Sessions::fetch(ispyb_pool),
             Proposals::fetch(ispyb_pool),
             Beamlines::fetch(ispyb_pool),
         )?;
+        // Ignore all static data if any of the reading fails
+        let static_data = match static_data_directory {
+            Some(dir) => static_data(dir).await.unwrap_or_default(),
+            None => HashMap::default(),
+        };
         Ok(Self::new(
-            metadata, subjects, sessions, proposals, beamlines,
+            metadata,
+            subjects,
+            sessions,
+            proposals,
+            beamlines,
+            static_data,
         ))
     }
 
@@ -172,6 +192,15 @@ where
             beamlines.as_slice(),
         )?;
 
+        for (name, data) in &self.static_data {
+            let mut header = Header::from_bytes(data);
+            bundle_builder.append_data(
+                &mut header,
+                format!("{BUNDLE_PREFIX}/{name}/data.json"),
+                data.as_slice(),
+            )?;
+        }
+
         Ok(bundle_builder.into_inner()?.finish()?)
     }
 
@@ -184,4 +213,29 @@ where
             (Beamlines::schema_name(), schema_for!(Beamlines)),
         ])
     }
+}
+
+/// Read static data from files that should be included in the compiled bundle
+async fn static_data(root: &Path) -> Result<HashMap<String, Vec<u8>>, std::io::Error> {
+    let mut data = HashMap::new();
+    let mut contents = tokio::fs::read_dir(root).await?;
+    while let Some(entry) = contents.next_entry().await? {
+        let path = entry.path();
+        if !path.is_file() || !path.extension().is_some_and(|ext| ext == "json") {
+            // Not explicitly a json file so ignore
+            trace!("Skipping non file in static data directory: {path:?}");
+            continue;
+        }
+        let name = path.file_stem();
+        let Some(name) = name.and_then(OsStr::to_str) else {
+            // Save having to think about non-utf8 in OPA rules
+            trace!("Skipping non-utf8 static file: {name:?}");
+            continue;
+        };
+        match tokio::fs::read(&path).await {
+            Ok(file_data) => _ = data.insert(name.to_string(), file_data),
+            Err(e) => warn!("Failed to read static data from {path:?}: {e}"),
+        }
+    }
+    Ok(data)
 }
