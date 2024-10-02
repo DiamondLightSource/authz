@@ -22,10 +22,10 @@ services:
       --server
       --config-file /config.yml
       --watch
-      /org-policy
+      /policy
     volumes:
       - ./opa.yml:/config.yml:cached,z
-      - ../org-policy/:/org-policy:cached,z
+      - ../policy/:/org-policy:cached,z
     environment:
       TRACING_ADDRESS: collector:4317
       USERINFO_ENDPOINT: https://authbeta.diamond.ac.uk/cas/oidc/oidcProfile
