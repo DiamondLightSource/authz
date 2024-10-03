@@ -6,7 +6,7 @@ use sqlx::MySqlPool;
 use std::{
     collections::{hash_map::DefaultHasher, BTreeMap, HashMap},
     ffi::OsStr,
-    fmt::{Debug, Display},
+    fmt::Debug,
     hash::{Hash, Hasher},
 };
 use tar::Header;
@@ -233,40 +233,12 @@ async fn static_data(patterns: &[Pattern]) -> Result<HashMap<String, Vec<u8>>, s
 }
 
 /// Combination of possible errors when fetching data to create bundle
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum BundleDataError {
     /// Error fetching data from database
-    Sql(sqlx::Error),
+    #[error("Error reading dynamic data: {0}")]
+    Sql(#[from] sqlx::Error),
     /// Error fetching data from file
-    Static(std::io::Error),
-}
-
-impl From<sqlx::Error> for BundleDataError {
-    fn from(value: sqlx::Error) -> Self {
-        Self::Sql(value)
-    }
-}
-
-impl From<std::io::Error> for BundleDataError {
-    fn from(value: std::io::Error) -> Self {
-        Self::Static(value)
-    }
-}
-
-impl Display for BundleDataError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            BundleDataError::Sql(e) => write!(f, "Error reading dynamic data: {e}"),
-            BundleDataError::Static(e) => write!(f, "Error reading static data: {e}"),
-        }
-    }
-}
-
-impl std::error::Error for BundleDataError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            BundleDataError::Sql(e) => Some(e),
-            BundleDataError::Static(e) => Some(e),
-        }
-    }
+    #[error("Error reading static data: {0}")]
+    Static(#[from] std::io::Error),
 }
