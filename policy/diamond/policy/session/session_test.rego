@@ -43,6 +43,7 @@ diamond_data := {
 		"2": 12,
 	}}},
 	"beamlines": {"i03": {"sessions": [11]}, "b07": {"sessions": [12]}},
+	"admin": {"b07_admin": ["b07"]},
 }
 
 test_session_member_allowed if {
@@ -63,4 +64,8 @@ test_super_admin_allowed if {
 
 test_non_member_denied if {
 	not session.access_session("oscar", 1, 1) with data.diamond.data as diamond_data
+}
+
+test_admin_not_on_session if {
+	not session.on_session("carol", 1, 1) with data.diamond.data as diamond_data
 }
