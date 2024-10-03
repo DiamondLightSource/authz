@@ -35,3 +35,11 @@ test_super_admin_allowed if {
 test_non_member_denied if {
 	not proposal.access_proposal("oscar", 1) with data.diamond.data as diamond_data
 }
+
+test_member_on_proposal if {
+	proposal.on_proposal("alice", 1) with data.diamond.data as diamond_data
+}
+
+test_admin_not_on_proposal if {
+	not proposal.on_proposal("carol", 1) with data.diamond.data as diamond_data
+}
