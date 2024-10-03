@@ -83,9 +83,10 @@ type CurrentBundle = Arc<RwLock<BundleFile<NoMetadata>>>;
 /// Bundler acts as a Open Policy Agent bundle server, providing permissionable data from the ISPyB database
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about= None)]
+#[allow(clippy::large_enum_variant)]
 enum Cli {
     /// Run the service providing bundle data
-    Serve(Box<ServeArgs>),
+    Serve(ServeArgs),
     /// Output the bundle schema
     BundleSchema(BundleSchemaArgs),
 }
@@ -130,7 +131,7 @@ async fn main() {
     let args = Cli::parse();
 
     match args {
-        Cli::Serve(args) => serve(*args).await,
+        Cli::Serve(args) => serve(args).await,
         Cli::BundleSchema(args) => bundle_schema(args),
     }
 }
