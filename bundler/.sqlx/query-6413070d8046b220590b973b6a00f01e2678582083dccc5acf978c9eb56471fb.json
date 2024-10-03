@@ -1,0 +1,34 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            SELECT\n                login as subject,\n                type as permission\n            FROM Person\n                JOIN UserGroup_has_Person ON Person.personId = UserGroup_has_Person.personId\n                JOIN UserGroup USING (userGroupId)\n                JOIN UserGroup_has_Permission USING (userGroupId)\n                JOIN Permission USING (permissionId)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "subject",
+        "type_info": {
+          "type": "VarString",
+          "flags": "UNIQUE_KEY",
+          "max_size": 180
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "permission",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 60
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      false
+    ]
+  },
+  "hash": "6413070d8046b220590b973b6a00f01e2678582083dccc5acf978c9eb56471fb"
+}

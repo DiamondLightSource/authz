@@ -1,0 +1,54 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            SELECT\n                sessionId as session_id,\n                proposalNumber as proposal_number,\n                visit_number,\n                beamLineName as beamline\n            FROM\n                BLSession\n                JOIN Proposal USING (proposalId)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "session_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | UNSIGNED | AUTO_INCREMENT",
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "proposal_number",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "max_size": 180
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "visit_number",
+        "type_info": {
+          "type": "Long",
+          "flags": "UNSIGNED",
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "beamline",
+        "type_info": {
+          "type": "VarString",
+          "flags": "MULTIPLE_KEY",
+          "max_size": 180
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "7ec83d6ddd963ad112f6a4e8f3a9240fb0a8e69be2d52b50460893e24f2bedaa"
+}

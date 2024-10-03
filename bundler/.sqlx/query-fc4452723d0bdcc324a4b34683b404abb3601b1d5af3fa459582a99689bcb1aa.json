@@ -1,0 +1,34 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            SELECT\n                login as subject,\n                sessionId as session_id\n            FROM\n                Person\n                INNER JOIN Session_has_Person USING (personId)\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "subject",
+        "type_info": {
+          "type": "VarString",
+          "flags": "UNIQUE_KEY",
+          "max_size": 180
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "session_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | UNSIGNED",
+          "max_size": 10
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      false
+    ]
+  },
+  "hash": "fc4452723d0bdcc324a4b34683b404abb3601b1d5af3fa459582a99689bcb1aa"
+}

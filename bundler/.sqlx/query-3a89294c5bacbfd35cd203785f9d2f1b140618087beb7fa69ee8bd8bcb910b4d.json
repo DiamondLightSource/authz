@@ -1,0 +1,34 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            SELECT\n                beamLineName as beamline,\n                sessionId as session_id\n            FROM\n                BLSession\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "beamline",
+        "type_info": {
+          "type": "VarString",
+          "flags": "MULTIPLE_KEY",
+          "max_size": 180
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "session_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | UNSIGNED | AUTO_INCREMENT",
+          "max_size": 10
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      false
+    ]
+  },
+  "hash": "3a89294c5bacbfd35cd203785f9d2f1b140618087beb7fa69ee8bd8bcb910b4d"
+}

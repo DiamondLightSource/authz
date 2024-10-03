@@ -1,0 +1,44 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            SELECT\n                proposalNumber as proposal_number,\n                visit_number,\n                sessionId as session_id\n            FROM\n                BLSession\n                JOIN Proposal USING (proposalId)\n            WHERE\n                Proposal.externalId IS NOT NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "proposal_number",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "max_size": 180
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "visit_number",
+        "type_info": {
+          "type": "Long",
+          "flags": "UNSIGNED",
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "session_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | UNSIGNED | AUTO_INCREMENT",
+          "max_size": 10
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "047eb6d48708efb6901bbcc7d1375ad4c01aaadba3026ad73b752f3d9b946370"
+}

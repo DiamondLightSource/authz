@@ -1,0 +1,34 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            SELECT\n                login AS subject,\n                proposalNumber AS proposal_number\n            FROM ProposalHasPerson\n                INNER JOIN Person USING (personId)\n                INNER JOIN Proposal USING (proposalId)\n            WHERE\n                Proposal.externalId IS NOT NULL\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "subject",
+        "type_info": {
+          "type": "VarString",
+          "flags": "UNIQUE_KEY",
+          "max_size": 180
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "proposal_number",
+        "type_info": {
+          "type": "VarString",
+          "flags": "",
+          "max_size": 180
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      true,
+      true
+    ]
+  },
+  "hash": "06d74f40924fd1f75c561fe04bc40077bf4ab8409c4fc9fea24417835c53690f"
+}
