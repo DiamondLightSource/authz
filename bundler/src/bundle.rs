@@ -1,4 +1,5 @@
 use flate2::{write::GzEncoder, Compression};
+use glob::Pattern;
 use schemars::{schema::RootSchema, schema_for, JsonSchema};
 use serde::Serialize;
 use sqlx::MySqlPool;
@@ -7,11 +8,10 @@ use std::{
     ffi::OsStr,
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
-    path::Path,
 };
 use tar::Header;
 use tokio::try_join;
-use tracing::{instrument, trace, warn};
+use tracing::{instrument, trace};
 
 use crate::permissionables::{
     beamlines::Beamlines, proposals::Proposals, sessions::Sessions, subjects::Subjects,
@@ -126,7 +126,7 @@ where
     #[instrument(name = "fetch_bundle")]
     pub async fn fetch(
         metadata: Metadata,
-        static_data_directory: Option<&Path>,
+        static_data_directory: &[Pattern],
         ispyb_pool: &MySqlPool,
     ) -> Result<Self, sqlx::Error> {
         let (subjects, sessions, proposals, beamlines) = try_join!(
@@ -135,10 +135,7 @@ where
             Proposals::fetch(ispyb_pool),
             Beamlines::fetch(ispyb_pool),
         )?;
-        let static_data = match static_data_directory {
-            Some(dir) => static_data(dir).await?,
-            None => HashMap::default(),
-        };
+        let static_data = static_data(static_data_directory).await?;
         Ok(Self::new(
             metadata,
             subjects,
@@ -218,23 +215,19 @@ where
 }
 
 /// Read static data from files that should be included in the compiled bundle
-async fn static_data(root: &Path) -> Result<HashMap<String, Vec<u8>>, std::io::Error> {
+async fn static_data(patterns: &[Pattern]) -> Result<HashMap<String, Vec<u8>>, std::io::Error> {
     let mut data = HashMap::new();
-    let mut contents = tokio::fs::read_dir(root).await?;
-    while let Some(entry) = contents.next_entry().await? {
-        let path = entry.path();
-        if !path.is_file() || !path.extension().is_some_and(|ext| ext == "json") {
-            // Not explicitly a json file so ignore
-            trace!("Skipping non file in static data directory: {path:?}");
-            continue;
+    for pattern in patterns {
+        for file in glob::glob(pattern.as_str()).expect("Pattern was validated by CLI") {
+            let file = file.map_err(|e| e.into_error())?;
+            let name = file.file_stem();
+            let Some(name) = name.and_then(OsStr::to_str) else {
+                // Save having to think about non-utf8 in OPA rules
+                trace!("Skipping non-utf8 static file: {name:?}");
+                continue;
+            };
+            data.insert(name.to_string(), tokio::fs::read(&file).await?);
         }
-        let name = path.file_stem();
-        let Some(name) = name.and_then(OsStr::to_str) else {
-            // Save having to think about non-utf8 in OPA rules
-            trace!("Skipping non-utf8 static file: {name:?}");
-            continue;
-        };
-        data.insert(name.to_string(), tokio::fs::read(&path).await?);
     }
     Ok(data)
 }
