@@ -5,7 +5,7 @@ use sqlx::MySqlPool;
 use std::{
     collections::{hash_map::DefaultHasher, BTreeMap, HashMap},
     ffi::OsStr,
-    fmt::Debug,
+    fmt::{Debug, Display},
     hash::{Hash, Hasher},
     path::Path,
 };
@@ -102,6 +102,9 @@ where
         sessions.hash(&mut hasher);
         proposals.hash(&mut hasher);
         beamlines.hash(&mut hasher);
+        for entry in &static_data {
+            entry.hash(&mut hasher);
+        }
         let hash = hasher.finish();
 
         Self {
@@ -132,9 +135,8 @@ where
             Proposals::fetch(ispyb_pool),
             Beamlines::fetch(ispyb_pool),
         )?;
-        // Ignore all static data if any of the reading fails
         let static_data = match static_data_directory {
-            Some(dir) => static_data(dir).await.unwrap_or_default(),
+            Some(dir) => static_data(dir).await?,
             None => HashMap::default(),
         };
         Ok(Self::new(
@@ -232,10 +234,46 @@ async fn static_data(root: &Path) -> Result<HashMap<String, Vec<u8>>, std::io::E
             trace!("Skipping non-utf8 static file: {name:?}");
             continue;
         };
-        match tokio::fs::read(&path).await {
-            Ok(file_data) => _ = data.insert(name.to_string(), file_data),
-            Err(e) => warn!("Failed to read static data from {path:?}: {e}"),
-        }
+        data.insert(name.to_string(), tokio::fs::read(&path).await?);
     }
     Ok(data)
+}
+
+/// Combination of possible errors when fetching data to create bundle
+#[derive(Debug)]
+pub enum BundleDataError {
+    /// Error fetching data from database
+    Sql(sqlx::Error),
+    /// Error fetching data from file
+    Static(std::io::Error),
+}
+
+impl From<sqlx::Error> for BundleDataError {
+    fn from(value: sqlx::Error) -> Self {
+        Self::Sql(value)
+    }
+}
+
+impl From<std::io::Error> for BundleDataError {
+    fn from(value: std::io::Error) -> Self {
+        Self::Static(value)
+    }
+}
+
+impl Display for BundleDataError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            BundleDataError::Sql(e) => write!(f, "Error reading dynamic data: {e}"),
+            BundleDataError::Static(e) => write!(f, "Error reading static data: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for BundleDataError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            BundleDataError::Sql(e) => Some(e),
+            BundleDataError::Static(e) => Some(e),
+        }
+    }
 }
