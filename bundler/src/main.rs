@@ -80,7 +80,8 @@ where
 /// A thread safe, mutable, wrapper around the [`BundleFile`]
 type CurrentBundle = Arc<RwLock<BundleFile<NoMetadata>>>;
 
-/// Bundler acts as a Open Policy Agent bundle server, providing permissionable data from the ISPyB database
+/// Bundler acts as an Open Policy Agent bundle server, providing permissionable data from the
+/// ISPyB database and static data from local files
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about= None)]
 #[allow(clippy::large_enum_variant)]
@@ -136,7 +137,7 @@ async fn main() {
     }
 }
 
-/// Runs the service, pulling fresh bundles from ISPyB and serving them via the API
+/// Runs the service, pulling fresh bundles from ISPyB/local files and serving them via the API
 async fn serve(args: ServeArgs) {
     setup_telemetry(args.log_level, args.otel_collector_url).unwrap();
 
@@ -239,7 +240,8 @@ async fn connect_ispyb(database_url: Url) -> Result<MySqlPool, sqlx::Error> {
     connection
 }
 
-/// Fetches the intial [`Bundle`] from ISPyB and produces the correspoinding [`BundleFile`]
+/// Fetches the initial [`Bundle`] from ISPyB and any static files, and produces the corresponding
+/// [`BundleFile`]
 #[instrument]
 async fn fetch_initial_bundle(
     static_data: &[Pattern],
@@ -266,7 +268,8 @@ async fn serve_endpoints(port: u16, app: Router) {
     axum::serve(listener, app).await.unwrap()
 }
 
-/// Periodically update the bundle with new data from ISPyB
+/// Periodically update the bundle with new data from ISPyB and any static files matching the given
+/// glob patterns.
 async fn update_bundle(
     current_bundle: impl AsRef<RwLock<BundleFile<NoMetadata>>>,
     static_data: Vec<Pattern>,
