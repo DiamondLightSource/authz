@@ -348,6 +348,7 @@ dependencies = [
  "derive_more",
  "dotenvy",
  "flate2",
+ "glob",
  "headers",
  "humantime",
  "opentelemetry",
