@@ -1,12 +1,16 @@
 package diamond.policy.admin
 
+import data.diamond.policy.token
 import rego.v1
 
-is_admin(subject) if {
-	"super_admin" in data.diamond.data.subjects[subject].permissions # regal ignore:external-reference
+is_admin[subject] := "super_admin" in data.diamond.data.subjects[subject].permissions
+
+beamline_admin_for_subject[subject] contains beamline if {
+	some subject
+	some role in data.diamond.data.subjects[subject].permissions
+	some beamline in data.diamond.data.admin[role]
 }
 
-is_beamline_admin(subject, beamline) if {
-	some admin in data.diamond.data.subjects[subject].permissions
-	beamline in data.diamond.data.admin[admin] # regal ignore:external-reference
-}
+admin := is_admin[token.claims.fedid] # regal ignore:rule-name-repeats-package
+
+beamline_admin := input.beamline in object.get(beamline_admin_for_subject, token.claims.fedid, [])
