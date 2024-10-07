@@ -1,7 +1,6 @@
 {
-    "em_admin": [],
-    "epsic_admin": [],
-    "fault_admin": [],
+    "em_admin": ["m01", "m02", "m03", "m04", "m05", "m06", "m07", "m08", "m09", "m10", "m11", "m12", "m13", "m14", "m15"],
+    "epsic_admin": ["e01", "e02", "e03"],
     "gen_admin": [],
     "pow_admin": [],
     "mx_admin": ["i02-1", "i02-2", "i03", "i04", "i04-1", "i23", "i24"],
