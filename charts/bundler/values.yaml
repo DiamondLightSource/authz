@@ -20,6 +20,7 @@ bundler:
     name: token-authorization
     key: bearer
   pollingInterval: 60s
+  staticDataPattern: "static/*.json"
 
 serviceAccount:
   create: true

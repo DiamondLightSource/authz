@@ -54,6 +54,8 @@ spec:
                   key: {{ .Values.bundler.requireTokenSecret.key }}
             - name: BUNDLER_POLLING_INTERVAL
               value: {{ .Values.bundler.pollingInterval }}
+            - name: BUNDLER_STATIC_DATA
+              value: /srv/bundler/{{ .Values.bundler.staticDataPattern }}
           ports:
             - name: http
               containerPort: 80
@@ -68,6 +70,13 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: static-bundler-volume
+              mountPath: /srv/bundler/
+      volumes:
+        - name: static-bundler-volume
+          configMap:
+            name: {{ include "common.names.fullname" . }}-static-data
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
