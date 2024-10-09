@@ -23,7 +23,7 @@ use axum::{
 use axum_extra::TypedHeader;
 use clap::Parser;
 use clio::ClioPath;
-use glob::Pattern;
+use glob::{Pattern, PatternError};
 use headers::{ETag, HeaderMapExt, IfNoneMatch};
 use opentelemetry_otlp::WithExportConfig;
 use require_bearer::RequireBearerLayer;
@@ -114,8 +114,9 @@ struct ServeArgs {
     #[arg(long, env = "BUNDLER_OTEL_COLLECTOR_URL")]
     otel_collector_url: Option<Url>,
     /// Paths to any static data files that should be included in the bundle - can be globs
-    #[arg(long, env = "BUNDLER_STATIC_DATA")]
-    static_data: Vec<Pattern>,
+    // validate that string can be converted to a glob pattern but store it in its string form
+    #[arg(long, env = "BUNDLER_STATIC_DATA", value_parser = |raw: &'_ str| Pattern::new(raw).map(|_| raw.to_string()))]
+    static_data: Vec<String>,
 }
 
 /// Arguments to output the schema with
@@ -244,7 +245,7 @@ async fn connect_ispyb(database_url: Url) -> Result<MySqlPool, sqlx::Error> {
 /// [`BundleFile`]
 #[instrument]
 async fn fetch_initial_bundle(
-    static_data: &[Pattern],
+    static_data: &[String],
     ispyb_pool: &MySqlPool,
 ) -> Result<Arc<RwLock<BundleFile<NoMetadata>>>, anyhow::Error> {
     tracing::info!("Fetching initial bundle");
@@ -272,7 +273,7 @@ async fn serve_endpoints(port: u16, app: Router) {
 /// glob patterns.
 async fn update_bundle(
     current_bundle: impl AsRef<RwLock<BundleFile<NoMetadata>>>,
-    static_data: Vec<Pattern>,
+    static_data: Vec<String>,
     ispyb_pool: MySqlPool,
     polling_interval: Duration,
 ) {
