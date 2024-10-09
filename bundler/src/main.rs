@@ -78,7 +78,7 @@ where
 }
 
 /// Wrapper to ensure that globs passed via the CLI are valid file globs
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, derive_more::AsRef)]
 struct StaticDataGlob(String);
 
 impl FromStr for StaticDataGlob {
@@ -87,12 +87,6 @@ impl FromStr for StaticDataGlob {
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         _ = Pattern::new(value)?;
         Ok(Self(value.into()))
-    }
-}
-
-impl AsRef<str> for StaticDataGlob {
-    fn as_ref(&self) -> &str {
-        &self.0
     }
 }
 
