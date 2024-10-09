@@ -77,6 +77,25 @@ where
     }
 }
 
+/// Wrapper to ensure that globs passed via the CLI are valid file globs
+#[derive(Debug, Clone)]
+struct StaticDataGlob(String);
+
+impl FromStr for StaticDataGlob {
+    type Err = PatternError;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        _ = Pattern::new(value)?;
+        Ok(Self(value.into()))
+    }
+}
+
+impl AsRef<str> for StaticDataGlob {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
 /// A thread safe, mutable, wrapper around the [`BundleFile`]
 type CurrentBundle = Arc<RwLock<BundleFile<NoMetadata>>>;
 
@@ -114,9 +133,8 @@ struct ServeArgs {
     #[arg(long, env = "BUNDLER_OTEL_COLLECTOR_URL")]
     otel_collector_url: Option<Url>,
     /// Paths to any static data files that should be included in the bundle - can be globs
-    // validate that string can be converted to a glob pattern but store it in its string form
-    #[arg(long, env = "BUNDLER_STATIC_DATA", value_parser = |raw: &'_ str| Pattern::new(raw).map(|_| raw.to_string()))]
-    static_data: Vec<String>,
+    #[arg(long, env = "BUNDLER_STATIC_DATA")]
+    static_data: Vec<StaticDataGlob>,
 }
 
 /// Arguments to output the schema with
@@ -245,7 +263,7 @@ async fn connect_ispyb(database_url: Url) -> Result<MySqlPool, sqlx::Error> {
 /// [`BundleFile`]
 #[instrument]
 async fn fetch_initial_bundle(
-    static_data: &[String],
+    static_data: &[StaticDataGlob],
     ispyb_pool: &MySqlPool,
 ) -> Result<Arc<RwLock<BundleFile<NoMetadata>>>, anyhow::Error> {
     tracing::info!("Fetching initial bundle");
@@ -273,7 +291,7 @@ async fn serve_endpoints(port: u16, app: Router) {
 /// glob patterns.
 async fn update_bundle(
     current_bundle: impl AsRef<RwLock<BundleFile<NoMetadata>>>,
-    static_data: Vec<String>,
+    static_data: Vec<StaticDataGlob>,
     ispyb_pool: MySqlPool,
     polling_interval: Duration,
 ) {

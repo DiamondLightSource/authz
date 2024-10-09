@@ -12,8 +12,11 @@ use tar::Header;
 use tokio::try_join;
 use tracing::{instrument, trace};
 
-use crate::permissionables::{
-    beamlines::Beamlines, proposals::Proposals, sessions::Sessions, subjects::Subjects,
+use crate::{
+    permissionables::{
+        beamlines::Beamlines, proposals::Proposals, sessions::Sessions, subjects::Subjects,
+    },
+    StaticDataGlob,
 };
 
 /// A compiled Web Assembly module
@@ -125,7 +128,7 @@ where
     #[instrument(name = "fetch_bundle")]
     pub async fn fetch(
         metadata: Metadata,
-        static_data: &[String],
+        static_data: &[StaticDataGlob],
         ispyb_pool: &MySqlPool,
     ) -> Result<Self, sqlx::Error> {
         let (subjects, sessions, proposals, beamlines) = try_join!(
@@ -214,12 +217,14 @@ where
 }
 
 /// Read static data from files that should be included in the compiled bundle
-async fn read_static_data(patterns: &[String]) -> Result<HashMap<String, Vec<u8>>, std::io::Error> {
+async fn read_static_data(
+    patterns: &[StaticDataGlob],
+) -> Result<HashMap<String, Vec<u8>>, std::io::Error> {
     let mut data = HashMap::new();
     for pattern in patterns {
-        for file in glob::glob(pattern).expect("Pattern was validated by CLI") {
+        for file in glob::glob(pattern.as_ref()).expect("Pattern was validated by CLI") {
             let file = file.map_err(|e| e.into_error())?;
-            trace!(glob = pattern.as_str(), file = ?file, "Reading static data from {file:?}");
+            trace!(glob = pattern.as_ref(), file = ?file, "Reading static data from {file:?}");
             let name = file.file_stem();
             let Some(name) = name.and_then(OsStr::to_str) else {
                 // Save having to think about non-utf8 in OPA rules
