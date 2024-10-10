@@ -27,7 +27,7 @@ extraEnv: []
 portOverride: ""
 
 serviceAccount:
-  create: false
+  create: true
   name: ""
 
 podAnnotations: {}
@@ -39,6 +39,13 @@ securityContext: {}
 service:
   type: ClusterIP
   port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []
 
 resources: {}
 
