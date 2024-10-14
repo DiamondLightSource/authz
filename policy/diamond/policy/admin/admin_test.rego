@@ -32,30 +32,91 @@ diamond_data := {
 	"admin": {"b07_admin": ["b07"], "group_admin": ["b07", "i07"]},
 }
 
-test_super_admin_subject if {
-	admin.is_admin("carol") with data.diamond.data as diamond_data
+test_is_admin_for_admin if {
+	admin.is_admin.carol with data.diamond.data as diamond_data
 }
 
-test_beamline_admin_subject_beamline if {
-	admin.is_beamline_admin("bob", "b07") with data.diamond.data as diamond_data
+test_beamline_admin_for_subject_for_beamline_admin if {
+	admin.beamline_admin_for_subject.bob == {"b07"} with data.diamond.data as diamond_data
 }
 
-test_group_admin_subject_beamline if {
-	admin.is_beamline_admin("oscar", "b07") with data.diamond.data as diamond_data
+test_beamlines_admin_for_subject_for_group_admin if {
+	admin.beamline_admin_for_subject.oscar == {"b07", "i07"} with data.diamond.data as diamond_data
 }
 
-test_non_admin if {
-	not admin.is_admin("alice") with data.diamond.data as diamond_data
+test_is_admin_for_non_admin if {
+	not admin.is_admin.alice with data.diamond.data as diamond_data
 }
 
-test_beamline_admin_not_admin if {
-	not admin.is_admin("bob") with data.diamond.data as diamond_data
+test_is_admin_for_beamline_admin_not_admin if {
+	not admin.is_admin.bob with data.diamond.data as diamond_data
 }
 
-test_non_beamline_admin if {
-	not admin.is_beamline_admin("alice", "b07") with data.diamond.data as diamond_data
+test_beamline_admin_for_subject_for_non_beamline_admin if {
+	not "alice" in admin.beamline_admin_for_subject with data.diamond.data as diamond_data
 }
 
-test_super_admin_not_beamline_admin if {
-	not admin.is_beamline_admin("carol", "b07") with data.diamond.data as diamond_data
+test_beamline_admin_for_subject_for_admin if {
+	not "carol" in admin.beamline_admin_for_subject with data.diamond.data as diamond_data
 }
+
+test_admin_rule_for_admin if {
+	admin.admin with input as {"user": "carol"}
+		with data.diamond.data as diamond_data
+}
+
+test_admin_rule_for_non_admin if {
+	not admin.admin with input as {"user": "bob"}
+		with data.diamond.data as diamond_data
+}
+
+# If no user is passed as input, the rule should be undefined
+test_admin_rule_for_no_user := false if {
+	local_admin := admin.admin with input as {}
+		with data.diamond.data as diamond_data
+}
+
+else := true # regal ignore:default-over-else
+
+test_beamline_admin_rule_for_beamline_admin if {
+	admin.beamline_admin with input as {"user": "bob", "beamline": "b07"}
+		with data.diamond.data as diamond_data
+}
+
+# super_admin can access anything but they still aren't automatically beamline admins
+test_beamline_admin_rule_for_super_admin if {
+	not admin.beamline_admin with input as {"user": "carol", "beamline": "b07"}
+		with data.diamond.data as diamond_data
+}
+
+test_beamline_admin_rule_for_non_beamline_admin if {
+	not admin.beamline_admin with input as {"user": "alice", "beamline": "b07"}
+		with data.diamond.data as diamond_data
+}
+
+test_beamline_admin_rule_for_wrong_beamline_admin if {
+	# bob is only beamline admin for b07
+	not admin.beamline_admin with input as {"user": "bob", "beamline": "i07"}
+		with data.diamond.data as diamond_data
+}
+
+test_beamline_admin_rule_for_no_user := false if {
+	local_admin := admin.beamline_admin with input as {"beamline": "i07"}
+		with data.diamond.data as diamond_data
+}
+
+else := true # regal ignore:default-over-else
+
+test_beamline_admin_rule_for_no_beamline := false if {
+	local_admin := admin.beamline_admin with input as {"user": "bob"}
+		with data.diamond.data as diamond_data
+}
+
+else := true # regal ignore:default-over-else
+
+test_beamline_admin_rule_for_no_input := false if {
+	local_admin := admin.beamline_admin with input as {}
+		with data.diamond.data as diamond_data
+}
+
+else := true # regal ignore:default-over-else
