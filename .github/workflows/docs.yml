@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
 
       - name: Setup Node
         uses: actions/setup-node@v4.0.4
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
 
       - name: Setup Python
         uses: actions/setup-python@v5.2.0
@@ -52,7 +52,7 @@ jobs:
         run: chmod -R +rX site
 
       - name: Upload User Docs Artifact
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: user-docs
           path: site
@@ -101,7 +101,7 @@ jobs:
       DATABASE_URL: mysql://root:rootpassword@localhost/ispyb_build
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.2.0
+        uses: actions/checkout@v4.2.1
 
       - name: Install stable toolchain
         uses: actions-rs/toolchain@v1.0.7
@@ -110,7 +110,7 @@ jobs:
           default: true
 
       - name: Cache Rust Build
-        uses: Swatinem/rust-cache@v2.7.3
+        uses: Swatinem/rust-cache@v2.7.5
 
       - name: Build docs
         uses: actions-rs/cargo@v1.0.3
@@ -126,7 +126,7 @@ jobs:
         run: chmod -R +rX bundler/target/doc
 
       - name: Upload Bundler Docs Artifact
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: bundler-docs
           path: bundler/target/doc/bundler
