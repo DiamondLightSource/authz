@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = { version = "1.0.89" }
+anyhow = { version = "1.0.90" }
 axum = { version = "0.7.7" }
 axum-extra = { version = "0.9.4", features = ["typed-header"] }
 clap = { version = "4.5.20", features = ["derive", "env"] }
@@ -21,7 +21,7 @@ opentelemetry-semantic-conventions = { version = "0.15.0" }
 opentelemetry_sdk = { version = "0.23.0", features = ["rt-tokio"] }
 schemars = { version = "0.8.21" }
 serde = { version = "1.0.210", features = ["derive"] }
-serde_json = { version = "1.0.128" }
+serde_json = { version = "1.0.132" }
 sqlx = { version = "0.8.2", features = [
     "runtime-tokio",
     "tls-rustls",
@@ -38,4 +38,4 @@ tracing-subscriber = { version = "0.3.18" }
 url = { version = "2.5.2" }
 
 [build-dependencies]
-built = { version = "0.7.4" }
+built = { version = "0.7.5" }
