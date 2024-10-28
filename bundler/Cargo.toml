@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = { version = "1.0.90" }
+anyhow = { version = "1.0.91" }
 axum = { version = "0.7.7" }
 axum-extra = { version = "0.9.4", features = ["typed-header"] }
 clap = { version = "4.5.20", features = ["derive", "env"] }
@@ -20,7 +20,7 @@ opentelemetry-otlp = { version = "0.16.0", features = ["metrics", "tokio"] }
 opentelemetry-semantic-conventions = { version = "0.15.0" }
 opentelemetry_sdk = { version = "0.23.0", features = ["rt-tokio"] }
 schemars = { version = "0.8.21" }
-serde = { version = "1.0.210", features = ["derive"] }
+serde = { version = "1.0.213", features = ["derive"] }
 serde_json = { version = "1.0.132" }
 sqlx = { version = "0.8.2", features = [
     "runtime-tokio",
@@ -28,7 +28,7 @@ sqlx = { version = "0.8.2", features = [
     "mysql",
 ] }
 tar = { version = "0.4.42" }
-thiserror = "1.0.64"
+thiserror = "1.0.65"
 tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
 tower = { version = "0.5.1" }
 tower-http = { version = "0.6.1", features = ["trace"] }
