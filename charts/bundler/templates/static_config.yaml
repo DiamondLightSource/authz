@@ -5,11 +5,5 @@ metadata:
   name: {{ include "common.names.fullname" . }}-static-data
   namespace: {{ .Release.Namespace }}
 data:
-  {{ range $path, $_ := .Files.Glob .Values.bundler.staticDataPattern -}}
-  {{ $data := $.Files.Get $path -}}
-  {{ if  (trim $data) -}}
-  {{ $path }}: |-
-    {{- $data | nindent 4 }}
-  {{ end -}}
-  {{- end -}}
+  {{- ( .Files.Glob .Values.bundler.staticDataPattern ).AsConfig | nindent 2 }}
 {{- end }}
