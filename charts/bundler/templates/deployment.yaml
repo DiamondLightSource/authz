@@ -70,13 +70,17 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{ if .Values.bundler.staticDataPattern -}}
           volumeMounts:
             - name: static-bundler-volume
               mountPath: /srv/bundler/
+          {{- end }}
+      {{ if .Values.bundler.staticDataPattern -}}
       volumes:
         - name: static-bundler-volume
           configMap:
             name: {{ include "common.names.fullname" . }}-static-data
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
