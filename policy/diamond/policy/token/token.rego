@@ -2,16 +2,24 @@ package diamond.policy.token
 
 import rego.v1
 
+issuer := opa.runtime().env.ISSUER
+
+jwks_endpoint := jwks_endpoint if {
+	metadata := http.send({
+		"url": concat("", [issuer, "/.well-known/openid-configuration"]),
+		"method": "GET",
+		"force_cache": true,
+		"force_cache_duration_seconds": 86400,
+	}).body
+	jwks_endpoint := metadata.jwks_uri
+}
+
 fetch_jwks(url) := http.send({
 	"url": url,
 	"method": "GET",
 	"force_cache": true,
 	"force_cache_duration_seconds": 86400,
 })
-
-jwks_endpoint := opa.runtime().env.JWKS_ENDPOINT
-
-issuer := opa.runtime().env.ISSUER
 
 unverified := io.jwt.decode(input.token)
 

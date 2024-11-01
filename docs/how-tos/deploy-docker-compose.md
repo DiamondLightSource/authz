@@ -14,7 +14,7 @@ The example below makes use of the [Diamond Data Bundle](../references/diamond-d
 
     Local policy which may be actively developed should not be included in the configuration file, instead it should be mounted into the OPA container and included using the `--watch` argument on the command.
 
-!!! example 
+!!! example
 
     ```yaml title="opa.yml"
     services:
@@ -51,7 +51,7 @@ If using the [Diamond Data Bundle](../references/diamond-data-bundle.md) you sho
 
 ### Using the Organisational Policy
 
-If using the [Organisational Policy](../references/organisational-policy.md) you should set the `JWKS_ENDPOINT` environment variable to the KeyCloak JSON Web Key Set (JWKS) endpoint - `https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs` - using the `environment` list.
+If using the [Organisational Policy](../references/organisational-policy.md) you should set the `ISSUER` environment variable to the KeyCloak instance - `https://authn.diamond.ac.uk/realms/master` - using the `environment` list.
 
 ### Using Local Policy
 
@@ -88,6 +88,6 @@ To utilize local policy you should mount in the policy volume and setting the `-
           - ./opa.yml:/config.yml:cached,z
           - ../policy:/policy:cached,z
         environment:
-          JWKS_ENDPOINT: https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs
+          ISSUER: https://authn.diamond.ac.uk/realms/master
         env_file: opa.env
     ```

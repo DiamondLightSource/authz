@@ -60,8 +60,8 @@ spec:
                     key: {{ .Values.orgData.bundlerSecret.key }}
             {{- end -}}
             {{- if and .Values.orgPolicy.enabled .Values.orgPolicy.jwksEndpoint }}
-            - name: JWKS_ENDPOINT
-              value: {{ .Values.orgPolicy.jwksEndpoint }}
+            - name: ISSUER
+              value: {{ .Values.orgPolicy.issuer }}
             {{- end }}
             {{- if .Values.extraEnv }}
               {{- .Values.extraEnv | toYaml | nindent 12 }}
