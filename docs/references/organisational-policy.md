@@ -47,18 +47,8 @@ To make a decision the following inputs must be supplied:
 
     Subject attributes, Session membership, and Proposal membership are supplied by the [Diamond Data Bundle](../references/diamond-data-bundle.md).
 
-## Token Verification
+## Subject Claims
 
-Queried via `diamond.policy.token.verify`
+Queried via `diamond.policy.token.claims`
 
-The token verification function allows you to check that an access token is valid, it returns the Subject who owns the access token. This is performed by querying the CAS User Info Endpoint, and is compatible with:
-
-- `auth.diamond.ac.uk`
-- `authbeta.diamond.ac.uk`
-- `authalpha.diamond.ac.uk`
-
-The CAS User Info Endpoint instance is supplied via the `USERINFO_ENDPOINT` environment variable.
-
-!!! warning
-
-    The token verification function performs an HTTP request, thus it is not suitable for usage in a hot loop
+The token claims object allows you to access the claims of a user token - providing it is valid. This is performed by verifying the signature of the token against a JSON Web Key Set (JWKS), and is compatible with `authn.diamond.ac.uk`.

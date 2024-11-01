@@ -46,7 +46,7 @@ kubectl create secret generic bundler --from-literal=bearer-token=<BUNDLER_BEARE
 
 By default the deployed OPA instance will not load the [Organisational Policy](../references/organisational-policy.md), however this can be enabled by setting the `opa.orgPolicy.enabled` value to `true` in your `values.yaml`.
 
-By default this will use the production CAS User Info Endpoint. If you wish to change this you should set the `opa.orgPolicy.userinfoEndpoint` value to the desired endpoint.
+By default this will use the KeyCloak JSON Web Key Set (JWKS). If you wish to change this you should set the `opa.orgPolicy.jwksEndpoint` value to the desired endpoint.
 
 
 !!! example "values.yml"
@@ -55,7 +55,7 @@ By default this will use the production CAS User Info Endpoint. If you wish to c
     opa:
         orgPolicy:
             enabled: true
-            userinfoEndpoint: https://authbeta.diamond.ac.uk/cas/oidc/oidcProfile
+            jwksEndpoint: https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs
     ```
 
 ## Adding Additional Bundles

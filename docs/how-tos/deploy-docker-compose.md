@@ -47,11 +47,11 @@ You may now add the OPA instance to your `docker-compose` configuration, using t
 
 ### Using the Diamond Data Bundle
 
-If using the [Diamond Data Bundle](../references/diamond-data-bundle.md) you should set the `USERINFO_ENDPOINT` environment variable to the CAS User Info endpoint - `https://authbeta.diamond.ac.uk/cas/oidc/oidcProfile` - using the `environment` list.
+If using the [Diamond Data Bundle](../references/diamond-data-bundle.md) you should create an envionment variable file (`opa.env`) containing the `BUNDLER_BEARER_TOKEN` environment variable and mount this using the `env_file` option.
 
 ### Using the Organisational Policy
 
-If using the [Organisational Policy](../references/organisational-policy.md) you should create an envionment variable file (`opa.env`) containing the `BUNDLER_BEARER_TOKEN` environment variable and mount this using the `env_file` option.
+If using the [Organisational Policy](../references/organisational-policy.md) you should set the `JWKS_ENDPOINT` environment variable to the KeyCloak JSON Web Key Set (JWKS) endpoint - `https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs` - using the `environment` list.
 
 ### Using Local Policy
 
@@ -88,6 +88,6 @@ To utilize local policy you should mount in the policy volume and setting the `-
           - ./opa.yml:/config.yml:cached,z
           - ../policy:/policy:cached,z
         environment:
-          USERINFO_ENDPOINT: https://authbeta.diamond.ac.uk/cas/oidc/oidcProfile
+          JWKS_ENDPOINT: https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs
         env_file: opa.env
     ```
