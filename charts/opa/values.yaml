@@ -17,7 +17,7 @@ orgData:
     key: bearer-token
 orgPolicy:
   enabled: false
-  userinfoEndpoint: https://auth.diamond.ac.uk/cas/oidc/oidcProfile
+  jwksEndpoint: https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs
 configOverride: {}
 extraConfig: {}
 extraServices: {}
