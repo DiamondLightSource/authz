@@ -17,7 +17,7 @@ orgData:
     key: bearer-token
 orgPolicy:
   enabled: false
-  jwksEndpoint: https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs
+  issuer: https://authn.diamond.ac.uk/realms/master
 configOverride: {}
 extraConfig: {}
 extraServices: {}

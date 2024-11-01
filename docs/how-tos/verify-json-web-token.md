@@ -10,7 +10,7 @@ We do not yet provide an organisational JWT verification policy. However the imp
 
 Verification of JSON Web Tokens (JWTs) may be performed without a round trip to the Single Sign On (SSO) provider by utilizing the JSON Web Key Set (JWKS) to cryptographically verify that the signature on the JWT is genuine. JSON Web Key Sets rotate periodically, thus we must occasionally fetch the current set via the JWKS endpoint with the Key ID (`kid`) supplied encoded within the JWT.
 
-The following code expects the `JWKS` endpoint (e.g. `https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs`) to be supplied in the `JWKS_ENDPOINT` environment variable.
+The following code expects the OIDC provider (e.g. `https://authn.diamond.ac.uk/realms/master`) to be supplied in the `ISSUER` environment variable.
 
 ```rego
 package token
@@ -24,7 +24,14 @@ fetch_jwks(url) := http.send({
     "force_cache_duration_seconds": 3600,
 })
 
-jwks_endpoint := opa.runtime().env.JWKS_ENDPOINT
+oidc_issuer := opa.runtime().env.ISSUER
+
+jwks_endpoint := http.send({
+    "url": concat("", [oidc_issuer, "/.well-known/openid-configuration"]),
+    "method": "GET",
+    "force_cache": true,
+    "force_cache_duration_seconds": 84600
+    }).body.jwks_uri
 
 unverified := io.jwt.decode(input.token)
 
@@ -40,5 +47,5 @@ valid := io.jwt.decode_verify(input.token, {
     "aud": "account",
 })
 
-claims := valid[2] 
+claims := valid[2]
 ```

@@ -28,7 +28,7 @@ services:
       - ../policy/:/org-policy:cached,z
     environment:
       TRACING_ADDRESS: collector:4317
-      JWKS_ENDPOINT: https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs
+      ISSUER: https://authn.diamond.ac.uk/realms/master
 
   ispyb:
     image: ghcr.io/diamondlightsource/ispyb-database:v3.0.0

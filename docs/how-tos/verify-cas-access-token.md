@@ -8,7 +8,7 @@ It is recommended you delegate this operation to the [Organisational Policy](../
 
 ## Using Organisational Policy
 
-When loaded, you can delegate KeyCloak token verification decisions to the [Organisational Policy Bundle](../references/organisational-policy.md) by referencing the `data.diamond.policy.token.claims` variable in your policy and setting the `JWKS_ENDPOINT` environment variable to point to the KeyCloak JWKS endpoint - e.g. `https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs`.
+When loaded, you can delegate KeyCloak token verification decisions to the [Organisational Policy Bundle](../references/organisational-policy.md) by referencing the `data.diamond.policy.token.claims` variable in your policy and setting the `ISSUER` environment variable to point to the KeyCloak instance - e.g. `https://authn.diamond.ac.uk/realms/master`.
 
 The example below shows how you might write a system package which allows the action if `input.action` is "do_thing" and the `input.token` is for the subject "bob".
 
