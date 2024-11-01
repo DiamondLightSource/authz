@@ -23,7 +23,6 @@ opa:
         key: bearer
     orgPolicy:
       enabled: true
-      userinfoEndpoint: https://auth.diamond.ac.uk/cas/oidc/oidcProfile
     autoscaling:
       enabled: true
       minReplicas: 2
