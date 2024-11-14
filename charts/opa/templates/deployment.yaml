@@ -59,9 +59,11 @@ spec:
                     name: {{ tpl .Values.orgData.bundlerSecret.name . }}
                     key: {{ .Values.orgData.bundlerSecret.key }}
             {{- end -}}
-            {{- if and .Values.orgPolicy.enabled .Values.orgPolicy.jwksEndpoint }}
+            {{- if .Values.orgPolicy.enabled }}
+            {{- with .Values.orgPolicy.issuer }}
             - name: ISSUER
-              value: {{ .Values.orgPolicy.issuer }}
+              value: {{ . }}
+            {{- end }}
             {{- end }}
             {{- if .Values.extraEnv }}
               {{- .Values.extraEnv | toYaml | nindent 12 }}
