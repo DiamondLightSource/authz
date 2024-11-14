@@ -46,7 +46,7 @@ kubectl create secret generic bundler --from-literal=bearer-token=<BUNDLER_BEARE
 
 By default the deployed OPA instance will not load the [Organisational Policy](../references/organisational-policy.md), however this can be enabled by setting the `opa.orgPolicy.enabled` value to `true` in your `values.yaml`.
 
-By default this will use the KeyCloak JSON Web Key Set (JWKS). If you wish to change this you should set the `opa.orgPolicy.jwksEndpoint` value to the desired endpoint.
+By default this will use the KeyCloak instance. If you wish to change this you should set the `opa.orgPolicy.issuer` value to the desired endpoint.
 
 
 !!! example "values.yml"
@@ -55,7 +55,7 @@ By default this will use the KeyCloak JSON Web Key Set (JWKS). If you wish to ch
     opa:
         orgPolicy:
             enabled: true
-            jwksEndpoint: https://authn.diamond.ac.uk/realms/master/protocol/openid-connect/certs
+            issuer: https://authn.diamond.ac.uk/realms/master
     ```
 
 ## Adding Additional Bundles
@@ -89,7 +89,7 @@ Configuration for additional services and bundles can be supplied via the `opa.e
                     min_delay_seconds: 30
                     max_delay_seconds: 120
         extraEnv:
-            - name: MY_BUNDLE_SERVER_BEARER_TOKEN 
+            - name: MY_BUNDLE_SERVER_BEARER_TOKEN
               valueFrom:
                 name: my-bundle-server
                 value: bearer-token
