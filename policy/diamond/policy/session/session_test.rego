@@ -175,9 +175,9 @@ else := true # regal ignore:default-over-else
 test_session_beamline if {
 	bl1 := session.beamline with input as {"proposal": 1, "visit": 1}
 		with data.diamond.data as diamond_data
+	bl1 == "i03"
+
 	bl2 := session.beamline with input as {"proposal": 1, "visit": 2}
 		with data.diamond.data as diamond_data
-
-	bl1 == "i03"
 	bl2 == "b07"
 }
