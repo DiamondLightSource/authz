@@ -44,6 +44,14 @@ access := access_session(token.claims.fedid, input.proposal, input.visit)
 
 named_user := on_session(token.claims.fedid, input.proposal, input.visit)
 
-matches_beamline := input.beamline == beamline_for(input.proposal, input.visit) # regal ignore:boolean-assignment
-
 beamline := beamline_for(input.proposal, input.visit)
+
+matches_beamline := input.beamline == beamline # regal ignore:boolean-assignment
+
+# A user can only write to a visit if the given user, beamline and visit are all compatible
+default write_to_beamline_visit := false
+
+write_to_beamline_visit if {
+	access
+	matches_beamline
+}
