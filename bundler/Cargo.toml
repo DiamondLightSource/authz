@@ -32,9 +32,9 @@ thiserror = "2.0.3"
 tokio = { version = "1.41.1", features = ["macros", "rt-multi-thread"] }
 tower = { version = "0.5.1" }
 tower-http = { version = "0.6.2", features = ["trace"] }
-tracing = { version = "0.1.40" }
+tracing = { version = "0.1.41" }
 tracing-opentelemetry = { version = "0.24.0" }
-tracing-subscriber = { version = "0.3.18" }
+tracing-subscriber = { version = "0.3.19" }
 url = { version = "2.5.2" }
 
 [build-dependencies]
