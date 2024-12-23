@@ -52,7 +52,7 @@ jobs:
         run: chmod -R +rX site
 
       - name: Upload User Docs Artifact
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: user-docs
           path: site
@@ -126,7 +126,7 @@ jobs:
         run: chmod -R +rX bundler/target/doc
 
       - name: Upload Bundler Docs Artifact
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: bundler-docs
           path: bundler/target/doc/bundler
