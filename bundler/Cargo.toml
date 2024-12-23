@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = { version = "1.0.93" }
+anyhow = { version = "1.0.95" }
 axum = { version = "0.7.9" }
 axum-extra = { version = "0.9.4", features = ["typed-header"] }
-clap = { version = "4.5.21", features = ["derive", "env"] }
+clap = { version = "4.5.23", features = ["derive", "env"] }
 clio = { version = "0.3.5", features = ["clap-parse"] }
 derive_more = { version = "1.0.0", features = ["deref", "deref_mut", "as_ref"] }
 dotenvy = { version = "0.15.7" }
@@ -20,17 +20,17 @@ opentelemetry-otlp = { version = "0.16.0", features = ["metrics", "tokio"] }
 opentelemetry-semantic-conventions = { version = "0.15.0" }
 opentelemetry_sdk = { version = "0.23.0", features = ["rt-tokio"] }
 schemars = { version = "0.8.21" }
-serde = { version = "1.0.215", features = ["derive"] }
-serde_json = { version = "1.0.133" }
+serde = { version = "1.0.216", features = ["derive"] }
+serde_json = { version = "1.0.134" }
 sqlx = { version = "0.8.2", features = [
     "runtime-tokio",
     "tls-rustls",
     "mysql",
 ] }
 tar = { version = "0.4.43" }
-thiserror = "2.0.3"
+thiserror = "2.0.9"
 tokio = { version = "1.41.1", features = ["macros", "rt-multi-thread"] }
-tower = { version = "0.5.1" }
+tower = { version = "0.5.2" }
 tower-http = { version = "0.6.2", features = ["trace"] }
 tracing = { version = "0.1.41" }
 tracing-opentelemetry = { version = "0.24.0" }
