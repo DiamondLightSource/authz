@@ -52,7 +52,7 @@ jobs:
         run: chmod -R +rX site
 
       - name: Upload User Docs Artifact
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: user-docs
           path: site
@@ -110,7 +110,7 @@ jobs:
           default: true
 
       - name: Cache Rust Build
-        uses: Swatinem/rust-cache@v2.7.5
+        uses: Swatinem/rust-cache@v2.7.7
 
       - name: Build docs
         uses: actions-rs/cargo@v1.0.3
@@ -126,7 +126,7 @@ jobs:
         run: chmod -R +rX bundler/target/doc
 
       - name: Upload Bundler Docs Artifact
-        uses: actions/upload-artifact@v4.4.3
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: bundler-docs
           path: bundler/target/doc/bundler
