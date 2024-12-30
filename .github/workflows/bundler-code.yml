@@ -31,7 +31,7 @@ jobs:
           default: true
 
       - name: Cache Rust Build
-        uses: Swatinem/rust-cache@v2.7.5
+        uses: Swatinem/rust-cache@v2.7.7
 
       - name: Check Formatting
         uses: actions-rs/cargo@v1.0.3
@@ -80,7 +80,7 @@ jobs:
           default: true
 
       - name: Cache Rust Build
-        uses: Swatinem/rust-cache@v2.7.5
+        uses: Swatinem/rust-cache@v2.7.7
 
       - name: Test
         uses: actions-rs/cargo@v1.0.3
