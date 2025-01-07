@@ -1,0 +1,26 @@
+name: Pages Build
+
+on:
+  workflow_call:
+
+jobs:
+  combine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download User Docs Artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: user-docs
+          path: docs
+
+      - name: Download User Docs Artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          name: bundler-docs
+          path: docs/bundler
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          path: docs
+
