@@ -52,6 +52,6 @@ It is strongly recommended you implement policy packaging as part of your Contin
 
     ```yaml
     {%
-          include "../../.github/workflows/policy-container.yml"
+          include "../../.github/workflows/_policy_container.yaml"
     %}
     ```

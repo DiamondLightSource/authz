@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  devcontainer:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_devcontainer.yaml
+
+  bundler_lint:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_bundler_lint.yaml
+
+  bundler_test:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_bundler_test.yaml
+
+  bundler_container:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs: 
+      - bundler_lint
+      - bundler_test
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/_bundler_container.yaml
+
+  bundler_docs:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_bundler_docs.yaml
+
+  policy_lint:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_policy_lint.yaml
+
+  policy_test:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_policy_test.yaml
+
+  policy_container:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs: 
+      - policy_lint
+      - policy_test
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/_policy_container.yaml
+
+  helm_chart_lint:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_helm_chart_lint.yaml
+
+  helm_chart_publish:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs: helm_chart_lint
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/_helm_chart_publish.yaml
+
+  docs_lint:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_docs_lint.yaml
+
+  docs_build:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_docs_build.yaml
+
+  techdocs_publish:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs:
+      - docs_lint
+      - docs_build
+    uses: ./.github/workflows/_techdocs_publish.yaml
+  
+  pages_build:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs:
+      - bundler_docs
+      - docs_lint
+      - docs_build
+    uses: ./.github/workflows/_pages_build.yaml
+
+  pages_publish:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: pages_build
+    permissions:
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/_pages_publish.yaml

@@ -1,0 +1,24 @@
+name: Policy Lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Regal
+        uses: StyraInc/setup-regal@v1.0.0
+        with:
+          version: latest
+
+      - name: Lint
+        run: >
+          regal
+          lint
+          --format github
+          --config-file regal.yaml
+          ./policy

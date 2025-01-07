@@ -1,0 +1,31 @@
+name: Docs Build
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5.3.0
+        with:
+          python-version: 3.12
+
+      - name: Install Python Dependencies
+        run: pip install -r docs/requirements.txt
+
+      - name: Build User Docs
+        run: mkdocs build
+
+      - name: Fix file permissions for pages
+        run: chmod -R +rX site
+
+      - name: Upload User Docs Artifact
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: user-docs
+          path: site

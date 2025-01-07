@@ -1,0 +1,26 @@
+name: Docs Lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: 18
+
+      - name: Install Yarn dependencies
+        uses: borales/actions-yarn@v5.0.0
+        with:
+          cmd: global add markdownlint-cli2 markdown-it-admon
+
+      - name: Lint with markdownlint-cli2
+        run: >
+          markdownlint-cli2
+          **/*.{md,markdown}

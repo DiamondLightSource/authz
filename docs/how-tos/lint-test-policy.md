@@ -116,10 +116,18 @@ Test cases should begin with `test_` with a name which describes the expected be
 
 It is strongly recommeneded you implement automated linting and testing as part of your Continious Integration (CI) pipeline, an example for doing this in GitHub Actions is shown below.
 
-!!! example "GitHub Actions lint and test workflow"
+!!! example "GitHub Actions lint workflow"
 
     ```yaml
     {%
-          include "../../.github/workflows/policy-code.yml"
+          include "../../.github/workflows/_policy_lint.yaml"
+    %}
+    ```
+
+!!! example "GitHub Actions test workflow"
+
+    ```yaml
+    {%
+          include "../../.github/workflows/_policy_test.yaml"
     %}
     ```

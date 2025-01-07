@@ -1,0 +1,27 @@
+name: Helm Charts Lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Setup chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Lint
+        run: >
+          ct
+          lint
+          --target-branch=${{ github.event.repository.default_branch }}
+          --validate-maintainers=false
+
