@@ -1,0 +1,47 @@
+name: Bundler SQLX
+
+on:
+  workflow_call:
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    services:
+      ispyb:
+        image: ghcr.io/diamondlightsource/ispyb-database:v3.0.0
+        ports:
+          - 3306:3306
+        env:
+          MARIADB_ROOT_PASSWORD: rootpassword
+        options: >-
+          --health-cmd "/usr/local/bin/healthcheck.sh --defaults-file=/ispyb/.my.cnf --connect"
+          --health-interval 1s
+          --health-retries 60
+    env:
+      DATABASE_URL: mysql://root:rootpassword@localhost/ispyb_build
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.2.2
+
+      - name: Install stable toolchain
+        uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          default: true
+
+      - name: Cache Rust Build
+        uses: Swatinem/rust-cache@v2.7.7
+
+      - name: Install SQLX CLI
+        run: cargo install sqlx-cli
+
+      - name: Prepare SQLX Query
+        working-directory: bundler
+        run: cargo sqlx prepare
+
+      - name: Upload Prepared Queries Artifact
+        uses: actions/upload-artifact@v4.5.0
+        with:
+          name: prepared-queries
+          path: bundler/.sqlx
+          include-hidden-files: true

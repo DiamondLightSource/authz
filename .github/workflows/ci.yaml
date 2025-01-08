@@ -10,9 +10,15 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     uses: ./.github/workflows/_devcontainer.yaml
 
+  bundler_sqlx:
+    # Deduplicate jobs from pull requests and branch pushes within the same repo.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    uses: ./.github/workflows/_bundler_sqlx.yaml
+
   bundler_lint:
     # Deduplicate jobs from pull requests and branch pushes within the same repo.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs: bundler_sqlx
     uses: ./.github/workflows/_bundler_lint.yaml
 
   bundler_test:
@@ -24,6 +30,7 @@ jobs:
     # Deduplicate jobs from pull requests and branch pushes within the same repo.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     needs: 
+      - bundler_sqlx
       - bundler_lint
       - bundler_test
     permissions:
@@ -34,6 +41,7 @@ jobs:
   bundler_docs:
     # Deduplicate jobs from pull requests and branch pushes within the same repo.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
+    needs: bundler_sqlx
     uses: ./.github/workflows/_bundler_docs.yaml
 
   policy_lint:
