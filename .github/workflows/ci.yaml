@@ -95,6 +95,9 @@ jobs:
     needs:
       - docs_lint
       - docs_build
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.TECHDOCS_S3_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.TECHDOCS_S3_SECRET_ACCESS_KEY }}
     uses: ./.github/workflows/_techdocs_publish.yaml
   
   pages_build:
