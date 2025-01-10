@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: opa
+  name: {{ include "common.names.fullname" $ }}-opa
   namespace: {{ .Release.Namespace }}
   finalizers:
     - resources-finalizer.argocd.arogproj.io
