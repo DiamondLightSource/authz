@@ -10,7 +10,8 @@ updates:
         update-types:
           - minor
           - patch
-
+    commit-message:
+      prefix: "chore(deps)"
   - package-ecosystem: docker
     directories:
       - bundler
@@ -23,7 +24,8 @@ updates:
         update-types:
           - minor
           - patch
-
+    commit-message:
+      prefix: "chore(deps)"
   - package-ecosystem: cargo
     directory: bundler
     schedule:
@@ -37,3 +39,5 @@ updates:
       patch:
         update-types:
           - patch
+    commit-message:
+      prefix: "chore(deps)"
