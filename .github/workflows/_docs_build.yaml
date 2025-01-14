@@ -25,7 +25,7 @@ jobs:
         run: chmod -R +rX site
 
       - name: Upload User Docs Artifact
-        uses: actions/upload-artifact@v4.5.0
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: user-docs
           path: site
