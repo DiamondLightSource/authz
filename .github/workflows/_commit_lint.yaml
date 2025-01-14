@@ -18,4 +18,5 @@ jobs:
       - name: Lint Commits
         uses: wagoid/commitlint-github-action@v6.1.2
         with:
+          configFile: .commitlintrc.json
           failOnWarnings: true
