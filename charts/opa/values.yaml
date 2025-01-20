@@ -47,7 +47,13 @@ ingress:
   hosts: []
   tls: []
 
-resources: {}
+resources:
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
 
 replicaCount: 1
 
