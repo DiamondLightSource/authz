@@ -4,6 +4,18 @@ on:
   workflow_call:
 
 jobs:
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4.2.2
+
+      - name: Check Dependencies with Cargo Deny
+        uses: EmbarkStudios/cargo-deny-action@v2.0.4
+        with:
+          manifest-path: bundler/Cargo.toml
+          command: check bans licenses sources
+
   lint:
     runs-on: ubuntu-latest
     steps:
