@@ -2,6 +2,8 @@ FROM docker.io/library/rust:1.84.0-bookworm AS build
 
 ARG DATABASE_URL
 
+RUN cargo install cargo-auditable
+
 WORKDIR /app
 
 RUN cargo init
@@ -10,7 +12,7 @@ RUN cargo build --release
 
 COPY ./ ./
 RUN touch src/main.rs \
-    && cargo build --release
+    && cargo auditable build --release
 
 FROM gcr.io/distroless/cc-debian12@sha256:f913198471738d9eedcd00c0ca812bf663e8959eebff3a3cbadb027ed9da0c38 AS deploy
 
