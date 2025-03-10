@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: Download Prepared Queries Artifact
-        uses: actions/download-artifact@v4.1.8
+        uses: actions/download-artifact@v4.1.9
         with:
           name: prepared-queries
           path: bundler/.sqlx
@@ -32,7 +32,7 @@ jobs:
 
       - name: Docker Metadata
         id: meta
-        uses: docker/metadata-action@v5.6.1
+        uses: docker/metadata-action@v5.7.0
         with:
           images: ${{ env.IMAGE_REPOSITORY }}
           tags: |
@@ -40,10 +40,10 @@ jobs:
             type=raw,value=latest
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.9.0
+        uses: docker/setup-buildx-action@v3.10.0
 
       - name: Build & Publish Image
-        uses: docker/build-push-action@v6.13.0
+        uses: docker/build-push-action@v6.15.0
         with:
           context: bundler/
           push: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
