@@ -7,7 +7,7 @@ license-file = "../LICENSE"
 [dependencies]
 anyhow = { version = "1.0.95" }
 axum = { version = "0.7.9" }
-axum-extra = { version = "0.9.4", features = ["typed-header"] }
+axum-extra = { version = "0.10.1", features = ["typed-header"] }
 clap = { version = "4.5.28", features = ["derive", "env"] }
 clio = { version = "0.3.5", features = ["clap-parse"] }
 derive_more = { version = "2.0.1", features = ["deref", "deref_mut", "as_ref"] }
