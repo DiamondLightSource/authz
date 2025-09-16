@@ -237,6 +237,7 @@ async fn read_static_data(
     Ok(data)
 }
 
+#[allow(dead_code)]
 /// Combination of possible errors when fetching data to create bundle
 #[derive(Debug, thiserror::Error)]
 pub enum BundleDataError {
