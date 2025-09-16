@@ -5,10 +5,12 @@ import rego.v1
 
 is_admin[subject] := "super_admin" in data.diamond.data.subjects[subject].permissions
 
-beamline_admin_for_subject[subject] contains beamline if {
-	some subject
-	some role in data.diamond.data.subjects[subject].permissions
-	some beamline in data.diamond.data.admin[role]
+beamline_admin_for_subject[subject_name] contains beamline if {
+	some subject_name, subject in data.diamond.data.subjects
+	some subject_role in subject.permissions
+	some role, role_beamlines in data.diamond.data.admin
+	subject_role == role
+	some beamline in role_beamlines
 }
 
 admin := is_admin[token.claims.fedid] # regal ignore:rule-name-repeats-package
