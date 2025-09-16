@@ -2,3 +2,10 @@ rules:
   idiomatic:
     no-defined-entrypoint:
       level: ignore
+
+  imports:
+    unresolved-reference:
+      level: error
+      except-paths:
+        - data.diamond.data
+        - data.diamond.data.*
