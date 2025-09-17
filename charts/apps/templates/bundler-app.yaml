@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: bundler
+  name: {{ include "common.names.fullname" $ }}-bundler
   namespace: {{ .Release.Namespace }}
   finalizers:
     - resources-finalizer.argocd.arogproj.io
