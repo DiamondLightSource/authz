@@ -2,6 +2,8 @@ rules:
   idiomatic:
     no-defined-entrypoint:
       level: ignore
+    use-some-for-output-vars:
+      level: ignore
 
   imports:
     unresolved-reference:
