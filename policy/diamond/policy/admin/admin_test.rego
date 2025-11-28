@@ -33,7 +33,7 @@ diamond_data := {
 }
 
 test_is_admin_for_admin if {
-	admin.is_admin.carol with data.diamond.data as diamond_data
+	admin.is_admin("carol") with data.diamond.data as diamond_data
 }
 
 test_beamline_admin_for_subject_for_beamline_admin if {
@@ -45,11 +45,11 @@ test_beamlines_admin_for_subject_for_group_admin if {
 }
 
 test_is_admin_for_non_admin if {
-	not admin.is_admin.alice with data.diamond.data as diamond_data
+	not admin.is_admin("alice") with data.diamond.data as diamond_data
 }
 
 test_is_admin_for_beamline_admin_not_admin if {
-	not admin.is_admin.bob with data.diamond.data as diamond_data
+	not admin.is_admin("bob") with data.diamond.data as diamond_data
 }
 
 test_beamline_admin_for_subject_for_non_beamline_admin if {
