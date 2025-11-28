@@ -14,8 +14,6 @@ write_scopes := {
 	"register",
 }
 
-default scopes := set()
-
 scopes_for(claims) := read_scopes & write_scopes if {
 	"azp" in object.keys(claims)
 	endswith(claims.azp, "-blueapi")
@@ -29,5 +27,7 @@ scopes_for(claims) := read_scopes if {
 scopes_for(claims) := read_scopes if {
 	not "azp" in object.keys(claims)
 }
+
+default scopes := set()
 
 scopes := scopes_for(token.claims)
