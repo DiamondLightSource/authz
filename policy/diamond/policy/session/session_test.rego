@@ -1,6 +1,7 @@
 package diamond.policy.session_test
 
 import data.diamond.policy.session
+import data.diamond.policy.token
 import rego.v1
 
 diamond_data := {
@@ -180,4 +181,11 @@ test_session_beamline if {
 	bl2 := session.beamline with input as {"proposal": 1, "visit": 2}
 		with data.diamond.data as diamond_data
 	bl2 == "b07"
+}
+
+test_user_session_tags if {
+	session.user_sessions == set() with data.diamond.data as diamond_data with data.diamond.policy.token.claims as {"fedid": "oscar"}
+	session.user_sessions == {{"proposal_number": 1, "visit_number": 2, "beamline": "b07"}, {"proposal_number": 1, "visit_number": 1, "beamline": "i03"}} with data.diamond.data as diamond_data with data.diamond.policy.token.claims as {"fedid": "alice"}
+	session.user_sessions == {{"proposal_number": 1, "visit_number": 2, "beamline": "b07"}, {"proposal_number": 1, "visit_number": 1, "beamline": "i03"}} with data.diamond.data as diamond_data with data.diamond.policy.token.claims as {"fedid": "bob"}
+	session.user_sessions == {{"proposal_number": 1, "visit_number": 2, "beamline": "b07"}, {"proposal_number": 1, "visit_number": 1, "beamline": "i03"}} with data.diamond.data as diamond_data with data.diamond.policy.token.claims as {"fedid": "carol"}
 }

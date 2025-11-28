@@ -55,3 +55,9 @@ write_to_beamline_visit if {
 	access
 	matches_beamline
 }
+
+user_sessions contains session if {
+	subject := token.claims.fedid
+	some session in data.diamond.data.sessions
+	access_session(subject, session.proposal_number, session.visit_number)
+}
