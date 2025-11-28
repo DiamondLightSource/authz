@@ -1,7 +1,6 @@
 package diamond.policy.session_test
 
 import data.diamond.policy.session
-import data.diamond.policy.token
 import rego.v1
 
 diamond_data := {
