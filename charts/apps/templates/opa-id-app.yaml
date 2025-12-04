@@ -1,0 +1,28 @@
+{{ if .Values.opa-id.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: opa-id
+  namespace: {{ .Release.Namespace }}
+  finalizers:
+    - resources-finalizer.argocd.arogproj.io
+spec:
+  project: {{ default .Release.Namespace .Values.project }}
+  source:
+    repoURL: {{ .Values.opa-id.repoUrl }}
+    targetRevision: {{ .Values.opa-id.targetRevision }}
+    path: {{ .Values.opa-id.path }}
+    {{- if .Values.opa-id.valuesObject }}
+    helm:
+      valuesObject:
+          {{ .Values.opa-id.valuesObject | toYaml | nindent 10 }}
+    {{- end }}
+  destination:
+    name: {{ .Values.destination.name }}
+    server: {{ .Values.destination.server }}
+    namespace: {{ default .Release.Namespace .Values.destination.namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+{{- end }}
