@@ -10,6 +10,45 @@ bundler:
   repoUrl: https://github.com/DiamondLightSource/authz.git
   targetRevision: HEAD
   path: charts/bundler
+  valuesObject:
+
+    extraEnvVars:
+    - name: BUNDLER_DATABASE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: ispyb
+          key: password
+    - name: BUNDLER_DATABASE_URL
+      value: mysql://ispybdbproxy.diamond.ac.uk:4306/ispyb/ispyb_ro:$(BUNDLER_DATABASE_PASSWORD)
+    - name: BUNDLER_REQUIRE_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: token-authorization
+          key: bearer
+    - name: BUNDLER_STATIC_DATA
+      value: /srv/bundler/*.json
+
+    volumeMounts:
+      - name: static-bundler-volume
+        mountPath: /srv/bundler/
+
+    volumes:
+      - name: static-bundler-volume
+        configMap:
+          name: bundler-static-data
+
+    autoscaling:
+      enabled: true
+      maxReplicas: 10
+      targetMemoryUtilizationPercentage: 80
+
+    ingress:
+      enabled: true
+      hosts:
+        - host: authz.diamond.ac.uk
+          paths:
+            - path: /bundle.tar.gz
+              pathType: Prefix
 
 opa:
   enabled: true
