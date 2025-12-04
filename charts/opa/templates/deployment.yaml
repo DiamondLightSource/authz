@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "opa.fullname" . }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "opa.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      {{- include "opa.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -19,24 +19,27 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
       labels:
-        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        {{- include "opa.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.serviceAccount.create }}
-      serviceAccountName: {{ default (include "common.names.fullname" .) .Values.serviceAccount.name }}
-      {{- else }}
-      serviceAccountName: {{ default "default" .Values.serviceAccount.name }}
-      {{- end }}
+      serviceAccountName: {{ include "opa.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
-        - name: opa
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ include "opa.imageTag" . }}"
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - run
@@ -47,52 +50,42 @@ spec:
             - /etc/opa-config/config.yaml
             - --log-level
             - {{ .Values.logLevel }}
-          {{- if .Values.envOverride }}
+          {{- with .Values.env }}
           env:
-          {{- .Values.envOverride | toYaml | nindent 12 }}
-          {{- else if or .Values.orgData.bundlerSecret .Values.extraEnv }}
-          env:
-            {{- if and .Values.orgData.enabled .Values.orgData.bundlerSecret }}
-            - name: BUNDLER_BEARER_TOKEN
-              valueFrom:
-                secretKeyRef:
-                    name: {{ tpl .Values.orgData.bundlerSecret.name . }}
-                    key: {{ .Values.orgData.bundlerSecret.key }}
-            {{- end -}}
-            {{- if .Values.orgPolicy.enabled }}
-            {{- with .Values.orgPolicy.issuer }}
-            - name: ISSUER
-              value: {{ . }}
-            {{- end }}
-            {{- end }}
-            {{- if .Values.extraEnv }}
-              {{- .Values.extraEnv | toYaml | nindent 12 }}
-            {{- end }}
+          {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- with .Values.volumeMounts }}
           volumeMounts:
             - name: opa-config
               mountPath: /etc/opa-config
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
-            - name: query
-              containerPort: {{ include "opa.queryPort" . }}
+            - name: http
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
             - name: diagnostic
               containerPort: 8282
               protocol: TCP
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            httpGet:
-              path: /health
-              port: diagnostic
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
           readinessProbe:
-            httpGet:
-              path: /health
-              port: diagnostic
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       volumes:
         - name: opa-config
           configMap:
             name: opa-config
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
