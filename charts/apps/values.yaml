@@ -50,7 +50,7 @@ bundler:
             - path: /bundle.tar.gz
               pathType: Prefix
 
-opa:
+opa-authn:
   enabled: true
   repoUrl: https://github.com/DiamondLightSource/authz.git
   targetRevision: HEAD
@@ -78,6 +78,68 @@ opa:
         - host: authz.diamond.ac.uk
           paths:
             - path: /
+              pathType: Prefix
+
+    config:
+      services:
+        diamond-bundler:
+          url: https://authz.diamond.ac.uk
+          credentials:
+            bearer:
+              token: ${BUNDLER_BEARER_TOKEN}
+        ghcr:
+          url: https://ghcr.io
+          type: oci
+      bundles:
+        diamond-permissionables:
+          service: diamond-bundler
+          resource: bundle.tar.gz
+          polling:
+            min_delay_seconds: 10
+            max_delay_seconds: 60
+        diamond-policies:
+          service: ghcr
+          resource: ghcr.io/diamondlightsource/authz-policy:0.0.16
+          polling:
+            min_delay_seconds: 30
+            max_delay_seconds: 120
+
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 2Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+opa-id:
+  enabled: true
+  repoUrl: https://github.com/DiamondLightSource/authz.git
+  targetRevision: HEAD
+  path: charts/opa
+  valuesObject:
+
+    env:
+    - name: BUNDLER_BEARER_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: token-authorization
+          key: bearer
+    - name: ISSUER
+      value: https://identity.diamond.ac.uk/realms/dls
+
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 10
+      targetMemoryUtilizationPercentage: 80
+
+    ingress:
+      enabled: true
+      hosts:
+        - host: authz.diamond.ac.uk
+          paths:
+            - path: /id
               pathType: Prefix
 
     config:
