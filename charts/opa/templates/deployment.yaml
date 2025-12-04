@@ -46,10 +46,11 @@ spec:
             - --server
             - --diagnostic-addr
             - 0.0.0.0:8282
+            - --addr
+            - 0.0.0.0:8181
             - --config-file
             - /etc/opa-config/config.yaml
-            - --log-level
-            - {{ .Values.logLevel }}
+            - --log-level={{ .Values.logLevel | default "info" }}
           {{- with .Values.env }}
           env:
           {{- toYaml . | nindent 12 }}
