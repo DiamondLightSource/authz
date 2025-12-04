@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: bundler-static-data
 data:
-  {{ (.Files.Glob "static/*.json").AsConfig | indent 2 }}
+  {{- ( .Files.Glob "static/*.json" ).AsConfig | nindent 2 }}
