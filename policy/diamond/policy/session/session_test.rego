@@ -212,32 +212,32 @@ test_user_session_tags if {
 	session.user_sessions == set() with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "oscar"}
 	session.user_sessions == {
-		`{"proposal": 1, "visit": 2, "beamline": "b07"}`,
-		`{"proposal": 1, "visit": 1, "beamline": "i03"}`,
+		"{\"beamline\": \"b07\", \"proposal_number\": 1, \"visit_number\": 2}",
+		"{\"beamline\": \"i03\", \"proposal_number\": 1, \"visit_number\": 1}",
 	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "alice"}
 	session.user_sessions == {
-		`{"proposal": 1, "visit": 2, "beamline": "b07"}`,
-		`{"proposal": 1, "visit": 1, "beamline": "i03"}`,
-		`{"proposal": 2, "visit": 1, "beamline": "b07"}`,
-		`{"proposal": 2, "visit": 2, "beamline": "b07"}`,
+		"{\"beamline\": \"b07\", \"proposal_number\": 1, \"visit_number\": 2}",
+		"{\"beamline\": \"i03\", \"proposal_number\": 1, \"visit_number\": 1}",
+		"{\"beamline\": \"b07\", \"proposal_number\": 2, \"visit_number\": 1}",
+		"{\"beamline\": \"b07\", \"proposal_number\": 2, \"visit_number\": 2}",
 	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "bob"}
 	session.user_sessions == {
-		`{"proposal": 1, "visit": 2, "beamline": "b07"}`,
-		`{"proposal": 1, "visit": 1, "beamline": "i03"}`,
-		`{"proposal": 2, "visit": 1, "beamline": "b07"}`,
-		`{"proposal": 2, "visit": 2, "beamline": "b07"}`,
+		"{\"beamline\": \"b07\", \"proposal_number\": 1, \"visit_number\": 2}",
+		"{\"beamline\": \"i03\", \"proposal_number\": 1, \"visit_number\": 1}",
+		"{\"beamline\": \"b07\", \"proposal_number\": 2, \"visit_number\": 1}",
+		"{\"beamline\": \"b07\", \"proposal_number\": 2, \"visit_number\": 2}",
 	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "carol"}
 	session.user_sessions == {
-		`{"proposal": 2, "visit": 1, "beamline": "b07"}`,
-		`{"proposal": 2, "visit": 2, "beamline": "b07"}`,
+		"{\"beamline\": \"b07\", \"proposal_number\": 2, \"visit_number\": 1}",
+		"{\"beamline\": \"b07\", \"proposal_number\": 2, \"visit_number\": 2}",
 	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "desmond"}
 	session.user_sessions == {
-		`{"proposal": 2, "visit": 1, "beamline": "b07"}`,
-		`{"proposal": 2, "visit": 2, "beamline": "b07"}`,
+		"{\"beamline\": \"b07\", \"proposal_number\": 2, \"visit_number\": 1}",
+		"{\"beamline\": \"b07\", \"proposal_number\": 2, \"visit_number\": 2}",
 	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "edna"}
 }
