@@ -13,7 +13,7 @@ on_proposal(subject, proposal_number) if {
 default access_proposal(_, _) := false
 
 # Allow if subject has super_admin permission
-access_proposal(subject, proposal_number) if admin.is_admin[subject] # regal ignore:external-reference
+access_proposal(subject, proposal_number) if admin.is_admin(subject) # regal ignore:external-reference
 
 # Allow if subject is on proposal
 access_proposal(subject, proposal_number) if on_proposal(subject, proposal_number)
