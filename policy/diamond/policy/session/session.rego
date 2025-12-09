@@ -24,7 +24,7 @@ on_session(subject, proposal_number, visit_number) if {
 default access_session(_, _, _) := false
 
 # Allow if subject has super_admin permission
-access_session(subject, proposal_number, visit_number) if admin.is_admin[subject] # regal ignore:external-reference
+access_session(subject, proposal_number, visit_number) if admin.is_admin(subject) # regal ignore:external-reference
 
 # Allow if subject is admin for beamline containing session
 access_session(subject, proposal_number, visit_number) if {
