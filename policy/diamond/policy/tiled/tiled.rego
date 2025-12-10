@@ -1,6 +1,7 @@
 package diamond.policy.tiled
 
 import data.diamond.policy.token
+import data.diamond.policy.session.access_session
 
 read_scopes := {
 	"read:metadata",
@@ -31,3 +32,9 @@ scopes_for(claims) := read_scopes if {
 default scopes := set()
 
 scopes := scopes_for(token.claims)
+
+user_sessions contains user_session if {
+	some session in data.diamond.data.sessions
+	access_session(token.claims.fedid, session.proposal_number, session.visit_number)
+	user_session := sprintf("%s", [session])
+}
