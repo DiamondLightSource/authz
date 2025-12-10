@@ -1,7 +1,7 @@
 package diamond.policy.tiled
 
-import data.diamond.policy.token
 import data.diamond.policy.session.access_session
+import data.diamond.policy.token
 
 read_scopes := {
 	"read:metadata",
