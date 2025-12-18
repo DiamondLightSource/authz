@@ -12,7 +12,7 @@ read_scopes := {
 write_scopes := {
 	"write:metadata",
 	"write:data",
-	"create",
+	"create:node",
 	"register",
 }
 
