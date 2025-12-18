@@ -19,7 +19,7 @@ test_blueapi_given_write_scopes if {
 		"read:data",
 		"write:metadata",
 		"write:data",
-		"create",
+		"create:node",
 		"register",
 	} with data.diamond.policy.token.claims as {"azp": "foo-blueapi"}
 }
