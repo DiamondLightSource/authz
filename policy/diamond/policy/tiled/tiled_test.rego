@@ -93,20 +93,20 @@ diamond_data := {
 test_user_session_tags if {
 	tiled.user_sessions == set() with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "oscar"}
-	tiled.user_sessions == {11, 12} with data.diamond.data as diamond_data
+	tiled.user_sessions == {"11", "12"} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "alice"}
-	tiled.user_sessions == {11, 12, 13, 14} with data.diamond.data as diamond_data
+	tiled.user_sessions == {"11", "12", "13", "14"} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "bob"}
 	tiled.user_sessions == {"*"} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "carol"}
-	tiled.user_sessions == {13, 14} with data.diamond.data as diamond_data
+	tiled.user_sessions == {"13", "14"} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "desmond"}
-	tiled.user_sessions == {13, 14} with data.diamond.data as diamond_data
+	tiled.user_sessions == {"13", "14"} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "edna"}
 }
 
 test_user_session_allow if {
-	tiled.user_session == 11 with data.diamond.data as diamond_data
+	tiled.user_session == "11" with data.diamond.data as diamond_data
 		with input as {"beamline": "i03", "proposal": 1, "visit": 1}
 		with data.diamond.policy.token.claims as {"fedid": "carol"}
 }
@@ -132,7 +132,7 @@ test_modify_session if {
 # Service account tests
 
 test_user_session_allow_service_account_on_beamline if {
-	tiled.user_session == 11 with data.diamond.data as diamond_data
+	tiled.user_session == "11" with data.diamond.data as diamond_data
 		with input as {"beamline": "i03", "proposal": 1, "visit": 1}
 		with data.diamond.policy.token.claims as {"beamline": "i03"}
 }
@@ -168,9 +168,9 @@ test_modify_session_on_none_existent_beamline if {
 }
 
 test_user_session_tags_service_account if {
-	tiled.user_sessions == {11} with data.diamond.data as diamond_data
+	tiled.user_sessions == {"11"} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"beamline": "i03"}
-	tiled.user_sessions == {12, 13, 14} with data.diamond.data as diamond_data
+	tiled.user_sessions == {"12", "13", "14"} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"beamline": "b07"}
 	tiled.user_sessions == set() with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"beamline": "b007"}
