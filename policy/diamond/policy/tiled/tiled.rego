@@ -27,13 +27,13 @@ _session := data.diamond.data.proposals[format_int(input.proposal, 10)].sessions
 
 # Returns the session ID if the subject has write permissions for the
 # specific beamline, visit and proposal requested in the input.
-user_session := to_number(_session) if {
+user_session := format_int(_session, 10) if {
 	session.write_to_beamline_visit
 	_session
 }
 
 # service account check
-user_session := to_number(_session) if {
+user_session := format_int(_session, 10) if {
 	input.beamline == token.claims.beamline
 	input.beamline == session.beamline_for(input.proposal, input.visit)
 	_session in data.diamond.data.beamlines[input.beamline].sessions
@@ -81,20 +81,20 @@ user_sessions contains "*" if {
 	admin.is_admin(token.claims.fedid)
 }
 
-user_sessions contains to_number(session) if {
+user_sessions contains format_int(session, 10) if {
 	subject
 	not admin.is_admin(token.claims.fedid)
 	some session in subject.sessions
 }
 
-user_sessions contains to_number(session) if {
+user_sessions contains format_int(session, 10) if {
 	subject
 	not admin.is_admin(token.claims.fedid)
 	some beamline in beamlines
 	some session in data.diamond.data.beamlines[beamline].sessions
 }
 
-user_sessions contains to_number(session) if {
+user_sessions contains format_int(session, 10) if {
 	subject
 	not admin.is_admin(token.claims.fedid)
 	some p in subject.proposals
@@ -103,7 +103,7 @@ user_sessions contains to_number(session) if {
 }
 
 # service account check
-user_sessions contains to_number(session) if {
+user_sessions contains format_int(session, 10) if {
 	not subject
 	some session in data.diamond.data.beamlines[token.claims.beamline].sessions
 }
