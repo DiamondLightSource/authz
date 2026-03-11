@@ -33,3 +33,8 @@ opa:
           paths:
             - path: /
               pathType: Prefix
+
+openfga:
+  enabled: true
+  targetRevision: '*'
+  valuesObject: {}
