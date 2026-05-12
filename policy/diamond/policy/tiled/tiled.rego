@@ -23,14 +23,6 @@ scopes := {
 	"tiled-writer" in token.claims.aud
 }
 
-default service_account_for_beamline := false
-
-service_account_for_beamline if {
-	input.beamline == token.claims.beamline
-	"tiled-writer" in token.claims.aud
-	not token.claims.fedid
-}
-
 _session := data.diamond.data.proposals[format_int(input.proposal, 10)].sessions[format_int(input.visit, 10)]
 
 # Returns the session ID if the subject has write permissions for the
