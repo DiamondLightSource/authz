@@ -20,7 +20,9 @@ impl Sessions {
                 sessionId as session_id,
                 proposalNumber as proposal_number,
                 visit_number,
-                beamLineName as beamline
+                beamLineName as beamline,
+                UNIX_TIMESTAMP(BLSession.startDate) as start_time,
+                UNIX_TIMESTAMP(BLSession.endDate) as end_time
             FROM
                 BLSession
                 JOIN Proposal USING (proposalId)
@@ -42,6 +44,10 @@ pub struct Session {
     visit_number: u32,
     /// The beamline the session took place on
     beamline: String,
+    /// The session start time expressed as a Unix timestamp in seconds.
+    start_time: i64,
+    /// The session end time expressed as a Unix timestamp in seconds.
+    end_time: i64,
 }
 
 /// A row from ISPyB detailing the beamline a session took place on
@@ -54,6 +60,10 @@ struct SessionRow {
     visit_number: u32,
     /// The beamline the session took place on
     beamline: String,
+    /// The session start time expressed as a Unix timestamp in seconds.
+    start_time: i64,
+    /// The session end time expressed as a Unix timestamp in seconds.
+    end_time: i64,
 }
 
 #[allow(clippy::missing_docs_in_private_items)]
@@ -62,6 +72,8 @@ struct RawSessionRow {
     proposal_number: Option<String>,
     visit_number: Option<u32>,
     beamline: Option<String>,
+    start_time: Option<i64>,
+    end_time: Option<i64>,
 }
 
 impl TryFrom<RawSessionRow> for SessionRow {
@@ -76,6 +88,8 @@ impl TryFrom<RawSessionRow> for SessionRow {
                 .parse()?,
             visit_number: value.visit_number.unwrap_or_default(),
             beamline: value.beamline.ok_or(anyhow::anyhow!("Beamline was NULL"))?,
+            start_time: value.start_time.unwrap_or_default(),
+            end_time: value.end_time.unwrap_or_default(),
         })
     }
 }
@@ -91,6 +105,8 @@ impl FromIterator<RawSessionRow> for Sessions {
                         proposal_number: session_row.proposal_number,
                         visit_number: session_row.visit_number,
                         beamline: session_row.beamline,
+                        start_time: session_row.start_time,
+                        end_time: session_row.end_time,
                     },
                 );
             }
@@ -128,6 +144,8 @@ mod tests {
                 proposal_number: 10030,
                 visit_number: 10,
                 beamline: "i12".to_string(),
+                start_time: 1778662800,
+                end_time: 1778691600,
             },
         );
         expected.insert(
@@ -136,6 +154,8 @@ mod tests {
                 proposal_number: 10030,
                 visit_number: 11,
                 beamline: "i22".to_string(),
+                start_time: 1778576400,
+                end_time: 1778605200,
             },
         );
         expected.insert(
@@ -144,6 +164,8 @@ mod tests {
                 proposal_number: 10030,
                 visit_number: 12,
                 beamline: "b13".to_string(),
+                start_time: 1778490000,
+                end_time: 1778518800,
             },
         );
         expected.insert(
@@ -152,6 +174,8 @@ mod tests {
                 proposal_number: 10031,
                 visit_number: 10,
                 beamline: "p99".to_string(),
+                start_time: 1778403600,
+                end_time: 1778432400,
             },
         );
         expected.insert(
@@ -160,6 +184,8 @@ mod tests {
                 proposal_number: 10031,
                 visit_number: 11,
                 beamline: "i22".to_string(),
+                start_time: 1778317200,
+                end_time: 1778346000,
             },
         );
         assert_eq!(expected, sessions.0);
