@@ -17,7 +17,7 @@ orgData:
     key: bearer-token
 orgPolicy:
   enabled: false
-  issuer: https://authn.diamond.ac.uk/realms/master
+  issuer: https://identity.diamond.ac.uk/realms/dls
 configOverride: {}
 extraConfig: {}
 extraServices: {}
