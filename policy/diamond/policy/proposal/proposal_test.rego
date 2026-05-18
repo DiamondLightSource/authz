@@ -56,19 +56,15 @@ test_named_user_rule_for_unnamed_user if {
 		with data.diamond.data as diamond_data
 }
 
-test_named_user_rule_for_no_user := false if {
-	named := proposal.named_user with input as {"proposal": 1}
+test_named_user_rule_for_no_user if {
+	not proposal.named_user with input as {"proposal": 1}
 		with data.diamond.data as diamond_data
 }
 
-else := true # regal ignore:default-over-else
-
-test_named_user_rule_for_no_proposal := false if {
-	named := proposal.named_user with data.diamond.policy.token.claims as {"fedid": "carol"}
+test_named_user_rule_for_no_proposal if {
+	not proposal.named_user with data.diamond.policy.token.claims as {"fedid": "carol"}
 		with data.diamond.data as diamond_data
 }
-
-else := true # regal ignore:default-over-else
 
 test_access_rule_for_super_admin if {
 	proposal.access with input as {"proposal": 1}
@@ -88,16 +84,12 @@ test_access_rule_for_unnamed_user if {
 		with data.diamond.data as diamond_data
 }
 
-test_access_rule_for_no_user := false if {
-	access := proposal.access with input as {"proposal": 1}
+test_access_rule_for_no_user if {
+	not proposal.access with input as {"proposal": 1}
 		with data.diamond.data as diamond_data
 }
 
-else := true # regal ignore:default-over-else
-
-test_access_rule_for_no_proposal := false if {
-	access := proposal.access with data.diamond.policy.token.claims as {"fedid": "alice"}
+test_access_rule_for_no_proposal if {
+	not proposal.access with data.diamond.policy.token.claims as {"fedid": "alice"}
 		with data.diamond.data as diamond_data
 }
-
-else := true # regal ignore:default-over-else

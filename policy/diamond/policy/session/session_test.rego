@@ -94,28 +94,22 @@ test_access_rule_for_non_user if {
 		with data.diamond.data as diamond_data
 }
 
-test_access_rule_for_no_user := false if {
-	access := session.access with input as {"proposal": 1, "visit": 2}
+test_access_rule_for_no_user if {
+	not session.access with input as {"proposal": 1, "visit": 2}
 		with data.diamond.data as diamond_data
 }
 
-else := true # regal ignore:default-over-else
-
-test_access_rule_for_no_proposal := false if {
-	access := session.access with input as {"visit": 2}
+test_access_rule_for_no_proposal if {
+	not session.access with input as {"visit": 2}
 		with data.diamond.policy.token.claims as {"fedid": "bob"}
 		with data.diamond.data as diamond_data
 }
 
-else := true # regal ignore:default-over-else
-
-test_access_rule_for_no_visit := false if {
-	access := session.access with input as {"proposal": 2}
+test_access_rule_for_no_visit if {
+	not session.access with input as {"proposal": 2}
 		with data.diamond.policy.token.claims as {"fedid": "bob"}
 		with data.diamond.data as diamond_data
 }
-
-else := true # regal ignore:default-over-else
 
 test_named_user_rule_for_named_user if {
 	session.named_user with input as {"proposal": 1, "visit": 1}
@@ -148,29 +142,29 @@ test_named_user_rule_for_named_proposal if {
 		with data.diamond.data as diamond_data
 }
 
-test_matches_beamline_rule_for_match if {
-	session.matches_beamline with input as {"beamline": "b07", "proposal": 1, "visit": 2}
+test_write_to_beamline_rule_for_match if {
+	session.write_to_beamline_visit with input as {"beamline": "b07", "proposal": 1, "visit": 2}
+		with data.diamond.policy.token.claims as {"fedid": "bob"}
 		with data.diamond.data as diamond_data
 }
 
-test_matches_beamline_rule_for_non_match if {
-	not session.matches_beamline with input as {"beamline": "b07", "proposal": 1, "visit": 1}
+test_write_to_beamline_rule_for_non_match if {
+	not session.write_to_beamline_visit with input as {"beamline": "b07", "proposal": 1, "visit": 1}
+		with data.diamond.policy.token.claims as {"fedid": "alice"}
 		with data.diamond.data as diamond_data
 }
 
-test_matches_beamline_rule_for_no_beamline := false if {
-	match := session.matches_beamline with input as {"proposal": 1, "visit": 1}
+test_write_to_beamline_rule_for_no_beamline if {
+	not session.write_to_beamline_visit with input as {"proposal": 1, "visit": 1}
+		with data.diamond.policy.token.claims as {"fedid": "alice"}
 		with data.diamond.data as diamond_data
 }
 
-else := true # regal ignore:default-over-else
-
-test_matches_beamline_rule_for_no_visit := false if {
-	match := session.matches_beamline with input as {"beamline": "b07"}
+test_write_to_beamline_rule_for_no_visit if {
+	not session.write_to_beamline_visit with input as {"beamline": "b07"}
+		with data.diamond.policy.token.claims as {"fedid": "alice"}
 		with data.diamond.data as diamond_data
 }
-
-else := true # regal ignore:default-over-else
 
 test_session_beamline if {
 	bl1 := session.beamline with input as {"proposal": 1, "visit": 1}
