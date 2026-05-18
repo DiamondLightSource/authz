@@ -71,12 +71,10 @@ test_admin_rule_for_non_admin if {
 }
 
 # If no user is passed as input, the rule should be undefined
-test_admin_rule_for_no_user := false if {
-	local_admin := admin.admin with data.diamond.policy.token.claims as {}
+test_admin_rule_for_no_user if {
+	not admin.admin with data.diamond.policy.token.claims as {}
 		with data.diamond.data as diamond_data
 }
-
-else := true # regal ignore:default-over-else
 
 test_beamline_admin_rule_for_beamline_admin if {
 	admin.beamline_admin with input as {"beamline": "b07"}
@@ -104,23 +102,17 @@ test_beamline_admin_rule_for_wrong_beamline_admin if {
 		with data.diamond.data as diamond_data
 }
 
-test_beamline_admin_rule_for_no_user := false if {
-	local_admin := admin.beamline_admin with input as {"beamline": "i07"}
+test_beamline_admin_rule_for_no_user if {
+	not admin.beamline_admin with input as {"beamline": "i07"}
 		with data.diamond.data as diamond_data
 }
 
-else := true # regal ignore:default-over-else
-
-test_beamline_admin_rule_for_no_beamline := false if {
-	local_admin := admin.beamline_admin with data.diamond.policy.token.claims as {"fedid": "bob"}
+test_beamline_admin_rule_for_no_beamline if {
+	not admin.beamline_admin with data.diamond.policy.token.claims as {"fedid": "bob"}
 		with data.diamond.data as diamond_data
 }
 
-else := true # regal ignore:default-over-else
-
-test_beamline_admin_rule_for_no_input := false if {
-	local_admin := admin.beamline_admin with input as {}
+test_beamline_admin_rule_for_no_input if {
+	not admin.beamline_admin with input as {}
 		with data.diamond.data as diamond_data
 }
-
-else := true # regal ignore:default-over-else
