@@ -13,12 +13,12 @@ mod require_bearer;
 
 use crate::bundle::{Bundle, NoMetadata};
 use axum::{
+    Router,
     body::Bytes,
     extract::State,
     http::{HeaderMap, StatusCode},
     response::IntoResponse,
     routing::get,
-    Router,
 };
 use axum_extra::TypedHeader;
 use clap::Parser;
@@ -28,7 +28,7 @@ use headers::{ETag, HeaderMapExt, IfNoneMatch};
 use opentelemetry_otlp::WithExportConfig;
 use require_bearer::RequireBearerLayer;
 use serde::Serialize;
-use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+use sqlx::{MySqlPool, mysql::MySqlPoolOptions};
 use std::{
     fmt::Debug,
     fs::File,
@@ -43,7 +43,7 @@ use std::{
 use tokio::{
     net::TcpListener,
     sync::RwLock,
-    time::{sleep_until, Instant},
+    time::{Instant, sleep_until},
 };
 use tower_http::trace::{
     DefaultMakeSpan, DefaultOnFailure, DefaultOnRequest, DefaultOnResponse, TraceLayer,

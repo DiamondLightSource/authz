@@ -32,6 +32,7 @@ pub struct Subject {
 }
 
 impl Subjects {
+    /// Fetches [`Subject`] from ISPyB
     #[instrument(name = "fetch_subjects")]
     pub async fn fetch(ispyb_pool: &MySqlPool) -> Result<Self, sqlx::Error> {
         let (mut permissions, mut proposals, mut sessions) = try_join!(
