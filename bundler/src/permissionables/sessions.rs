@@ -1,7 +1,7 @@
 use derive_more::{Deref, DerefMut};
 use schemars::JsonSchema;
 use serde::Serialize;
-use sqlx::{query_as, MySqlPool};
+use sqlx::{MySqlPool, query_as};
 use std::collections::BTreeMap;
 use tracing::instrument;
 

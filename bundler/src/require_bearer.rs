@@ -3,7 +3,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use headers::{authorization::Bearer, Authorization, HeaderMapExt};
+use headers::{Authorization, HeaderMapExt, authorization::Bearer};
 use std::{
     future::Future,
     pin::Pin,

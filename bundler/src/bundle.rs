@@ -1,9 +1,9 @@
-use flate2::{write::GzEncoder, Compression};
-use schemars::{schema::RootSchema, schema_for, JsonSchema};
+use flate2::{Compression, write::GzEncoder};
+use schemars::{JsonSchema, schema::RootSchema, schema_for};
 use serde::Serialize;
 use sqlx::MySqlPool;
 use std::{
-    collections::{hash_map::DefaultHasher, BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, hash_map::DefaultHasher},
     ffi::OsStr,
     fmt::Debug,
     hash::{Hash, Hasher},
@@ -13,10 +13,10 @@ use tokio::try_join;
 use tracing::{instrument, trace};
 
 use crate::{
+    StaticDataGlob,
     permissionables::{
         beamlines::Beamlines, proposals::Proposals, sessions::Sessions, subjects::Subjects,
     },
-    StaticDataGlob,
 };
 
 /// A compiled Web Assembly module
