@@ -39,4 +39,4 @@ tracing-subscriber = { version = "0.3.19" }
 url = { version = "2.5.2" }
 
 [build-dependencies]
-built = { version = "0.7.6" }
+built = { version = "0.8.1" }
