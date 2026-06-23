@@ -35,4 +35,17 @@ verified := io.jwt.decode_verify(input.token, {
 	"aud": input.audience,
 })
 
+# METADATA
+# title: Valid Token
+# description: |
+#   Returns whether or not input.token is a valid JWT for our identity provider
+#   Requires:
+#     - `input.token`, a JWT
+# entrypoint: true
+default valid_token := false
+
+valid_token if {
+	verified[0]
+}
+
 claims := verified[2] if verified[0]

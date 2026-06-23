@@ -1,6 +1,7 @@
 package diamond.policy.session
 
 import data.diamond.policy.admin
+import data.diamond.policy.beamline as beamline_policy
 import data.diamond.policy.proposal
 import data.diamond.policy.token
 import rego.v1
@@ -51,4 +52,53 @@ default write_to_beamline_visit := false
 write_to_beamline_visit if {
 	access
 	input.beamline == beamline
+}
+
+subject := data.diamond.data.subjects[token.claims.fedid]
+
+# METADATA
+# title: User Sessions
+# description: |
+#   Aggregates all session IDs the subject is authorized to view.
+#   Admins receive a wildcard "*" granting access to all sessions.
+#   Regular users gain session access through three pathways:
+#     1. Direct session membership
+#     2. Access via beamline-level permissions
+#     3. Access via proposal-level permissions
+# entrypoint: false
+# scope: document
+user_sessions contains "*" if {
+	subject
+	admin.is_admin(token.claims.fedid)
+}
+
+# Direct session membership
+user_sessions contains format_int(session, 10) if {
+	subject
+	not admin.is_admin(token.claims.fedid)
+	some session in subject.sessions
+}
+
+# Access via beamline permissions
+user_sessions contains format_int(session, 10) if {
+	subject
+	not admin.is_admin(token.claims.fedid)
+	some _beamline in beamline_policy.user_beamlines
+	some session in data.diamond.data.beamlines[_beamline].sessions
+}
+
+# Access via beamline permissions (service accounts)
+user_sessions contains format_int(session, 10) if {
+	not subject
+	some _beamline in beamline_policy.user_beamlines
+	some session in data.diamond.data.beamlines[_beamline].sessions
+}
+
+# Access via proposal permissions
+user_sessions contains format_int(session, 10) if {
+	subject
+	not admin.is_admin(token.claims.fedid)
+	some p in subject.proposals
+	some i in data.diamond.data.proposals[format_int(p, 10)]
+	some session in i
 }
