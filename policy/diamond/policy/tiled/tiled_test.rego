@@ -7,7 +7,8 @@ test_read_scopes if {
 	tiled.scopes == {
 		"read:metadata",
 		"read:data",
-	} with data.diamond.policy.token.claims as {}
+	}
+		with data.diamond.policy.token.claims as {}
 }
 
 test_tiled_writer_given_write_scopes if {
@@ -18,7 +19,8 @@ test_tiled_writer_given_write_scopes if {
 		"write:data",
 		"create:node",
 		"register",
-	} with data.diamond.policy.token.claims as {"aud": ["tiled-writer"]}
+	}
+		with data.diamond.policy.token.claims as {"aud": ["tiled-writer"]}
 }
 
 diamond_data := {

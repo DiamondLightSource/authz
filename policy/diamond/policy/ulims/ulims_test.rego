@@ -89,7 +89,8 @@ test_session_restrictions_for_non_admin_1 if {
 			"proposal_number": 1,
 			"visit_number": 2,
 		},
-	] with data.diamond.data as diamond_data
+	]
+		with data.diamond.data as diamond_data
 		with data.diamond.policy.token as {"claims": {"fedid": "alice"}}
 }
 
@@ -103,7 +104,8 @@ test_session_restrictions_service_account if {
 		"beamline": "i03",
 		"proposal_number": 1,
 		"visit_number": 1,
-	}] with data.diamond.data as diamond_data
+	}]
+		with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"beamline": "i03"}
 }
 
