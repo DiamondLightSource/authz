@@ -16,7 +16,7 @@ jobs:
           - bundler
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v6.0.3
 
       - name: Install chart dependencies
         run: |
