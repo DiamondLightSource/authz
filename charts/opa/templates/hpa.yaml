@@ -1,15 +1,15 @@
-{{- if .Values.autoscaling.enabled -}}
+{{- if .Values.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "opa.fullname" . }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "opa.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "common.names.fullname" . }}
+    name: {{ include "opa.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

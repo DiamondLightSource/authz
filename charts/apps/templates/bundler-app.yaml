@@ -12,6 +12,11 @@ spec:
     repoURL: {{ .Values.bundler.repoUrl }}
     targetRevision: {{ .Values.bundler.targetRevision }}
     path: {{ .Values.bundler.path }}
+    {{- if .Values.bundler.valuesObject }}
+    helm:
+      valuesObject:
+          {{ .Values.bundler.valuesObject | toYaml | nindent 10 }}
+    {{- end }}
   destination:
     name: {{ .Values.destination.name }}
     server: {{ .Values.destination.server }}

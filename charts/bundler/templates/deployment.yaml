@@ -1,14 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "common.names.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "bundler.fullname" . }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "bundler.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      {{- include "bundler.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -16,70 +18,61 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        {{- include "bundler.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.serviceAccount.create }}
-      serviceAccountName: {{ default (include "common.names.fullname" .) .Values.serviceAccount.name }}
-      {{- else }}
-      serviceAccountName: {{ default "default" .Values.serviceAccount.name }}
-      {{- end }}
+      serviceAccountName: {{ include "bundler.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
-        - name: bundler
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository}}:{{ default .Chart.AppVersion .Values.image.tag }}"
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - serve
           env:
-            - name: BUNDLER_PORT
-              value: "80"
-            - name: BUNDLER_DATABASE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.bundler.database.passwordSecret.name }}
-                  key: {{ .Values.bundler.database.passwordSecret.key }}
-            - name: BUNDLER_DATABASE_URL
-              value: {{ include "bundler.databaseURL" . }}
-            - name: BUNDLER_REQUIRE_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.bundler.requireTokenSecret.name }}
-                  key: {{ .Values.bundler.requireTokenSecret.key }}
             - name: BUNDLER_POLLING_INTERVAL
-              value: {{ .Values.bundler.pollingInterval }}
-            - name: BUNDLER_STATIC_DATA
-              value: /srv/bundler/*.json
+              value: {{ .Values.pollingInterval | quote }}
+            - name: BUNDLER_PORT
+              value: {{ .Values.service.port | quote }}
+          {{- with .Values.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
+          {{- with .Values.livenessProbe }}
           livenessProbe:
-            httpGet:
-              path: /healthz
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: http
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{ if .Values.bundler.staticDataPattern -}}
-          volumeMounts:
-            - name: static-bundler-volume
-              mountPath: /srv/bundler/
+            {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{ if .Values.bundler.staticDataPattern -}}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
       volumes:
-        - name: static-bundler-volume
-          configMap:
-            name: {{ include "common.names.fullname" . }}-static-data
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
