@@ -7,8 +7,7 @@ test_read_scopes if {
 	tiled.scopes == {
 		"read:metadata",
 		"read:data",
-	}
-		with data.diamond.policy.token.claims as {}
+	} with data.diamond.policy.token.claims as {}
 }
 
 test_tiled_writer_given_write_scopes if {
@@ -19,8 +18,7 @@ test_tiled_writer_given_write_scopes if {
 		"write:data",
 		"create:node",
 		"register",
-	}
-		with data.diamond.policy.token.claims as {"aud": ["tiled-writer"]}
+	} with data.diamond.policy.token.claims as {"aud": ["tiled-writer"]}
 }
 
 diamond_data := {
@@ -95,27 +93,54 @@ diamond_data := {
 test_user_session_tags if {
 	tiled.user_sessions == set() with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "oscar"}
-	tiled.user_sessions == {"11", "12"} with data.diamond.data as diamond_data
+	tiled.user_sessions == {
+		"beamline:i03",
+		"beamline:i03,proposal:1",
+		"beamline:i03,proposal:1,session:1-1",
+		"beamline:b07",
+		"beamline:b07,proposal:1",
+		"beamline:b07,proposal:1,session:1-2",
+	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "alice"}
-	tiled.user_sessions == {"11", "12", "13", "14"} with data.diamond.data as diamond_data
+	tiled.user_sessions == {
+		"beamline:i03",
+		"beamline:i03,proposal:1",
+		"beamline:i03,proposal:1,session:1-1",
+		"beamline:b07",
+		"beamline:b07,proposal:1",
+		"beamline:b07,proposal:1,session:1-2",
+		"beamline:b07,proposal:2",
+		"beamline:b07,proposal:2,session:2-1",
+		"beamline:b07,proposal:2,session:2-2",
+	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "bob"}
 	tiled.user_sessions == {"*"} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "carol"}
-	tiled.user_sessions == {"13", "14"} with data.diamond.data as diamond_data
+	tiled.user_sessions == {
+		"beamline:b07",
+		"beamline:b07,proposal:2",
+		"beamline:b07,proposal:2,session:2-1",
+		"beamline:b07,proposal:2,session:2-2",
+	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "desmond"}
-	tiled.user_sessions == {"13", "14"} with data.diamond.data as diamond_data
+	tiled.user_sessions == {
+		"beamline:b07",
+		"beamline:b07,proposal:2",
+		"beamline:b07,proposal:2,session:2-1",
+		"beamline:b07,proposal:2,session:2-2",
+	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"fedid": "edna"}
 }
 
 test_user_session_allow if {
-	tiled.user_session == "11" with data.diamond.data as diamond_data
-		with input as {"beamline": "i03", "proposal": 1, "visit": 1}
+	tiled.user_session == "beamline:i03,proposal:1,session:1-1" with data.diamond.data as diamond_data
+		with input as {"beamline": "i03", "proposal": "cm1", "visit": 1}
 		with data.diamond.policy.token.claims as {"fedid": "carol"}
 }
 
 test_user_session_not_allowed if {
 	not tiled.user_session with data.diamond.data as diamond_data
-		with input as {"beamline": "i03", "proposal": 1, "visit": 1}
+		with input as {"beamline": "i03", "proposal": "cm1", "visit": 1}
 		with data.diamond.policy.token.claims as {"fedid": "oscar"}
 }
 
@@ -134,21 +159,30 @@ test_modify_session if {
 # Service account tests
 
 test_user_session_allow_service_account_on_beamline if {
-	tiled.user_session == "11" with data.diamond.data as diamond_data
-		with input as {"beamline": "i03", "proposal": 1, "visit": 1}
+	tiled.user_session == "beamline:i03,proposal:1,session:1-1" with data.diamond.data as diamond_data
+		with input as {"beamline": "i03", "proposal": "cm1", "visit": 1}
 		with data.diamond.policy.token.claims as {"beamline": "i03"}
 }
 
 test_user_session_not_allow_service_account_wrong_beamline if {
 	not tiled.user_session with data.diamond.data as diamond_data
-		with input as {"beamline": "i03", "proposal": 1, "visit": 2}
+		with input as {"beamline": "i03", "proposal": "cm1", "visit": 2}
 		with data.diamond.policy.token.claims as {"beamline": "b07"}
 }
 
 test_user_session_not_allow_service_account_on_none_existent_beamline_beamline if {
 	not tiled.user_session with data.diamond.data as diamond_data
-		with input as {"beamline": "i03", "proposal": 1, "visit": 2}
+		with input as {"beamline": "i03", "proposal": "cm1", "visit": 2}
 		with data.diamond.policy.token.claims as {"beamline": "b007"}
+}
+
+# A token carrying both fedid and beamline claims should still be judged as
+# a named user (fedid's real permissions), not fall into the service-account
+# branch just because the beamline claim happens to match the input.
+test_user_session_not_allow_named_user_with_beamline_claim_and_no_access if {
+	not tiled.user_session with data.diamond.data as diamond_data
+		with input as {"beamline": "b07", "proposal": "cm2", "visit": 1}
+		with data.diamond.policy.token.claims as {"fedid": "alice", "beamline": "b07"}
 }
 
 test_modify_session_on_beamline if {
@@ -170,10 +204,65 @@ test_modify_session_on_none_existent_beamline if {
 }
 
 test_user_session_tags_service_account if {
-	tiled.user_sessions == {"11"} with data.diamond.data as diamond_data
+	tiled.user_sessions == {
+		"beamline:i03",
+		"beamline:i03,proposal:1",
+		"beamline:i03,proposal:1,session:1-1",
+	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"beamline": "i03"}
-	tiled.user_sessions == {"12", "13", "14"} with data.diamond.data as diamond_data
+	tiled.user_sessions == {
+		"beamline:b07",
+		"beamline:b07,proposal:1",
+		"beamline:b07,proposal:1,session:1-2",
+		"beamline:b07,proposal:2",
+		"beamline:b07,proposal:2,session:2-1",
+		"beamline:b07,proposal:2,session:2-2",
+	} with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"beamline": "b07"}
 	tiled.user_sessions == set() with data.diamond.data as diamond_data
 		with data.diamond.policy.token.claims as {"beamline": "b007"}
+}
+
+# Level 1 & 2 node creation
+
+test_user_session_beamline_level_allow if {
+	tiled.user_session == "beamline:b07" with data.diamond.data as diamond_data
+		with input as {"beamline": "b07"}
+		with data.diamond.policy.token.claims as {"fedid": "bob"}
+}
+
+test_user_session_beamline_level_denied if {
+	not tiled.user_session with data.diamond.data as diamond_data
+		with input as {"beamline": "b07"}
+		with data.diamond.policy.token.claims as {"fedid": "alice"}
+}
+
+test_user_session_beamline_level_allow_service_account if {
+	tiled.user_session == "beamline:i03" with data.diamond.data as diamond_data
+		with input as {"beamline": "i03"}
+		with data.diamond.policy.token.claims as {"beamline": "i03"}
+}
+
+test_user_session_proposal_level_allow if {
+	tiled.user_session == "beamline:i03,proposal:1" with data.diamond.data as diamond_data
+		with input as {"beamline": "i03", "proposal": "cm1"}
+		with data.diamond.policy.token.claims as {"fedid": "alice"}
+}
+
+test_user_session_proposal_level_denied_wrong_beamline if {
+	not tiled.user_session with data.diamond.data as diamond_data
+		with input as {"beamline": "i04", "proposal": "cm1"}
+		with data.diamond.policy.token.claims as {"fedid": "alice"}
+}
+
+test_user_session_proposal_level_denied_no_access if {
+	not tiled.user_session with data.diamond.data as diamond_data
+		with input as {"beamline": "i03", "proposal": "cm1"}
+		with data.diamond.policy.token.claims as {"fedid": "oscar"}
+}
+
+test_user_session_proposal_level_allow_service_account if {
+	tiled.user_session == "beamline:b07,proposal:2" with data.diamond.data as diamond_data
+		with input as {"beamline": "b07", "proposal": "cm2"}
+		with data.diamond.policy.token.claims as {"beamline": "b07"}
 }
