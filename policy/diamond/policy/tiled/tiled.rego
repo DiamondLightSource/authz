@@ -1,5 +1,6 @@
 package diamond.policy.tiled
 
+import data.diamond.policy.admin
 import data.diamond.policy.beamline as beamline_policy
 import data.diamond.policy.proposal
 import data.diamond.policy.session
@@ -71,6 +72,29 @@ proposal_tag(bl, p) := sprintf("beamline:%s,proposal:%s", [bl, format_int(p, 10)
 session_tag(bl, p, v) := sprintf("beamline:%s,proposal:%s,session:%s-%d", [bl, format_int(p, 10), format_int(p, 10), v])
 
 # METADATA
+# title: Visible Tag
+# description: |
+#   Lets a caller list a beamline or proposal node without being granted
+#   what is under it. tiled matches tags exactly, so this is a separate tag
+#   from the grant `t`: a session member gets the visible tags of the
+#   proposal and beamline above them, never their grant tags.
+visible_tag(t) := concat("", ["visible:", t])
+
+# METADATA
+# title: Node Tags
+# description: |
+#   The tags stamped on a node at each level: its own tag, the grant tag of
+#   every ancestor, so one grant matches a whole subtree, and for the two
+#   container levels, a visible tag so callers granted something below can
+#   still list it. The node's own tag is first; dls.py reads it back from
+#   `tags[0]`.
+beamline_node_tags(bl) := [beamline_tag(bl), visible_tag(beamline_tag(bl))]
+
+proposal_node_tags(bl, p) := [proposal_tag(bl, p), beamline_tag(bl), visible_tag(proposal_tag(bl, p))]
+
+session_node_tags(bl, p, v) := [session_tag(bl, p, v), proposal_tag(bl, p), beamline_tag(bl)]
+
+# METADATA
 # title: Proposal Beamlines
 # description: |
 #   The beamlines hosting at least one session of the bare proposal number `p`.
@@ -79,10 +103,10 @@ proposal_beamlines(p) := {data.diamond.data.sessions[format_int(s, 10)].beamline
 }
 
 # METADATA
-# title: Node Access Tag
+# title: Node Access Tags
 # description: |
-#   The access tag to stamp on the node the caller is creating, or nothing
-#   at all if they are not allowed to create it.
+#   The access tags to stamp on the node the caller is creating (see Node
+#   Tags), or nothing at all if they are not allowed to create it.
 #   tiled's create-node flow (see `init_node` in dls.py) tells the policy
 #   nothing about the path or the parent, so the only clue to which level is
 #   being created is which fields arrive alongside the beamline:
@@ -100,7 +124,7 @@ proposal_beamlines(p) := {data.diamond.data.sessions[format_int(s, 10)].beamline
 #       two levels
 #     - `input.visit`, a visit number, for a session node
 # entrypoint: true
-user_session := session_tag(input.beamline, p, input.visit) if {
+user_session := session_node_tags(input.beamline, p, input.visit) if {
 	input.visit
 	p := bare_proposal(input.proposal)
 	session.access_session(token.claims.fedid, p, input.visit)
@@ -109,7 +133,7 @@ user_session := session_tag(input.beamline, p, input.visit) if {
 }
 
 # Session level, for a service account tied to the beamline.
-user_session := session_tag(input.beamline, p, input.visit) if {
+user_session := session_node_tags(input.beamline, p, input.visit) if {
 	input.visit
 	not token.claims.fedid
 	input.beamline == token.claims.beamline
@@ -120,7 +144,7 @@ user_session := session_tag(input.beamline, p, input.visit) if {
 
 # Proposal level: the caller has access to the proposal, and the proposal
 # actually runs on the beamline they asked for.
-user_session := proposal_tag(input.beamline, p) if {
+user_session := proposal_node_tags(input.beamline, p) if {
 	not input.visit
 	input.proposal
 	p := bare_proposal(input.proposal)
@@ -129,7 +153,7 @@ user_session := proposal_tag(input.beamline, p) if {
 }
 
 # Proposal level, for a service account tied to the beamline.
-user_session := proposal_tag(input.beamline, p) if {
+user_session := proposal_node_tags(input.beamline, p) if {
 	not input.visit
 	input.proposal
 	not token.claims.fedid
@@ -139,7 +163,7 @@ user_session := proposal_tag(input.beamline, p) if {
 }
 
 # Beamline level: the caller is authorized on the beamline itself.
-user_session := beamline_tag(input.beamline) if {
+user_session := beamline_node_tags(input.beamline) if {
 	not input.visit
 	not input.proposal
 	input.beamline in beamline_policy.user_beamlines
@@ -172,36 +196,49 @@ modify_session if {
 	) == token.claims.beamline
 }
 
+# Defaulted so `not _is_admin` holds for service accounts, whose token has no
+# fedid: `not admin.is_admin(token.claims.fedid)` would be undefined for them.
+default _is_admin := false
+
+_is_admin if admin.is_admin(token.claims.fedid)
+
 # METADATA
 # title: Accessible Node Tags
 # description: |
-#   Every access tag the caller is allowed to see. tiled asks for these when
-#   listing the tree and keeps the nodes whose own tag is in the set.
-#   Each session the caller can reach contributes three tags, one for itself
-#   and one for each of its ancestors, so the beamline and proposal that
-#   contain a session stay visible alongside the session itself.
+#   The tags the caller may see. tiled asks for these when listing the tree
+#   and keeps the nodes carrying any of them (an exact match on each tag).
+#   Access is returned at the level it is granted, not expanded into every
+#   session below it: nodes carry their ancestors' grant tags (see Node Tags),
+#   so a beamline grant is one tag however many sessions the beamline has.
+#     - beamline admins and service accounts: the beamline tag
+#     - proposal members: the proposal tag, plus the beamline's visible tag
+#     - session members: the session tag, plus the proposal's and beamline's
+#       visible tags
 #   Admins get "*", which stands in for every tag.
-#   The tags are rebuilt from the numbers in the data bundle, exactly as they
-#   are built when a node is created, so the two always agree.
 #   Requires:
 #     - `input.token`, a JWT
 # entrypoint: true
-user_sessions contains "*" if "*" in session.user_sessions
+user_sessions contains "*" if _is_admin
 
-user_sessions contains beamline_tag(s.beamline) if {
-	not "*" in session.user_sessions
-	some id in session.user_sessions
-	s := data.diamond.data.sessions[id]
+user_sessions contains beamline_tag(bl) if {
+	not _is_admin
+	some bl in beamline_policy.user_beamlines
 }
 
-user_sessions contains proposal_tag(s.beamline, s.proposal_number) if {
-	not "*" in session.user_sessions
-	some id in session.user_sessions
-	s := data.diamond.data.sessions[id]
+user_sessions contains tag if {
+	not _is_admin
+	some p in session.subject.proposals
+	some bl in proposal_beamlines(p)
+	some tag in [proposal_tag(bl, p), visible_tag(beamline_tag(bl))]
 }
 
-user_sessions contains session_tag(s.beamline, s.proposal_number, s.visit_number) if {
-	not "*" in session.user_sessions
-	some id in session.user_sessions
-	s := data.diamond.data.sessions[id]
+user_sessions contains tag if {
+	not _is_admin
+	some id in session.subject.sessions
+	s := data.diamond.data.sessions[format_int(id, 10)]
+	some tag in [
+		session_tag(s.beamline, s.proposal_number, s.visit_number),
+		visible_tag(proposal_tag(s.beamline, s.proposal_number)),
+		visible_tag(beamline_tag(s.beamline)),
+	]
 }
