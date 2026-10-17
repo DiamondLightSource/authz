@@ -15,7 +15,7 @@ services:
       BUNDLER_OTEL_COLLECTOR_URL: http://collector:4317
 
   opa:
-    image: docker.io/openpolicyagent/opa:0.59.0
+    image: docker.io/openpolicyagent/opa:1.21.2
     restart: unless-stopped
     command: >
       run

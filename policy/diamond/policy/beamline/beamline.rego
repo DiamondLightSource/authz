@@ -24,6 +24,9 @@ user_beamlines contains beamline if {
 	some beamline in object.keys(data.diamond.data.beamlines)
 }
 
+# Service accounts only: a token that also names a user (fedid) is judged on
+# that user's own permissions, never on its beamline claim.
 user_beamlines contains token.claims.beamline if {
+	not token.claims.fedid
 	token.claims.beamline in object.keys(data.diamond.data.beamlines)
 }
