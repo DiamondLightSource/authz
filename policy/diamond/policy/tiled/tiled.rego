@@ -53,7 +53,7 @@ _session(p) := data.diamond.data.proposals[format_int(p, 10)].sessions[format_in
 # description: |
 #   The access tag for a beamline, the top level of the beamline, proposal
 #   and session tree.
-beamline_tag(bl) := sprintf("beamline:%s", [bl])
+beamline_tag(bl) := $"beamline:{bl}"
 
 # METADATA
 # title: Proposal Tag
@@ -61,7 +61,7 @@ beamline_tag(bl) := sprintf("beamline:%s", [bl])
 #   The access tag for a proposal. It names the beamline above it as well,
 #   so that one flat membership check can match a node at any level of the
 #   tree. `p` is always the bare proposal number.
-proposal_tag(bl, p) := sprintf("beamline:%s,proposal:%s", [bl, format_int(p, 10)])
+proposal_tag(bl, p) := $"beamline:{bl},proposal:{format_int(p, 10)}"
 
 # METADATA
 # title: Session Tag
@@ -78,7 +78,7 @@ session_tag(bl, p, v) := sprintf("beamline:%s,proposal:%s,session:%s-%d", [bl, f
 #   what is under it. tiled matches tags exactly, so this is a separate tag
 #   from the grant `t`: a session member gets the visible tags of the
 #   proposal and beamline above them, never their grant tags.
-visible_tag(t) := concat("", ["visible:", t])
+visible_tag(t) := $"visible:{t}"
 
 # METADATA
 # title: Node Tags

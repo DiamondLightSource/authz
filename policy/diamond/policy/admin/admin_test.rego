@@ -53,11 +53,11 @@ test_is_admin_for_beamline_admin_not_admin if {
 }
 
 test_beamline_admin_for_subject_for_non_beamline_admin if {
-	not "alice" in admin.beamline_admin_for_subject with data.diamond.data as diamond_data
+	not admin.beamline_admin_for_subject.alice with data.diamond.data as diamond_data
 }
 
 test_beamline_admin_for_subject_for_admin if {
-	not "carol" in admin.beamline_admin_for_subject with data.diamond.data as diamond_data
+	not admin.beamline_admin_for_subject.carol with data.diamond.data as diamond_data
 }
 
 test_admin_rule_for_admin if {
