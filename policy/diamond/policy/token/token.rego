@@ -6,7 +6,7 @@ issuer := opa.runtime().env.ISSUER
 
 jwks_endpoint := jwks_endpoint if {
 	metadata := http.send({
-		"url": concat("", [issuer, "/.well-known/openid-configuration"]),
+		"url": $"{issuer}/.well-known/openid-configuration",
 		"method": "GET",
 		"force_cache": true,
 		"force_cache_duration_seconds": 86400,

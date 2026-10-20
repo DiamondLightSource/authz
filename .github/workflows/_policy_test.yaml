@@ -13,7 +13,7 @@ jobs:
       - name: Setup OPA
         uses: open-policy-agent/setup-opa@v2.2.0
         with:
-          version: latest
+          version: 1.21.2
 
       - name: Test
         run: opa test ./policy -v

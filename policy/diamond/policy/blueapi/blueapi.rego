@@ -1,6 +1,5 @@
 package diamond.policy.blueapi
 
-import data.diamond.policy.admin
 import data.diamond.policy.session
 import data.diamond.policy.token
 

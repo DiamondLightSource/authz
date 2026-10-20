@@ -96,3 +96,12 @@ test_user_beamlines_service_account_bad_beamline_claim if {
 	beamline.user_beamlines == set() with data.diamond.policy.token.claims as {"beamline": "area-51-beamline"}
 		with data.diamond.data as diamond_data
 }
+
+# A beamline claim only counts for service accounts; a named user keeps their
+# own beamlines whatever the token's beamline claim says.
+test_user_beamlines_named_user_ignores_beamline_claim if {
+	beamline.user_beamlines == set() with data.diamond.policy.token.claims as {"fedid": "alice", "beamline": "b07"}
+		with data.diamond.data as diamond_data
+	beamline.user_beamlines == {"b07"} with data.diamond.policy.token.claims as {"fedid": "bob", "beamline": "i03"}
+		with data.diamond.data as diamond_data
+}
