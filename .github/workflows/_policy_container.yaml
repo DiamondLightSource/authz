@@ -38,7 +38,7 @@ jobs:
 
       - name: Setup ORAS
         if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@v2
 
       - name: Publish OPA Bundle
         if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
